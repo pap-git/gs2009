@@ -17,6 +17,9 @@ const gs2009_version = pjson.version
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const __sDpath = fs.readFileSync(__dirname + '/sponsored/dictionary.json');
+let sponsoredDictionary = JSON.parse(__sDpath.toString())
+
 var port = 3000;
 var gs_api = "";
 var gs_engineID = "";
@@ -27,6 +30,8 @@ var yt2009address = "";
 var only_old = false;
 var only_old_date = "2010-03-20";
 var serverlanguage = "en";
+var sponsoredLinksEnabled = false;
+var enabletopItem = false;
 
 function reloadconfig(){
     console.log("[INFO] Reloading config...")
@@ -60,7 +65,9 @@ function reloadconfig(){
             YT2009_ADDRESS: "",
 
             ONLY_OLD: false,
-            ONLY_OLD_DATE: only_old_date
+            ONLY_OLD_DATE: only_old_date,
+
+            ENABLE_INCOMPLETED_FEATURES: false
         }
         console.log(JsonTemp)
         fs.writeFileSync('config.json', JSON.stringify(JsonTemp));
@@ -99,6 +106,11 @@ function reloadconfig(){
     console.log("[CONFIG] serverlanguage <= " + config.LANGUAGE)
     port = config.PORT
     console.log("[CONFIG] port <= " + config.PORT)
+    // dev only !!! change when features can be merged to main branch
+    sponsoredLinksEnabled = config.ENABLE_INCOMPLETED_FEATURES;
+    console.log("[CONFIG] sponsoredLinksEnabled <= " + config.ENABLE_INCOMPLETED_FEATURES)
+    enabletopItem = config.ENABLE_INCOMPLETED_FEATURES;
+    console.log("[CONFIG] enabletopItem <= " + config.ENABLE_INCOMPLETED_FEATURES)
 
     if (gs_api == "") {
         console.log("[WARN] Custom Search API (API_KEY) is not set correctly! PLease see /gs2009settings")
@@ -131,14 +143,28 @@ let template_search_EOM = path.join(__dirname, "/template/" + serverlanguage + "
 
 let template_did_you_mean = path.join(__dirname, "/template/" + serverlanguage + "/search/did_you_mean.txt"); // ext_t_dym
 
+let template_sponsored_table = path.join(__dirname, "/template/" + serverlanguage + "/search/sponsored_table.txt"); // ext_t_s_sp_t
+let template_sponsored_item = path.join(__dirname, "/template/sponsored_item.txt"); // ext_t_s_sp_i
+let template_search_time = path.join(__dirname, "/template/" + serverlanguage + "/search/time.txt"); // ext_t_s_t
+
 let ext_t_g_u = fs.readFileSync(template_gbar_user, "utf8")
 console.log("[INFO] loaded template (template_gbar_user)")
 let ext_t_g_u_i = fs.readFileSync(template_gbar_user_index, "utf8")
 console.log("[INFO] loaded template (template_gbar_user_index)")
 let ext_t_g_u_l = fs.readFileSync(template_gbar_user_logged, "utf8")
 console.log("[INFO] loaded template (template_gbar_user_logged)")
+
 let ext_t_dym = fs.readFileSync(template_did_you_mean, "utf8")
 console.log("[INFO] loaded template (template_did_you_mean)")
+
+let ext_t_s_sp_t = fs.readFileSync(template_sponsored_table, "utf8")
+console.log("[INFO] loaded template (template_sponsored_table)")
+
+let ext_t_s_sp_i = fs.readFileSync(template_sponsored_item, "utf8")
+console.log("[INFO] loaded template (template_sponsored_item)")
+
+let ext_t_s_t = fs.readFileSync(template_search_time, "utf8")
+console.log("[INFO] loaded template (template_search_time)")
 
 function reloadtemplate(){
 
@@ -152,6 +178,10 @@ function reloadtemplate(){
 
     template_did_you_mean = path.join(__dirname, "/template/" + serverlanguage + "/search/did_you_mean.txt"); // ext_t_dym
 
+    template_sponsored_table = path.join(__dirname, "/template/" + serverlanguage + "/search/sponsored_table.txt"); // ext_t_s_sp_t
+    template_sponsored_item = path.join(__dirname, "/template/sponsored_item.txt"); // ext_t_s_sp_i
+    template_search_time = path.join(__dirname, "/template/" + serverlanguage + "/search/time.txt"); // ext_t_s_t
+
     ext_t_g_u = fs.readFileSync(template_gbar_user, "utf8")
     console.log("[INFO] reloaded template (template_gbar_user)")
     ext_t_g_u_i = fs.readFileSync(template_gbar_user_index, "utf8")
@@ -159,7 +189,13 @@ function reloadtemplate(){
     ext_t_g_u_l = fs.readFileSync(template_gbar_user_logged, "utf8")
     console.log("[INFO] reloaded template (template_gbar_user_logged)")
     ext_t_dym = fs.readFileSync(template_did_you_mean, "utf8")
-    console.log("[INFO] loaded template (template_did_you_mean)")
+    console.log("[INFO] reloaded template (template_did_you_mean)")
+    ext_t_s_sp_t = fs.readFileSync(template_sponsored_table, "utf8")
+    console.log("[INFO] reloaded template (template_sponsored_table)")
+    ext_t_s_sp_i = fs.readFileSync(template_sponsored_item, "utf8")
+    console.log("[INFO] reloaded template (template_sponsored_item)")
+    ext_t_s_t = fs.readFileSync(template_search_time, "utf8")
+    console.log("[INFO] reloaded template (template_search_time)")
     console.log("[INFO] reloaded all template/template paths")
 }
 
@@ -215,8 +251,8 @@ app.use(cookie());
 app.use(express.static('public'));
 
 app.listen(port, () => {
-    console.log(`[INFO] Server started at port ${port} in ` + Date());
-});
+    console.log(`[INFO] Server started at port ${port} in ` + Date())
+})
 
 app.get('/setprefs', (req, res) => {
     console.log("a")
@@ -261,7 +297,9 @@ app.get('/setprefs', (req, res) => {
         YT2009_ADDRESS: req.query.yt2009addr,
 
         ONLY_OLD: onlyold_temp,
-        ONLY_OLD_DATE: req.query.onlyolddate
+        ONLY_OLD_DATE: req.query.onlyolddate,
+
+        ENABLE_INCOMPLETED_FEATURES: req.query.enableincomp
     }
 
     console.log(JsonTemp)
@@ -302,6 +340,13 @@ app.get('/images/firefox/firefox35_v1.png', (req, res) => {
 
 app.get('/images/firefox/sprite2.png', (req, res) => {
     fs.readFile('./assets/images/firefox/sprite2.png', (err, data) => {
+      res.type('png');
+      res.send(data);
+    });
+})
+
+app.get('/chart/clock.png', (req, res) => {
+    fs.readFile('./assets/images/chart/clock.png', (err, data) => {
       res.type('png');
       res.send(data);
     });
@@ -551,7 +596,7 @@ app.get('/gs2009settings', (req, res) => {
         repl = repl.replace("yt2009addr-replace-this", yt2009address)
 
         if (toHTTP == true) {
-            repl = repl.replace(/p value=1/, "p value=1 checked")
+            repl = repl.replace(/redirhttp value=1/, "redirhttp value=1 checked")
         }
 
         if (only_old == true) {
@@ -559,6 +604,12 @@ app.get('/gs2009settings', (req, res) => {
         }
 
         repl = repl.replace("onlyolddate-replace-this", only_old_date)
+
+        if (sponsoredLinksEnabled == true && enabletopItem == true) {
+            repl = repl.replace(/enableincomp value=1/, "enableincomp value=1 checked")
+        }
+
+
         repl = repl.replace("VersionNumber", gs2009_version)
 
         res.send(repl)
@@ -788,7 +839,67 @@ app.get('/search', async (req, res) => {
             repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
         }
 
+        let reg = "";
+        let isMatch = false;
+        let matchedWord = "";
+
+        try {
+            if (result.data.spelling.correctedQuery != undefined) {
+                reg = new RegExp(result.data.spelling.correctedQuery, "i")
+            }
+        } catch {
+            reg = new RegExp(actualq, "i")
+        }
+        Object.values(sponsoredDictionary.dictionary).forEach((content, i) => {
+            content.forEach(word => {
+                if (isMatch == true) {
+                    return
+                }
+                
+                if (word.match(reg)){
+                    isMatch = true
+                    matchedWord = Object.keys(sponsoredDictionary.dictionary)[i]
+                }
+            })
+        });
+        if (isMatch == true) {
+            if (matchedWord == "Time") {
+                if (enabletopItem == true) {
+                    repl = repl.replace("topItem", ext_t_s_t)
+                }
+            }
+        }
         
+        if (sponsoredLinksEnabled == true) {
+            if (isMatch == true) {
+                try {
+                    const links = JSON.parse(fs.readFileSync(path.join(__dirname, "/sponsored/" + serverlanguage + "/links/" + matchedWord + ".json"), "utf8").toString())
+                    let sponsoredItem_count = "";
+                    links.items.forEach((item) => {
+                        sponsoredItem_count = sponsoredItem_count + "sponsoredItem"
+                    })
+                    repl = repl.replace("sponsoredTemplate", ext_t_s_sp_t)
+                    repl = repl.replace("sponsoredItem", sponsoredItem_count)
+                    repl = repl.replace(/sponsoredItem/g, ext_t_s_sp_i)
+
+                    links.items.forEach((item) => {
+                        repl = repl.replace("SponsoredTitle", item.SponsoredTitle)
+                        repl = repl.replace("SponsoredDescription", item.SponsoredDescription)
+                        repl = repl.replace("SponsoredLinkHtml", item.SponsoredLinkHtml)
+                        console.log(item.SponsoredLinkHtml)
+                        repl = repl.replace("SponsoredLink", item.SponsoredLink)
+                    })
+                } catch {
+                    console.log("[INFO] 'sponsored' ads assets not found for the word \"" + matchedWord + "\"")
+                    repl = repl.replace("sponsoredTemplate", "")
+                }
+            } else {
+                repl = repl.replace("sponsoredTemplate", "")
+            }
+
+        } else {
+            repl = repl.replace("sponsoredTemplate", "")
+        }
         
         if (only_old == true) {
             repl = repl.replace(/query/g, actualq)
@@ -1039,7 +1150,7 @@ app.get('/search', async (req, res) => {
         repl = repl.replace(/topItem/g, "")
         console.log("[INFO] search: Sending replaced result")
         
-        console.log("result: ", result);
+        // console.log("result: ", result);
         console.log()
         if (serverlanguage == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')

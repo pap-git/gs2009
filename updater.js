@@ -3,7 +3,7 @@ import os from 'os';
 
 const config = {
     repository: 'https://github.com/pap-git/gs2009',
-    branch: 'main',
+    branch: 'dev',
     tempLocation: os.tmpdir()
 }
 

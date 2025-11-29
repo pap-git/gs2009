@@ -1,0 +1,10 @@
+<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em">
+  <tr>
+    <td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">Sponsored Links</h2>
+    <ol onmouseover="return true" class="nobr">
+      sponsoredItem
+    </ol>
+    <p>&nbsp;
+    <tr>
+  <td id="rhspad">
+</table>

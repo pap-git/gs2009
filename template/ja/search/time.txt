@@ -1,0 +1,1 @@
+<div class="e"><table border="0" cellpadding="0" cellspacing="0"><tr><td width="47" valign="top"><img border="0" width="40" height="30" valign="middle" src="/chart/clock.png" alt="Clock"></td><td valign="middle"><b>7:23am</b> Friday (JST) - <b>Time</b> in <b>Japan</b></td></tr></table></div>
