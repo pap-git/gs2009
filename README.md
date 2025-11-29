@@ -1,10 +1,3 @@
-> [!CAUTION]
-> <h3>THIS IS NOT MAIN BRANCH!!!!!!!!!!!!!!</h3>
-> <b>you might encounter the bug than ever before</b> ok thx
-
-> [!NOTE]
-> you can enable incompleted features from /gs2009settings
-
 <h5 align="center">
 <nobr>
 <img width="384" height="288" alt="image" src="https://github.com/user-attachments/assets/f2825850-07a9-4fb3-bf2e-26ec7d69bf4f" />
