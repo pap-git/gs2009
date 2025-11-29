@@ -252,7 +252,7 @@ app.use(express.static('public'));
 
 app.listen(port, () => {
     console.log(`[INFO] Server started at port ${port} in ` + Date())
-})
+});
 
 app.get('/setprefs', (req, res) => {
     console.log("a")
