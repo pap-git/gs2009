@@ -450,6 +450,20 @@ app.get('/intl/ja/images/logos/accounts_logo.gif', (req, res) => {
     });
 })
 
+app.get('/images/toolbarsmall.gif', (req, res) => {
+    fs.readFile('./assets/images/toolbarsmall.gif', (err, data) => {
+      res.type('gif');
+      res.send(data);
+    });
+})
+
+app.get('/logos/Logo_50wht.gif', (req, res) => {
+    fs.readFile('./assets/logos/Logo_50wht.gif', (err, data) => {
+      res.type('gif');
+      res.send(data);
+    });
+})
+
 app.get('/intl/en/images/logos/accounts_logo.gif', (req, res) => {
     fs.readFile('./assets/images/en/accounts_logo.gif', (err, data) => {
       res.type('gif');
@@ -484,6 +498,50 @@ app.get('/webhp', (req, res) => {
         }
         
         repl = repl.replace(/gbar_username/g, SimLogin)
+        if (serverlanguage == "ja"){
+            let encoded = iconv.encode(repl, 'shift_jis')
+            res.set("Content-Type", "text/html;charset=Shift_JIS")
+            res.send(encoded)
+            return
+        }
+        res.send(repl)
+        
+    } )
+    return
+});
+
+
+app.get('/ie', (req, res) => {
+    console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
+    let SimLogin = req.cookies.SimLogin;
+    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/index.html");
+    fs.readFile(filePath, (err, data) => {
+        let repl = "";
+        
+        if (serverlanguage == "ja") {
+            repl = iconv.decode(data, 'shift_jis')
+        } else {
+            repl = data.toString();
+        }
+
+        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
+            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_i)
+        } else {
+            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
+        }
+        
+        repl = repl.replace(/gbar_username/g, SimLogin)
+
+        console.log(req.query)
+
+        if (req.query.q != "") {
+            if (gs_api == "" || gs_engineID == "") {
+                console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set!")
+                res.send("Please set up the API key and Programmable Search Engine ID before searching.")
+                return
+            }
+        }
+
         if (serverlanguage == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
