@@ -7,7 +7,8 @@ import parseurl from 'parseurl';
 import qs from 'qs';
 import googleapis from 'googleapis';
 import Encoding from 'encoding-japanese';
-import autocomplete from './extern_js/pull_autocomplete.js'
+
+import autocomplete from './backend/pull_autocomplete.js'
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -128,6 +129,8 @@ if (serverlanguage == "jp") {
     serverlanguage = "ja";
 }
 
+// ↓よく考えたらサーバーサイドなのでhl等で変わったときに反映されない
+
 let template_gbar_user = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user.txt"); // ext_t_g_u
 let template_gbar_user_index = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_index.txt"); // ext_t_g_u
 let template_gbar_user_logged = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_logged.txt"); // ext_t_g_u_l
@@ -225,6 +228,26 @@ app.listen(port, () => {
     console.log(`[INFO] Server started at port ${port} in ` + Date());
 });
 
+function throwe(status, message){
+    console.error("[ERROR] GaxiosError:", status);
+    console.error("[ERROR]", message);
+    if (status != "RESOURCE_EXHAUSTED") {
+        const filePath = path.join(__dirname, "/html/error.html");
+        fs.readFile(filePath, (err, data) => {
+            let repl = data.toString();
+            repl = repl.replace(/status/, status)
+            repl = repl.replace(/message/, message)
+            res.send(repl)
+        })
+    } else {
+        const filePath = path.join(__dirname, "/html/quota.html");
+        fs.readFile(filePath, (err, data) => {
+            data = data.toString();
+            res.send(data)
+        })
+    }
+}
+
 app.get('/setprefs', (req, res) => {
     console.log("a")
     if (req.query.yt2009addr == "yt2009addr-replace-this") {
@@ -280,6 +303,9 @@ app.get('/setprefs', (req, res) => {
     reloadtemplate();
     res.redirect('/');
 })
+
+// new-search branchで修正できればする
+// ↓非効率すぎだろ
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
     fs.readFile('./assets/images/ja_jp/logo.gif', (err, data) => {
@@ -511,10 +537,68 @@ app.get('/webhp', (req, res) => {
 });
 
 
-app.get('/ie', (req, res) => {
+app.get('/ie', async (req, res) => {
     console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = req.cookies.SimLogin;
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/index.html");
+    let filePath = "";
+    if (req.query.q != "") {
+        filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/search.html");
+        if (!fs.existsSync(filePath)) { filePath = path.join(__dirname, "/html/en/ie/search.html"); } // fallback
+
+        if (gs_api == "" || gs_engineID == "") {
+            console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set!")
+            res.send("Please set up the API key and Programmable Search Engine ID before searching.")
+            return
+        }
+        var sqparam = qs.parse(parseurl(req).query);
+        if (sqparam.q.includes('%')) {
+            console.log("[INFO] search: maybe Shift-JIS? trying to decode to Unicode")
+            let sjisArray = Encoding.urlDecode(sqparam.q);
+            let unicodeArray = Encoding.convert(sjisArray, { to: 'UNICODE', from: 'SJIS' });
+            query = Encoding.codeToString(unicodeArray);
+        } else {
+            query = sqparam.q;
+        }
+        console.log("[INFO] search: extracted query: " + query)
+
+        if (only_old == true) {
+            console.log("[INFO] search: only_old is enabled, adding before:")
+            actualq = query
+            if (only_old_date == undefined) {
+                query = query + " before:2010-03-21";
+            }
+            query = query + " before:" + only_old_date;
+        }
+
+        if (req.query.hl == "" || req.query.hl == undefined) {
+            hl = serverlanguage;
+        } else {
+            hl = req.query.hl;
+        }
+
+        if (req.query.lr != "" || req.query.lr != undefined) {
+            lr = req.query.lr
+        }
+
+        if (req.query.start != "" || req.query.start != undefined) {
+            start = parseInt(req.query.start) + 1;
+        } else {
+            start = 0;
+        }
+
+        console.log("[INFO] search: waiting for result")
+
+        let result;
+        try {
+            result = await search();
+        } catch(e) {
+            throwe(e.cause.status, e.cause.message);
+            return
+        }
+    } else {
+        filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/index.html");
+        if (!fs.existsSync(filePath)) { filePath = path.join(__dirname, "/html/en/ie/index.html"); } // fallback
+    }
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
@@ -535,11 +619,22 @@ app.get('/ie', (req, res) => {
         console.log(req.query)
 
         if (req.query.q != "") {
-            if (gs_api == "" || gs_engineID == "") {
-                console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set!")
-                res.send("Please set up the API key and Programmable Search Engine ID before searching.")
-                return
+            if (only_old == true) {
+                repl = repl.replace(/query/g, actualq)
+            } else {
+                repl = repl.replace(/query/g, query)
             }
+
+            result.data.items.forEach((item, i) => {
+                const search = [];
+                search.htmlTitle = item.htmlTitle;
+                search.link = item.link;
+                search.htmlFormattedUrl = item.htmlFormattedUrl;
+                search.htmlSnippet = item.htmlSnippet;
+                search.displayLink = item.displayLink;
+
+                
+            })
         }
 
         if (serverlanguage == "ja"){
@@ -765,7 +860,7 @@ app.get('/search', async (req, res) => {
         res.redirect('/');
         return
     }
-    if (sqparam.q.includes('%')) {
+    if (sqparam.q.includes('%')) { // この処理普通にSJIS以外だったら文字化けしない？？
         console.log("[INFO] search: maybe Shift-JIS? trying to decode to Unicode")
         let sjisArray = Encoding.urlDecode(sqparam.q);
         let unicodeArray = Encoding.convert(sjisArray, { to: 'UNICODE', from: 'SJIS' });
@@ -807,23 +902,7 @@ app.get('/search', async (req, res) => {
     try {
         result = await search();
     } catch(e) {
-        console.error("[ERROR] GaxiosError:", e.cause.status);
-        console.error("[ERROR]", e.cause.message);
-        if (e.cause.status != "RESOURCE_EXHAUSTED") {
-            const filePath = path.join(__dirname, "/html/error.html");
-            fs.readFile(filePath, (err, data) => {
-                let repl = data.toString();
-                repl = repl.replace(/status/, e.cause.status)
-                repl = repl.replace(/message/, e.cause.message)
-                res.send(repl)
-            })
-        } else {
-            const filePath = path.join(__dirname, "/html/quota.html");
-            fs.readFile(filePath, (err, data) => {
-                data = data.toString();
-                res.send(data)
-            })
-        }
+        throwe(e.cause.status, e.cause.message);
         return
     }
 
@@ -855,24 +934,12 @@ app.get('/search', async (req, res) => {
         console.log("link alp:" + alp)
         result.data.items.forEach((item, o) => {
             console.log("checking url:", item.displayLink)
-            if (linklist[i] == 0){
-                console.log("no")
-                return
-            }
-            if (o == i) {
-                console.log("no")
-                return
-            }
-            if (typeof linklist[i] !== 'number') {
+            if (linklist[i] == 0 || o == i || typeof linklist[i] !== 'number'){
                 console.log("no")
                 return
             }
             if (link[i] == item.displayLink){
-                if (i <= o) {
-                    console.log("matched???? nah")
-                    return
-                }
-                if (isNaN(linklist[i])){
+                if (i <= o || isNaN(linklist[i])) {
                     console.log("nah")
                     return
                 }
