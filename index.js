@@ -7,7 +7,7 @@ import parseurl from 'parseurl';
 import qs from 'qs';
 import googleapis from 'googleapis';
 import Encoding from 'encoding-japanese';
-import autocomplete from './extern_js/pull_autocomplete.js'
+import autocomplete from './backend/pull_autocomplete.js'
 import * as readline from 'readline-sync'
 
 import { fileURLToPath } from 'url';
