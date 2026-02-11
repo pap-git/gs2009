@@ -7,8 +7,8 @@ import parseurl from 'parseurl';
 import qs from 'qs';
 import googleapis from 'googleapis';
 import Encoding from 'encoding-japanese';
-
-import autocomplete from './backend/pull_autocomplete.js'
+import autocomplete from './extern_js/pull_autocomplete.js'
+import * as readline from 'readline-sync'
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -31,24 +31,28 @@ var only_old_date = "2010-03-20";
 var serverlanguage = "en";
 var searchqueryEnabled = true;
 
-function reloadconfig(){
-    console.log("[INFO] Reloading config...")
-    gs_api = "";
-    gs_engineID = "";
-    toHTTP = false;
-    redirector_only = "none";
+function genconfig(){
     waybackdate = "20100324182056";
-    yt2009address = "";
-    only_old = false;
     only_old_date = "2010-03-20";
-    serverlanguage = "en";
-    searchqueryEnabled = true;
     
     try {
         fs.readFileSync('config.json')
+        console.log("[INFO] config.json already exists")
     } catch(e) {
-        console.error("[ERROR] config.json not found")
-        console.log("[ERROR] regenerating...")
+        console.log("[INFO] generating config")
+        console.log("[INFO]")
+        console.log("[INFO] ===============================================")
+        console.log("[INFO] You will need to get Custom Search API key and Programmable Search Engine ID.")
+        console.log("[INFO] These input fields can be filled empty for now, but you can't search without them for right now.")
+        console.log("[INFO] Key/ID can be obtained from:")
+        console.log("[INFO] API: https://developers.google.com/custom-search/v1/overview")
+        console.log("[INFO] ID : https://programmablesearchengine.google.com/controlpanel/create")
+        console.log("[INFO] ===============================================")
+        console.log("[INFO]")
+        let key = readline.question("[JSON] Custom Search API key: ");
+        gs_api = key;
+        let id = readline.question("[JSON] Programmable Search Engine ID: ");
+        gs_engineID = id;
         const JsonTemp = {
             PORT: "3000",
 
@@ -68,9 +72,28 @@ function reloadconfig(){
 
             SEARCH_QUERY: true
         }
-        console.log(JsonTemp)
         fs.writeFileSync('config.json', JSON.stringify(JsonTemp));
         console.log("[INFO] Generated config.json to " + __dirname + "/config.json")
+    }
+}
+
+function reloadconfig(){
+    console.log("[INFO] Reloading config...")
+    gs_api = "";
+    gs_engineID = "";
+    toHTTP = false;
+    redirector_only = "none";
+    waybackdate = "20100324182056";
+    yt2009address = "";
+    only_old = false;
+    only_old_date = "2010-03-20";
+    serverlanguage = "en";
+    searchqueryEnabled = true;
+    
+    try {
+        fs.readFileSync('config.json')
+    } catch(e) {
+        genconfig()
     }
 
     const configTemp = fs.readFileSync('config.json');
@@ -117,6 +140,11 @@ function reloadconfig(){
 }
 
 reloadconfig()
+
+if (process.argv[2] == "--gen-config") {
+    console.log("[INFO] done")
+    process.exit(0)
+}
 
 const {google} = googleapis;
 const customSearch = google.customsearch("v1");
@@ -308,8 +336,69 @@ app.get('/setprefs', (req, res) => {
 // ↓非効率すぎだろ
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
-    fs.readFile('./assets/images/ja_jp/logo.gif', (err, data) => {
+    let now = new Date
+    let nowmonth = now.getMonth() + 1
+    let tmp = now.getDay()
+    let nowday 
+    if (tmp < 10) {
+        nowday = 0 + tmp.toString()
+    } else {
+        nowday = tmp
+    }
+    let nowdate = nowmonth.toString() + nowday.toString()
+    
+    let logo_path = './assets/images/ja_jp/logo.gif';
+    
+    
+    if (nowdate == "0209") {
+        logo_path = './assets/logos/soseki10-hp.gif'
+    }
+    fs.readFile(logo_path, (err, data) => {
       res.type('gif');
+      res.send(data);
+    });
+})
+
+app.get('/logos/olympics10.png', (req, res) => {
+    let now = new Date
+    let nowmonth = now.getMonth() + 1
+    let tmp = now.getDay()
+    let nowday 
+    if (tmp < 10) {
+        nowday = 0 + tmp.toString()
+    } else {
+        nowday = tmp
+    }
+    let nowdate = nowmonth.toString() + nowday.toString()
+    
+    let logo_path = './assets/images/ja_jp/logo.gif';
+
+    if (nowdate == "0213") {
+        if (serverlanguage == "ja") {
+            logo_path = './assets/logos/olympics10-opening-nr-hp.png'
+        } else {
+            logo_path = './assets/logos/olympics10-opening-hp.png'
+        }
+    } else if (nowdate == "0214" || nowdate == "0215") {
+        logo_path = './assets/logos/olympics10-snowboarding-hp.png'
+    } else if (nowdate == "0216") {
+        logo_path = './assets/logos/olympics10-xcskiing-hp.png'
+    } else if (nowdate == "0217") {
+        logo_path = './assets/logos/olympics10-curling-hp.png'
+    } else if (nowdate == "0218") {
+        logo_path = './assets/logos/olympics10-xcskiiing2-hp.png'
+    } else if (nowdate == "0219" || nowdate == "0220") {
+        logo_path = './assets/logos/olympics10-apskiing-hp.png'
+    } else if (nowdate == "0221") {
+        logo_path = './assets/logos/olympics10-skijump-hp.png'
+    } else if (nowdate == "0222") {
+        logo_path = './assets/logos/olympics10-bobsleigh-hp.png'
+    } else if (nowdate == "0223") {
+        logo_path = './assets/logos/olympics10-icedance-hp.png'
+    }
+
+    fs.readFile(logo_path, (err, data) => {
+      res.type('png');
       res.send(data);
     });
 })
@@ -323,6 +412,13 @@ app.get('/intl/en_ALL/images/logo.gif', (req, res) => {
 
 app.get('/images/nav_logo3.png', (req, res) => {
     fs.readFile('./assets/images/nav_logo3.png', (err, data) => {
+      res.type('png');
+      res.send(data);
+    });
+})
+
+app.get('/logos/olympics10-bg.jpg', (req, res) => {
+    fs.readFile('./assets/logos/olympics10-bg.jpg', (err, data) => {
       res.type('png');
       res.send(data);
     });
@@ -523,6 +619,7 @@ app.get('/webhp', (req, res) => {
             repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
         }
         
+        repl = repl.replace(/message/g, "")
         repl = repl.replace(/gbar_username/g, SimLogin)
         if (serverlanguage == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
@@ -714,7 +811,23 @@ app.get('/imghp', (req, res) => {
 app.get('/', (req, res) => {
     console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = req.cookies.SimLogin;
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+
+    let now = new Date
+    let nowmonth = now.getMonth() + 1
+    let tmp = now.getDay()
+
+    let filePath
+
+    if (nowmonth == 2){
+        if (tmp >= 12 && tmp <= 23) {
+            filePath = path.join(__dirname, "/html/" + serverlanguage + "/index-olympics10.html");
+        } else {
+            filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+        }
+    } else {
+        filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+    }
+        
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
@@ -729,7 +842,30 @@ app.get('/', (req, res) => {
         } else {
             repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
         }
+
+        let messagelist = JSON.parse(fs.readFileSync('./assets/messages/' + serverlanguage + '.json', 'utf8'))
+
+        let now = new Date
+        let nowmonth = now.getMonth() + 1
+        let tmp = now.getDay()
+        let nowday 
+        if (tmp < 10) {
+            nowday = 0 + tmp.toString()
+        } else {
+            nowday = tmp
+        }
+        let nowdate = nowmonth.toString() + nowday.toString()
+        let message;
+
+        messagelist.messages.forEach(item => {
+            if (nowdate.toString() == item.date) {
+                message = item.message
+            }
+        })
+        repl = repl.replace(/message/g, message)
+        repl = repl.replace(/message/g, "")
         
+        repl = repl.replace(/undefined/g, "")
         repl = repl.replace(/gbar_username/g, SimLogin)
         if (serverlanguage == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')

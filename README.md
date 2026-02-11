@@ -24,7 +24,7 @@
 
 ## Usage
 ### Initialize
-1. Install [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/). (tested on node 18.19.1/24.11.1, npm 11.6.2/9.2.0)
+1. Install [Node.js](https://nodejs.org/), [npm](https://www.npmjs.com/) and **git**. (tested on node 18.19.1/24.11.1, npm 11.6.2/9.2.0)
 2. **Clone the repository with `git clone https://github.com/pap-git/gs2009`**, then `npm install` (if need, `npm audit fix`)
 3. `npm start` or `node index.js`
 4. It will automatically generates config.json, and runs server at PORT 3000 by default.
@@ -33,7 +33,7 @@
 `npm start` or `node index.js`
 ### Updating the server
 1. Stop the server if any gs2009 instance running in machine
-2. `npm update` or `npm updater.json`
+2. `npm update` or `node updater.js`
 
 **Before version `1.1.20251124` (Updating to latest)**
 1. Copy `config.json` to somewhere
