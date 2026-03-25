@@ -638,7 +638,8 @@ app.get('/ie', async (req, res) => {
     console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = req.cookies.SimLogin;
     let filePath = "";
-    if (req.query.q != "") {
+
+    if (req.query.q != undefined) {
         filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/search.html");
         if (!fs.existsSync(filePath)) { filePath = path.join(__dirname, "/html/en/ie/search.html"); } // fallback
 
@@ -715,7 +716,7 @@ app.get('/ie', async (req, res) => {
 
         console.log(req.query)
 
-        if (req.query.q != "") {
+        if (req.query.q != undefined) {
             if (only_old == true) {
                 repl = repl.replace(/query/g, actualq)
             } else {
@@ -991,7 +992,7 @@ app.get('/search', async (req, res) => {
     const startTime = Date.now();
     let nowTime = 0;
     var sqparam = qs.parse(parseurl(req).query);
-    if (sqparam.q == "") {
+    if (sqparam.q == undefined || sqparam.q == "") {
         console.log("[INFO] search: query was empty, redirecting to /")
         res.redirect('/');
         return
