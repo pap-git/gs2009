@@ -167,12 +167,28 @@
                     <img alt="" height=1 width=2>
                 </td>
                 <td width=175 nowrap valign=top>&nbsp;
-                    <br>&nbsp;<h2>API Key/CSE ID</h2>
+                    <br>&nbsp;<h2>Engine</h2>
                 </td>
                 <td colspan=2>
                     <br>
                     <font size=-1 face=arial,sans-serif>
-                        Please put your Custom Search API key and your CSE ID below:
+                        Select the API to use.
+                    </font>
+                    <div style="margin-bottom:1.2em;font:smaller arial,sans-serif;">
+                        <input id=searxng type=radio name=engine value="searxng">
+                        <label for=on>SearXNG Search API (requires JSON format available on API)</label>
+                        <br>
+                        <input id=cse type=radio name=engine value="cse">
+                        <label for=nor>Custom Search JSON API <b>(not recommended)</b></label>
+                    </div>
+                    <font size=-1 face=arial,sans-serif>
+                        <b>SearXNG instance URL:&nbsp;&nbsp;</b>
+                        <input id=searxng_url name=searxng_url value="searxng_url-replace-this">
+                        <br>
+                        Do not include "/" after the URL (orr would break)
+                        <br>
+                        <br>
+                        <b>Custom Search API Settings</b>
                         <br>
                         <br>
                         <b>Custom Search API:&nbsp;&nbsp;</b>
