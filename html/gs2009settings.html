@@ -167,12 +167,28 @@
                     <img alt="" height=1 width=2>
                 </td>
                 <td width=175 nowrap valign=top>&nbsp;
-                    <br>&nbsp;<h2>API Key/CSE ID</h2>
+                    <br>&nbsp;<h2>Engine</h2>
                 </td>
                 <td colspan=2>
                     <br>
                     <font size=-1 face=arial,sans-serif>
-                        Please put your Custom Search API key and your CSE ID below:
+                        Select the API to use.
+                    </font>
+                    <div style="margin-bottom:1.2em;font:smaller arial,sans-serif;">
+                        <input id=searxng type=radio name=engine value="searxng">
+                        <label for=on>SearXNG Search API (requires JSON format available on API)</label>
+                        <br>
+                        <input id=cse type=radio name=engine value="cse">
+                        <label for=nor>Custom Search JSON API <b>(not recommended)</b></label>
+                    </div>
+                    <font size=-1 face=arial,sans-serif>
+                        <b>SearXNG instance URL:&nbsp;&nbsp;</b>
+                        <input id=searxng_url name=searxng_url value="searxng_url-replace-this">
+                        <br>
+                        Do not include "/" after the URL (orr would break)
+                        <br>
+                        <br>
+                        <b>Custom Search API Settings</b>
                         <br>
                         <br>
                         <b>Custom Search API:&nbsp;&nbsp;</b>
@@ -301,7 +317,7 @@
                         <input id=rdh type=checkbox name=redirhttp value=1>
                         &nbsp; 
                         <label for=rdh><b>Replace HTTPS link with HTTP link.</b>
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For older browsers/Proxies that doesn't support HTTPS.</label>
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For older browsers/Proxies that doesn't support HTTPS.</label>
                     </font>
                     <br>&nbsp;
                 </td>
@@ -329,6 +345,28 @@
                         <br>
                             <br>
                             Format must be like: 'YYYY-MM-DD', otherwise the default will be used (2010-03-21)
+                    </font>
+                    <br>&nbsp;
+                </td>
+            </tr>
+        <table width=100% cellpadding=0 cellspacing=0 border=0>
+            <tr>
+                <tr>
+                    <td colspan=4 bgcolor=#cbdced><img alt="" height=1 width=1></td>
+                </tr>
+            </tr>
+            <tr>
+                <td width=1 bgcolor=#cbdced><img alt="" height=1 width=2></td>
+                <td valign=top width=175 nowrap>&nbsp;<br>&nbsp;<h2>Search Results</h2>
+                    <a name=safeui>&nbsp;</a>
+                </td>
+                <td>&nbsp;
+                    <br>
+                    <font size=-1 face=arial,sans-serif>
+                        <input id=esq type=checkbox name=enablesq value=1>
+                        &nbsp; 
+                        <label for=esq><b>Enable Search query</b></label>
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Enables Search query at home page.</label>
                     </font>
                     <br>&nbsp;
                 </td>
