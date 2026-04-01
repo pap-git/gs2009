@@ -44,7 +44,6 @@ export default async function searxngfetch(searchIP, isHTTPS, query, start, lr) 
     try {
         const result = await fetch(url)
         const json = await result.json();
-        console.log(json)
         if (result.ok == false) {
             console.log(url)
             throw new Error("omg look at the status code you did it wrong: " + result.status)

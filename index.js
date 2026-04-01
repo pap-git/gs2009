@@ -694,6 +694,7 @@ app.get('/ie', async (req, res) => {
     console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = req.cookies.SimLogin;
     let filePath = "";
+    let result;
 
     if (req.query.q != undefined) {
         filePath = path.join(__dirname, "/html/" + serverlanguage + "/ie/search.html");
@@ -741,8 +742,6 @@ app.get('/ie', async (req, res) => {
         }
 
         console.log("[INFO] search: waiting for result")
-
-        let result;
         try {
             result = await search();
         } catch(e) {
@@ -770,15 +769,14 @@ app.get('/ie', async (req, res) => {
         
         repl = repl.replace(/gbar_username/g, SimLogin)
 
-        console.log(req.query)
-
-        if (req.query.q != undefined) {
+        if (query != undefined) {
             if (only_old == true) {
                 repl = repl.replace(/query/g, actualq)
             } else {
                 repl = repl.replace(/query/g, query)
             }
 
+            let lastnum;
             result.data.items.forEach((item, i) => {
                 const search = [];
                 search.htmlTitle = item.htmlTitle;
@@ -787,8 +785,17 @@ app.get('/ie', async (req, res) => {
                 search.htmlSnippet = item.htmlSnippet;
                 search.displayLink = item.displayLink;
 
-                
+                repl = repl.replace(/ItemNum/, i + 1)
+                repl = repl.replace(/htmlTitle/, search.htmlTitle)
+                repl = repl.replace(/link/, search.link)
+
+                lastnum = i + 1;
             })
+
+            if (repl.match(/ItemNum\./) || repl.match(/htmlTitle/)) {
+                repl = repl.replace(/ItemNum\./, "")
+                repl = repl.replace(/htmlTitle/, "")
+            }
         }
 
         if (serverlanguage == "ja"){
@@ -884,9 +891,10 @@ app.get('/ie', async (req, res) => {
         
         repl = repl.replace(/gbar_username/g, SimLogin)
 
-        console.log(req.query)
+        console.log(req.query.q)
 
-        if (req.query.q != undefined) {
+        if (req.q != undefined) {
+            console.log("hi")
             if (only_old == true) {
                 repl = repl.replace(/query/g, actualq)
             } else {
@@ -901,7 +909,7 @@ app.get('/ie', async (req, res) => {
                 search.htmlSnippet = item.htmlSnippet;
                 search.displayLink = item.displayLink;
 
-                
+                repl = repl.replace(/ItemNum\./, i)
             })
         }
 
