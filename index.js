@@ -1,4 +1,4 @@
-import fs from "fs"
+import fs, { readFileSync } from "fs"
 import iconv from 'iconv-lite'
 import path from "path"
 import express from "express"
@@ -10,9 +10,12 @@ import Encoding from 'encoding-japanese';
 import autocomplete from './extern_js/pull_autocomplete.js'
 import * as readline from 'readline-sync'
 import searxngfetch from './backend/searx-api-hit.js'
-
+import cfg from "./backend/cfg.js";
+import { log } from "./backend/scripts/things.js"
+import strings from "./backend/strings.js"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import tempf from "./backend/template.js"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -20,201 +23,51 @@ const gs2009_version = pjson.version
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-var publicinstance = false;
-var settingspage = true;
+var config = cfg.template
 
-var port = 3000;
-var searchengine = "cse";
-
-var searxng_url = "";
 var searxng_ishttps = false;
 var searxng_eg = false;
-console.log(searxng_eg)
 
-var gs_api = "";
-var gs_engineID = "";
-
-var toHTTP = false;
-var redirector_only = "none";
-var waybackdate = "20100324182056";
-var yt2009address = "";
+var redirector_only = "none"; // keeping this shit for a while its so messy here
 var only_old = false;
 var only_old_date = "2010-03-20";
 var serverlanguage = "en";
 var searchqueryEnabled = true;
 
-function genconfig(){
-    waybackdate = "20100324182056";
-    only_old_date = "2010-03-20";
-    
-    try {
-        fs.readFileSync('config.json')
-        console.log("[INFO] config.json already exists")
-    } catch(e) {
-        console.log("[INFO] generating config")
-        console.log("[INFO]")
-        console.log("[INFO] ===============================================")
-        console.log("[INFO] Configure your instance via /gs2009settings or config.json!")
-        console.log("[INFO]")
-        console.log("[INFO] Before running your gs2009 instance, You'll need the")
-        console.log("[INFO] either SearXNG instance or Custom Search JSON API!")
-        console.log("[INFO]")
-        console.log("[INFO] If you wish to use the SearXNG instance, You need to configure")
-        console.log("[INFO] your instance to be able to use json format via Search API.")
-        console.log("[INFO]")
-        console.log("[INFO] If you wish to use the Custom Search JSON API, You need the")
-        console.log("[INFO] API key that is already generated before Google restricts")
-        console.log("[INFO] the generating API key.")
-        console.log("[INFO] Since Google deprecated Custom Search JSON API, You can't")
-        console.log("[INFO] use the new API key for this project, which will cause")
-        console.log("[INFO] ACCESS_DENIED error when searching.")
-        console.log("[INFO]")
-        console.log("[INFO] Key/ID can be obtained from:")
-        console.log("[INFO] API: https://developers.google.com/custom-search/v1/overview")
-        console.log("[INFO] ID : https://programmablesearchengine.google.com/controlpanel/create")
-        console.log("[INFO] ===============================================")
-        console.log("[INFO]")
-        /*
-        let key = readline.question("[JSON] Custom Search API key: ");
-        gs_api = key;
-        let id = readline.question("[JSON] Programmable Search Engine ID: ");
-        gs_engineID = id;
-        */
-        const JsonTemp = {
-            ENABLE_SERVER_SETTINGS_PAGE: false,
+async function reloadconfig(){
+    let tag = "cfg"
+    log.i(strings.cfg.reload, "init")
 
-            PORT: "3000",
+    config = cfg.template
+    if (!cfg.exists()) await cfg.gen()
 
-            LANGUAGE: "en",
+    const file = readFileSync("config.json")
 
-            ENGINE: "cse",
-            SEARXNG_URL: "",
-            SEARXNG_ISHTTPS: false,
-            SEARXNG_USEOTHERENGINE: false,
+    if (cfg.isOld(file)) {
+        log.w("old config found, backing up before convert", "config-conversion")
+        fs.writeFileSync("config.old.json", readFileSync("config.json"))
+        fs.writeFileSync("config.json", JSON.stringify(cfg.convertOld(JSON.parse(file))))
+        log.w("config converted to new format, Please check your config is matched with your previous one", "config-conversion")
+    }
 
-            API_KEY: "",
-            CSE_ID: "",
+    config = JSON.parse(readFileSync("config.json"))
 
-            REDIRECTOR_OPTION: "none",
-            REDIRECT_HTTP: false,
-
-            WAYBACKDATE: waybackdate,
-            YT2009_ADDRESS: "",
-
-            ONLY_OLD: false,
-            ONLY_OLD_DATE: only_old_date,
-
-            SEARCH_QUERY: true
+    if (config.backend.engine.type == "cse") {
+        if (config.backend.engine.config.cse.api_key == "") {
+            log.w("Custom Search API (backend.engine.config.cse.api_key) is not set correctly! PLease see /gs2009settings")
         }
-        fs.writeFileSync('config.json', JSON.stringify(JsonTemp));
-        console.log("[INFO] Generated config.json to " + __dirname + "/config.json")
-    }
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function reloadconfig(){
-    console.log("[INFO] Reloading config...")
-
-    searchengine = "cse";
-    searxng_url = "";
-    searxng_ishttps = false;
-    searxng_eg = false;
-
-    gs_api = "";
-    gs_engineID = "";
-    toHTTP = false;
-    redirector_only = "none";
-    waybackdate = "20100324182056";
-    yt2009address = "";
-    only_old = false;
-    only_old_date = "2010-03-20";
-    serverlanguage = "en";
-    searchqueryEnabled = true;
-
-    settingspage = true;
-    
-    try {
-        fs.readFileSync('config.json')
-    } catch(e) {
-        genconfig()
-    }
-
-    const configTemp = fs.readFileSync('config.json');
-
-    const config = JSON.parse(configTemp.toString())
-
-    searchengine = config.ENGINE
-    console.log("[CONFIG] searchengine <= " + config.ENGINE)
-
-    searxng_url = config.SEARXNG_URL
-    console.log("[CONFIG] searxng_url <= " + config.SEARXNG_URL)
-    searxng_ishttps = config.SEARXNG_ISHTTPS
-    console.log("[CONFIG] searxng_ishttps <= " + config.SEARXNG_ISHTTPS)
-    searxng_eg = config.SEARXNG_USEOTHERENGINE
-    console.log("[CONFIG] searxng_eg <= " + config.SEARXNG_USEOTHERENGINE)
-
-    gs_api = config.API_KEY
-    if (gs_api == "") {
-        console.log("[CONFIG] gs_api <= \"\"")
-    } else {
-        console.log("[CONFIG] gs_api <= [api key]")
-    }
-    gs_engineID = config.CSE_ID
-    if (gs_api == "") {
-        console.log("[CONFIG] gs_engineID <= \"\"")
-    } else {
-        console.log("[CONFIG] gs_engineID <= [cse id]")
-    }
-    toHTTP = config.REDIRECT_HTTP
-    console.log("[CONFIG] toHTTP <= " + config.REDIRECT_HTTP)
-    redirector_only = config.REDIRECTOR_OPTION
-    console.log("[CONFIG] redirector_only <= " + config.REDIRECTOR_OPTION)
-    waybackdate = config.WAYBACKDATE
-    console.log("[CONFIG] waybackdate <= " + config.WAYBACKDATE)
-    yt2009address = config.YT2009_ADDRESS
-    console.log("[CONFIG] yt2009address <= " + config.YT2009_ADDRESS)
-    only_old = config.ONLY_OLD
-    console.log("[CONFIG] only_old <= " + config.ONLY_OLD)
-    only_old_date = config.ONLY_OLD_DATE
-    console.log("[CONFIG] only_old_date <= " + config.ONLY_OLD_DATE)
-    serverlanguage = config.LANGUAGE
-    console.log("[CONFIG] serverlanguage <= " + config.LANGUAGE)
-    port = config.PORT
-    console.log("[CONFIG] port <= " + config.PORT)
-    searchqueryEnabled = config.SEARCH_QUERY
-    console.log("[CONFIG] searchqueryEnabled <= " + config.SEARCH_QUERY)
-    settingspage = config.ENABLE_SERVER_SETTINGS_PAGE
-
-    if (searchengine =="cse") {
-        if (gs_api == "") {
-            console.log("[WARN] Custom Search API (API_KEY) is not set correctly! PLease see /gs2009settings")
-        }
-        if (gs_engineID == "") {
-            console.log("[WARN] Search Engine ID (CSE_ID) is not set correctly! PLease see /gs2009settings")
+        if (config.backend.engine.config.cse.cse_id == "") {
+            log.w("Search Engine ID (backend.engine.config.cse.cse_id) is not set correctly! PLease see /gs2009settings")
         }
     }
 }
 
-reloadconfig()
-
-if (process.argv[2] == "--gen-config") {
-    console.log("[INFO] done")
-    process.exit(0)
-}
+await reloadconfig()
 
 const {google} = googleapis;
 const customSearch = google.customsearch("v1");
 
 const app = express();
-
-if (serverlanguage == "jp") {
-    console.log("[WARN] redirecting jp to ja")
-    console.log("[CONFIG] serverlanguage <= ja")
-    serverlanguage = "ja";
-}
 
 let template_gbar_user = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user.txt"); // ext_t_g_u
 let template_gbar_user_index = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_index.txt"); // ext_t_g_u
@@ -276,7 +129,6 @@ let SimLogin = [];
 // im using the google search example from here v (thx for og author)
 
 async function search(event) {
-
     if (isNaN(start) == true) {
         start = 0;
     }
@@ -285,20 +137,20 @@ async function search(event) {
 
     let result;
 
-    if (searchengine == "searxng") {
+    if (config.backend.engine.type == "searxng") {
         let temp_searxng_ishttps
-        if (searxng_url.match(/https:\/\//) || searxng_url.match(/http:\/\//)) {
+        if (config.backend.engine.config.searxng.match(/https:\/\//) || config.backend.engine.config.searxng.match(/http:\/\//)) {
             temp_searxng_ishttps = searxng_ishttps
             searxng_ishttps = undefined
         }
-            result = await searxngfetch(searxng_url, searxng_ishttps, searxng_eg, query, lr, start)
+            result = await searxngfetch(config.backend.engine.config.searxng, searxng_ishttps, searxng_eg, query, lr, start)
         searxng_ishttps = temp_searxng_ishttps
     } else {
         result = await customSearch.cse.list({
 
-            auth: gs_api,
+            auth: config.backend.engine.config.cse.api_key,
 
-            cx: gs_engineID,
+            cx: config.backend.engine.config.cse.cse_id,
 
             q: query,
 
@@ -317,13 +169,21 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-
 app.use(cookie());
-
 app.use(express.static('public'));
 
-app.listen(port, () => {
-    console.log(`[INFO] Server started at port ${port} in ` + Date());
+app.use(async (req, res, next) => {
+    // for some of server like in the issue #18 
+    if (Array.from(req.url)[0] + Array.from(req.url)[1] == "//") {
+        req.url = req.url.slice(1)
+    }
+
+    if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
+    next()
+})
+
+app.listen(config.server.port, () => {
+    log.i(`Server started at port ${config.server.port} in ` + Date());
 });
 
 app.get('/setprefs', (req, res) => {
@@ -331,7 +191,7 @@ app.get('/setprefs', (req, res) => {
         return
     }
 
-    if (settingspage == false) {
+    if (config.server.enableServerSettingsPage == false) {
         res.send("This feature is disabled due to settings page is disabled.<br>Please contact your administrator to change the settings.")
         return
     }
@@ -381,7 +241,6 @@ app.get('/setprefs', (req, res) => {
         REDIRECTOR_OPTION: redir_temp,
         REDIRECT_HTTP: redirhttp_temp,
 
-        WAYBACKDATE: req.query.waybackdate,
         YT2009_ADDRESS: req.query.yt2009addr,
 
         ONLY_OLD: onlyold_temp,
@@ -400,26 +259,19 @@ app.get('/setprefs', (req, res) => {
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
     let now = new Date
-    let nowmonth = now.getMonth() + 1
-    let tmp = now.getDay()
-    let nowday 
-    if (tmp < 10) {
-        nowday = 0 + tmp.toString()
-    } else {
-        nowday = tmp
+    let nowdate = (now.getMonth() + 1) + (now.getDay() < 10 ? 0 + now.getDay().toString() : now.getDay())
+    
+    let logo_path;
+
+    switch(nowdate){
+        case "0209":
+            logo_path = './assets/logos/soseki10-hp.gif'
+        default:
+            logo_path = './assets/images/ja_jp/logo.gif';
     }
-    let nowdate = nowmonth.toString() + nowday.toString()
-    
-    let logo_path = './assets/images/ja_jp/logo.gif';
-    
-    
-    if (nowdate == "0209") {
-        logo_path = './assets/logos/soseki10-hp.gif'
-    }
-    fs.readFile(logo_path, (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
+
+    res.type("gif")
+    res.send(fs.readFileSync(logo_path))
 })
 
 app.get('/logos/olympics10.png', (req, res) => {
@@ -589,8 +441,7 @@ app.get('/images/logo_sm.gif', (req, res) => {
 })
 
 app.get('/generate_204'), ((req, res) => {
-    res.status(204);
-    res.send("");
+    res.status(204).send("");
 })
 
 app.get('/accounts/msh.gif', (req, res) => {
@@ -648,39 +499,6 @@ app.get('/favicon.ico', (req, res) => {
       res.send(data);
     });
 })
-
-app.get('/webhp', (req, res) => {
-    // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
-    let SimLogin = req.cookies.SimLogin;
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
-    fs.readFile(filePath, (err, data) => {
-        let repl = "";
-        
-        if (serverlanguage == "ja") {
-            repl = iconv.decode(data, 'shift_jis')
-        } else {
-            repl = data.toString();
-        }
-
-        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_i)
-        } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
-        }
-        
-        repl = repl.replace(/message/g, "")
-        repl = repl.replace(/gbar_username/g, SimLogin)
-        if (serverlanguage == "ja"){
-            let encoded = iconv.encode(repl, 'shift_jis')
-            res.set("Content-Type", "text/html;charset=Shift_JIS")
-            res.send(encoded)
-            return
-        }
-        res.send(repl)
-        
-    } )
-    return
-});
 
 app.get('/notepad', (req, res) => {
     const filePath = path.join(__dirname, "/html/eggs/notepad.html");
@@ -829,7 +647,7 @@ app.get('/', (req, res) => {
 
 
 app.get('/gs2009settings', (req, res) => {
-    if (settingspage == false) {
+    if (config.server.enableServerSettingsPage == false) {
         res.send("This feature is disabled due to settings page is disabled.<br>Please contact your administrator to change the settings.")
         return
     }
@@ -838,50 +656,50 @@ app.get('/gs2009settings', (req, res) => {
         let repl;
         repl = data.toString();
 
-        if (searchengine == "cse") {
+        if (config.backend.engine.type == "cse") {
             repl = repl.replace(/cse"/, "cse\" checked")
         } else {
             repl = repl.replace(/searxng"/, "searxng\" checked")
         }
 
-        if (searxng_url == undefined) {
+        if (config.backend.engine.config.searxng == undefined) {
             repl = repl.replace("searxng_url-replace-this", "")
         } else {
-            repl = repl.replace("searxng_url-replace-this", searxng_url)
+            repl = repl.replace("searxng_url-replace-this", config.backend.engine.config.searxng)
         }
 
         if (searxng_eg == true) {
             repl = repl.replace(/searxng_eg value=1/, "searxng_eg value=1 checked")
         }
 
-        repl = repl.replace("api-key-replace-this", gs_api)
-        repl = repl.replace("cse-id-replace-this", gs_engineID)
+        repl = repl.replace("api-key-replace-this", config.backend.engine.config.cse.api_key)
+        repl = repl.replace("cse-id-replace-this", config.backend.engine.config.cse.cse_id)
         repl = repl.replace("value=" + serverlanguage, "value=" + serverlanguage + " selected")
 
         repl = repl.replace(/wayback" checked/, "wayback\"")
 
-        if (redirector_only = "none") {
+        if (!config.frontend.default.redirect.enabled.includes("wayback") && !config.frontend.default.redirect.enabled.includes("yt2009")) {
             repl = repl.replace(/off"/, "off\" checked")
-        } else if (redirector_only = "wayback") {
+        } else if (config.frontend.default.redirect.enabled.includes("wayback") && !config.frontend.default.redirect.enabled.includes("yt2009")) {
             repl = repl.replace(/wayback"/, "wayback\" checked")
-        } else if (redirector_only = "yt2009") {
-            if (yt2009address == "") {
+        } else if (!config.frontend.default.redirect.enabled.includes("wayback") && config.frontend.default.redirect.enabled.includes("yt2009")) {
+            if (config.frontend.default.redirect.properties.yt2009_url == "") {
                 repl = repl.replace(/off"/, "off\" checked")
             } else {
                 repl = repl.replace(/yt2009"/, "yt2009\" checked")
             }
-        } else if (redirector_only == "both") {
-            if (yt2009address == "") {
+        } else if (config.frontend.default.redirect.enabled.includes("wayback") && config.frontend.default.redirect.enabled.includes("yt2009")) {
+            if (config.frontend.default.redirect.properties.yt2009_url == "") {
                 repl = repl.replace(/wayback"/, "wayback\" checked")
             } else {
                 repl = repl.replace(/on"/, "on\" checked")
             }
         }
 
-        repl = repl.replace("waybackdate-replace-this", waybackdate)
-        repl = repl.replace("yt2009addr-replace-this", yt2009address)
+        repl = repl.replace("waybackdate-replace-this", config.frontend.default.redirect.properties.wayback_date)
+        repl = repl.replace("yt2009addr-replace-this", config.frontend.default.redirect.properties.yt2009_url)
 
-        if (toHTTP == true) {
+        if (config.frontend.default.redirect.enabled.includes("http") == true) {
             repl = repl.replace(/p value=1/, "p value=1 checked")
         }
 
@@ -945,6 +763,28 @@ app.post('/accounts/LoginAuth', (req, res) => {
     res.redirect('/');
 })
 
+app.get('/setCookie', (req, res) => {
+    const userlogin = {
+        "email": "paphere124@hotmail.com",
+        "auth": ""
+    }
+    const usersettings = {
+        "language": "en",
+        "searchQuery": false,
+        "before": {
+            "enabled": true,
+            "date": "2010-01-24"
+        },
+        "redirect": {
+            "enabled": ["wayback", "yt2009", "http"],
+            "properties": {
+                "wayback_date": 20100324182056,
+                "yt2009_url": ""
+            }
+        }
+    }
+})
+
 app.get('/clearcookies', (req, res) => {
     res.clearCookie('SimLogin');
     res.redirect('/');
@@ -952,18 +792,21 @@ app.get('/clearcookies', (req, res) => {
 
 app.get('/search', async (req, res) => {
     console.log("[INFO] search: got an /search GET")
-    if (searchengine == "cse") {
-        if (gs_api == "" || gs_engineID == "") {
-            console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set! redirecting to /gs2009settings")
-            res.redirect("/gs2009settings")
-            return
-        }
-    } else if (searchengine == "searxng") {
-        if (searxng_url == "" || searxng_url == undefined) {
-            console.log("[WARN] search: SearXNG Search API selected but API URL is not set on config! redirecting to /gs2009settings")
-            res.redirect("/gs2009settings")
-            return
-        }
+    switch (config.backend.engine.type) {
+        case "cse":
+            if (config.backend.engine.config.cse.api_key == "" || config.backend.engine.config.cse.cse_id == "") {
+                console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set! redirecting to /gs2009settings")
+                res.redirect("/gs2009settings")
+                return
+            }
+            break;
+        case "searxng":
+            if (config.backend.engine.config.searxng == "" || config.backend.engine.config.searxng == undefined) {
+                console.log("[WARN] search: SearXNG Search API selected but API URL is not set on config! redirecting to /gs2009settings")
+                res.redirect("/gs2009settings")
+                return
+            }
+            break;
     }
     const startTime = Date.now();
     let nowTime = 0;
@@ -1015,7 +858,7 @@ app.get('/search', async (req, res) => {
     try {
         result = await search();
     } catch(e) {
-        if (searchengine == "cse") {
+        if (config.backend.engine.type == "cse") {
             console.error("[ERROR] GaxiosError:", e.cause.status);
             console.error("[ERROR]", e.cause.message);
             if (e.cause.status != "RESOURCE_EXHAUSTED") {
@@ -1207,7 +1050,7 @@ app.get('/search', async (req, res) => {
         })
 
         repl = repl.replace(/htmlTitle/, result.data.items[0].htmlTitle)
-        if (toHTTP == true) {
+        if (config.frontend.default.redirect.enabled.includes("http") == true) {
             result.data.items[0].link = result.data.items[0].link.replace("https://", "http://")
         }
 
@@ -1227,33 +1070,33 @@ app.get('/search', async (req, res) => {
         if (redirector == true) {
             let waybacklink
             if (redirector_only == "yt2009") {
-                if (yt2009address == undefined) {
+                if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
                     return
                 }
 
-                search.link = search.link.replace("www.youtube.com", yt2009address)
-                search.link = search.link.replace("youtube.com", yt2009address)
+                search.link = search.link.replace("www.youtube.com", config.frontend.default.redirect.properties.yt2009_url)
+                search.link = search.link.replace("youtube.com", config.frontend.default.redirect.properties.yt2009_url)
             } else if (redirector_only == "wayback") {
-                if (waybackdate == undefined) {
+                if (config.frontend.default.redirect.properties.wayback_date == undefined) {
                     waybacklink = "http://web.archive.org/web/20100324182056/"
                 } else {
-                    waybacklink = "http://web.archive.org/web/" + waybackdate + "/"
+                    waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
                 }
                 search.link = search.link.replace("http://", waybacklink)
                 search.link = search.link.replace("https://", waybacklink)
             } else if (redirector_only == "none") {
             } else if (redirector_only == "both") {
-                if (waybackdate == undefined) {
+                if (config.frontend.default.redirect.properties.wayback_date == undefined) {
                     waybacklink = "http://web.archive.org/web/20100324182056/"
                 } else {
-                    waybacklink = "http://web.archive.org/web/" + waybackdate + "/"
+                    waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
                 }
                 search.link = search.link.replace("http://", waybacklink)
                 search.link = search.link.replace("https://", waybacklink)
 
-                if (yt2009address == undefined) {
+                if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
                 } else {
-                    let yt2009link = "http://" + yt2009address;
+                    let yt2009link = "http://" + config.frontend.default.redirect.properties.yt2009_url;
                     let ytlink0 = waybacklink + "https://www.youtube.com"
                     let ytlink1 = waybacklink + "http://www.youtube.com"
                     let ytlink2 = waybacklink + "www.youtube.com"
@@ -1299,38 +1142,38 @@ app.get('/search', async (req, res) => {
             }
             
             repl = repl.replace(/htmlTitle/, search.htmlTitle)
-            if (toHTTP == true) {
+            if (config.frontend.default.redirect.enabled.includes("http") == true) {
                 search.link = search.link.replace("https://", "http://")
             }
             if (redirector == true) {
                 let waybacklink
                 if (redirector_only == "yt2009") {
-                    if (yt2009address == undefined) {
+                    if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
                         return
                     }
-                    search.link = search.link.replace("www.youtube.com", yt2009address)
-                    search.link = search.link.replace("youtube.com", yt2009address)
+                    search.link = search.link.replace("www.youtube.com", config.frontend.default.redirect.properties.yt2009_url)
+                    search.link = search.link.replace("youtube.com", config.frontend.default.redirect.properties.yt2009_url)
                 } else if (redirector_only == "wayback") {
-                    if (waybackdate == undefined) {
+                    if (config.frontend.default.redirect.properties.wayback_date == undefined) {
                         waybacklink = "http://web.archive.org/web/20100324182056/"
                     } else {
-                        waybacklink = "http://web.archive.org/web/" + waybackdate + "/"
+                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
                     }
                     search.link = search.link.replace("http://", waybacklink)
                     search.link = search.link.replace("https://", waybacklink)
                 } else if (redirector_only == "none") {
                 } else if (redirector_only == "both") {
-                    if (waybackdate == undefined) {
+                    if (config.frontend.default.redirect.properties.wayback_date == undefined) {
                         waybacklink = "http://web.archive.org/web/20100324182056/"
                     } else {
-                        waybacklink = "http://web.archive.org/web/" + waybackdate + "/"
+                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
                     }
                     search.link = search.link.replace("http://", waybacklink)
                     search.link = search.link.replace("https://", waybacklink)
 
-                    if (yt2009address == undefined) {
+                    if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
                     } else {
-                        let yt2009link = "http://" + yt2009address;
+                        let yt2009link = "http://" + config.frontend.default.redirect.properties.yt2009_url;
                         let ytlink0 = waybacklink + "https://www.youtube.com"
                         let ytlink1 = waybacklink + "http://www.youtube.com"
                         let ytlink2 = waybacklink + "www.youtube.com"
@@ -1427,11 +1270,6 @@ app.get('/search', async (req, res) => {
         repl = repl.replace(/gbar_username/g, SimLogin)
         repl = repl.replace(/topItem/g, "")
         console.log("[INFO] search: Sending replaced result")
-        
-        /*
-        console.log("result: ", result);
-        console.log()
-        */
         if (serverlanguage == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")

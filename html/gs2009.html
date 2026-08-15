@@ -1,0 +1,1040 @@
+<!-- 
+Content-type: fix-mhtml
+
+ -->
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+  <!-- Grabbed from Google Desktop -->
+  <title>gs2009 Preferences</title>
+  <meta http-equiv=content-type content="text/html; charset=utf-8">
+  <style>
+    body {
+      margin-left: 2em;
+      margin-right: 2em;
+      font-family: arial, sans-serif;
+      color: #000;
+      background-color: #fff;
+    }
+
+    a:active {
+      color: #f00
+    }
+
+    a:visited {
+      color: #551a8b
+    }
+
+    a:link {
+      color: #00c
+    }
+
+    a.c:active {
+      color: #ff0000
+    }
+
+    a.c:visited {
+      color: #7777cc
+    }
+
+    a.c:link {
+      color: #7777cc
+    }
+
+    .b {
+      font-weight: bold
+    }
+
+    .shaded-header {
+      background-color: #CCE5ED;
+      border-top: 1px solid #39c;
+      margin: 0px;
+      padding: 0px
+    }
+
+    .shaded-subheader {
+      background-color: #CCE5ED;
+      margin: 12px 0px 0px 0px;
+      padding: 0px
+    }
+
+    .plain-subheader {
+      background-color: #fff;
+      margin: 12px 0px 0px 0px;
+      padding: 0px
+    }
+
+    .header-element {
+      margin: 0px;
+      padding: 2px
+    }
+
+    .expand {
+      width: 98%
+    }
+
+    .s {
+      font-size: smaller
+    }
+
+    .notice {
+      font-size: smaller;
+      color: red;
+      font-weight: bold
+    }
+
+    .prefgroup {
+      width: 100%
+    }
+
+    .phead {
+      font-weight: bold;
+      font-size: smaller;
+      vertical-align: top;
+      border-bottom: 2px solid #CCE5ED;
+      margin: 0px;
+      padding: 16px 8px 16px 8px
+    }
+
+    .pbody {
+      border-bottom: 2px solid #CCE5ED;
+      margin: 0px;
+      padding: 16px 8px 16px 8px
+    }
+
+    .pref-last {
+      border-bottom: 0px
+    }
+
+    .example {
+      color: gray;
+      font-family: monospace;
+    }
+
+    .q a:visited,
+    .q a:link,
+    .q a:active,
+    .q {
+      color: #00c;
+    }
+
+    .pref_all {
+      background-color: #CCE5ED;
+      margin: 10px 0 10px 0;
+      padding: 4px 4px 4px 4px;
+      width: 100%;
+    }
+
+    .pref_tabs {
+      font-size: smaller;
+      margin: 0 0 0 0;
+      padding: 0 0 0 0;
+      border: none;
+      width: 100%;
+    }
+
+    .pref_content {
+      background-color: #ffffff;
+      margin: 0 0 0 0;
+      width: 100%;
+    }
+
+    .tab {
+      width: 1px;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      margin: 0 0 0 0;
+      padding: .2em .8em .4em .8em;
+    }
+
+    .tab a:visited {
+      font-color: #00c;
+    }
+
+    .tab_selected {
+      width: 1px;
+      background-color: #ffffff;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      margin: 0 0 0 0;
+      padding: .2em .8em .4em .8em;
+    }
+
+    table.data {
+      border: 1px solid #E0E0E0;
+      width: 80%;
+    }
+
+    table.data td {
+      border-bottom: 1px solid #E0E0E0;
+      padding: 2px 4px 2px 4px;
+    }
+
+    table.data td.action {
+      background-color: #E0E0E0;
+    }
+
+    table.data td.action input {
+      font-size: .9em;
+    }
+
+    table.data td.last {
+      border: none;
+    }
+
+    table.data th {
+      font-weight: bold;
+      text-align: left;
+      border-bottom: 1px solid #E0E0E0;
+      padding: 2px 4px 2px 4px;
+      background-color: #E8E8E8;
+    }
+
+    .detail {
+      color: #008800
+    }
+
+    .error {
+      border: 1px solid #ff0033;
+    }
+
+    td.qf {
+      padding-top: 10px;
+    }
+
+    ul {
+      margin-top: 0
+    }
+
+    #whitelistTABLE,
+    #blacklistTABLE,
+    #policywhitelistTABLE,
+    {
+    margin: 0px 0px 0px 15px;
+    }
+  </style>
+  <script>
+    var kDeleteString = 'Delete'; var GDSPrefs_ID_BLACKLIST = "BLACKLIST"; var GDSPrefs_ID_WHITELIST = "WHITELIST"; var GDSPrefs_ID_POLICYWHITELIST = "POLICYWHITELIST"; var GDSPrefs_HTTP = "http://"; var GDSPrefs_PATHS = "-PATHS"; var kErrorMsgUnsupportedBrowser = 'This browser does not support this feature. Supported browsers include Firefox and Internet Explorer.'; var kInvalidString = 'INVALID'; var GDS_FOLDER = "folder"; var GDS_FILE = "file"; function GDS_openFolderBrowser(type, other) { doHttp((type == GDS_FOLDER) ? "/folderchooser&s=UkJl_whL3bT4dliSec10qicQi0Y" : "/filechooser&s=hqENDqJs-aFBbKH1uO_prAkiozI", null, { 'If-Modified-Since': 'Wed, 15 Nov 1995 04:58 GMT' }, null, function (r) { GDS_openFolderBrowserHandler(r.responseText, other); }, function (r) { if (r == null) { alert(kErrorMsgUnsupportedBrowser); } else { alert("Error " + r.status + ": " + r.statusText); } }); } function GDS_openFolderBrowserHandler(response, id) { if (response != kInvalidString) { response = response.substring(10); response = response.replace("&", "&amp;"); var strings = response.split("*"); if (strings.length > 0) GDSPrefs_handleFilePathAddition(strings[0], id); } } function GDS_HtmlEncode(text) { encoded = text.replace("&", "&amp;"); encoded = encoded.replace("<", "&lt;"); encoded = encoded.replace(">", "&gt;"); return encoded; } function GDS_HtmlDecodeWithoutAmpersand(text) { decoded = text.replace("&gt;", ">"); decoded = decoded.replace("&lt;", "<"); return decoded; } function GDSPrefs_createCrawlsLists() { GDSPrefs_updateCrawlsList(GDSPrefs_ID_BLACKLIST); GDSPrefs_updateCrawlsList(GDSPrefs_ID_WHITELIST); return true; } function GDSPrefs_updateCrawlsList(id) { var tbody = document.getElementById(id); var crawls = document.getElementById(id + GDSPrefs_PATHS); var str = []; for (var i = 0; i < tbody.rows.length; ++i) { str[str.length] = GDS_HtmlDecodeWithoutAmpersand(tbody.rows[i].cells[0].innerHTML) + "|"; } crawls.value = str.join(""); } function GDSPrefs_showTable(id, show) { var tbody = document.getElementById(id); var table = tbody.parentNode; if (show) { table.style.display = ""; } else { table.style.display = "none"; } } function GDSPrefs_initBlacklist() { var jsData = new Array(); var list = document.getElementById(GDSPrefs_ID_BLACKLIST); GDSPrefs_showTable(GDSPrefs_ID_BLACKLIST, jsData.length > 0); for (var i = 0; i < jsData.length; ++i) { GDSPrefs_insertNewItem(list, jsData[i].path, "", GDSPrefs_ID_BLACKLIST); } } function GDSPrefs_initWhitelist() { var jsData = new Array(); var list = document.getElementById(GDSPrefs_ID_WHITELIST); GDSPrefs_showTable(GDSPrefs_ID_WHITELIST, jsData.length > 0); for (var i = 0; i < jsData.length; ++i) { GDSPrefs_insertNewItem(list, jsData[i].path, jsData[i].status, GDSPrefs_ID_WHITELIST); } } function GDSPrefs_initPolicyWhitelist() { var jsData = new Array(); var list = document.getElementById(GDSPrefs_ID_POLICYWHITELIST); GDSPrefs_showTable(GDSPrefs_ID_POLICYWHITELIST, jsData.length > 0); for (var i = 0; i < jsData.length; ++i) { GDSPrefs_insertNewItem(list, jsData[i].path, jsData[i].status, GDSPrefs_ID_POLICYWHITELIST); } } function GDSPrefs_handleTextboxAddition(elem, id) { var text_box = document.getElementById(elem); GDSPrefs_handleFilePathAddition(GDS_HtmlEncode(text_box.value), id); text_box.value = GDSPrefs_HTTP; return false; } function GDSPrefs_handleFilePathAddition(path, id) { if (path === "" || path == GDSPrefs_HTTP) { return false; } var select = document.getElementById(id); var status = (id == GDSPrefs_ID_WHITELIST) ? "&nbsp;" : ""; GDSPrefs_insertNewItem(select, path, status, id); GDSPrefs_showTable(id, true); return false; } function GDSPrefs_handleRemoval(id, index) { var tbody = document.getElementById(id); for (var i = index + 1; i < tbody.rows.length; ++i) { var tr = tbody.rows[i]; var last = tr.cells.length - 1; if (last >= 0) { tr.cells[last].innerHTML = "<a href='#DELETE' onclick='GDSPrefs_handleRemoval(\"" + id + "\"," + (i - 1) + ")'>" + kDeleteString + "</a>"; } } tbody.deleteRow(index); GDSPrefs_showTable(id, tbody.rows.length > 0); return false; } function GDSPrefs_insertTD(tr, index, html) { var td = tr.insertCell(index); td.innerHTML = html; return td; } function GDSPrefs_insertNewItem(tbody, path, status, id) { var tr = tbody.insertRow(tbody.rows.length); GDSPrefs_insertTD(tr, tr.cells.length, path); if (status !== "") { GDSPrefs_insertTD(tr, tr.cells.length, status); } if (id != GDSPrefs_ID_POLICYWHITELIST) { GDSPrefs_insertTD(tr, tr.cells.length, "<a href='#DELETE' onclick='GDSPrefs_handleRemoval(\"" + id + "\"," + (tbody.rows.length - 1) + ")'>" + kDeleteString + "</a>"); } return tr; }
+    var gCachedXmlHttpRequestVersion = null; function getHttpRequest() { var req = null; if (gCachedXmlHttpRequestVersion) { req = new ActiveXObject(gCachedXmlHttpRequestVersion); } else { var versions = ["MSXML2.XMLHTTP", "Microsoft.XMLHTTP", "Msxml2.XMLHTTP.7.0", "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.5.0", "Msxml2.XMLHTTP.4.0", "MSXML2.XMLHTTP.3.0"]; for (var i = 0; i < versions.length; i++) { try { req = new ActiveXObject(versions[i]); if (req) { gCachedXmlHttpRequestVersion = versions[i]; break; } } catch (ignored) { } } } if (req == null) { if (typeof XMLHttpRequest != 'undefined') { req = new XMLHttpRequest(); } } return req; } function doHttp(url, opt_verb, opt_headers, opt_body, opt_OkCallback, opt_ErrorCallback) { var req = getHttpRequest(); if (req == null) { if (opt_ErrorCallback) { opt_ErrorCallback(null); } else { } return; } req.onreadystatechange = function () { if (req.readyState == 4) { if (req.status == 200) { if (opt_OkCallback) { opt_OkCallback(req); } } else { if (opt_ErrorCallback) { opt_ErrorCallback(req); } else { } } delete req.onreadystatechange; } }; var action = "GET"; if (opt_verb) { action = opt_verb; } req.open(action, url, true); if (opt_headers) { for (var header in opt_headers) { req.setRequestHeader(header, opt_headers[header]); } } req.send(opt_body); }
+  </script>
+  <script>
+    <!--
+    function fnOnClickAll() {for (var i = 0; i < document.langform.lr.length; i++) {
+    document.langform.lr[i].checked = false;}}
+    function fnOnClickSome() {
+    var count = 0;for (var i = 0; i < document.langform.lr.length; i++) {
+    if (document.langform.lr[i].checked) {count++;}}
+    document.langform.lang[0].checked = (count <= 0);
+    document.langform.lang[1].checked = (count > 0);}
+    
+    var is_vista = (navigator.userAgent.indexOf("Windows NT 6.0") > -1);
+    var g_gd_idx_check_box = null;
+    
+    function initialize() {
+      document.getElementById("table_pref_all").style.display = "";
+      document.getElementById("span_save_message").style.display = "";
+    
+      goToTab(0);
+      gs = new GoogleAccountDocElement();
+      checkOffice();
+      checkEmail();
+      GDSPrefs_updateAccount();
+      checkHTTPS();
+      checkZip();
+      checkPDF();
+      GDSPrefs_initWhitelist();
+      GDSPrefs_initPolicyWhitelist();
+      GDSPrefs_initBlacklist();
+      initQSB();
+      checkQSB();
+      checkFastStart();
+      checkGdIdx();
+      updateDbLeftCheckboxStatus();
+      g_gd_idx_check_box = (is_vista) ? document.getElementById("ENABLE_GD_INDEX_VISTA") :
+        document.getElementById("ENABLE_GD_INDEX_XP");
+      var idx_head = document.getElementById("idx_head");
+      if (idx_head) {
+        idx_head.innerHTML = (is_vista) ? document.getElementById("vista_idx_head").innerHTML :
+          document.getElementById("xp_idx_head").innerHTML;
+      }
+    }
+    function blockEnter(evt) {
+      evt = (evt) ? evt : event;
+      var charCode = (evt.charCode) ? evt.charCode :
+        ((evt.which) ? evt.which : evt.keyCode);
+      return (charCode == 13 || charCode == 3);
+    }
+    function addOnEnter(evt) {
+      var enter = blockEnter(evt);
+      if (enter) { // enter pressed
+        GDSPrefs_handleTextboxAddition("BlacklistText", "BLACKLIST");
+      }
+      return enter;
+    }
+    function checkEmail() {
+      var em = document.getElementById("h3");
+      var g = document.getElementById("USEGMAIL");
+      var p = document.getElementById("POLICYGMAIL");
+      if (!(em.checked) || p.value == 1) {
+        g.disabled = 1;
+      }
+      else {
+        g.disabled = 0;
+      }
+    }
+    function goToTab(index) {
+      if (index >= 4) {index = 0;}
+      for (var i = 0; i < 4 ; i++) {
+        document.getElementById("HTAB_" + i).className = (i == index) ? "tab_selected" : "tab q";
+        document.getElementById("TAB_" + i).style.display = (i == index) ? "" : "none";
+      }
+      document.getElementById("tab").value = index;
+    
+      content_index = document.getElementById("ENABLE_GD_INDEX_VISTA").checked ||
+        document.getElementById("ENABLE_GD_INDEX_XP").checked;
+    
+      if (index > 1 || content_index) {
+        showCurtain(false);
+      } else {
+        showCurtain(true);
+      }
+    }
+    function delDb() {
+      if (confirm("Are you sure you want to delete the database?")) {
+        doHttp("/deldb&s=3x-66bijJfYL1qSG4AMs9GQ1PXs", null, null, null,
+          function(r) { alert("Database deleted"); },
+          function(r) { alert("Error deleting the database"); });
+      }
+    }
+    function initQSB() {
+      qsb_images = {};
+      qsb_images.with_fast_start = new Image();
+      qsb_images.without_fast_start = new Image();
+      if (qsb_images.with_fast_start && qsb_images.without_fast_start) {
+        qsb_images.with_fast_start.src = "http://desktop.google.com/images/pref_faststart.png";
+        qsb_images.without_fast_start.src = "http://desktop.google.com/images/pref_qsb.png";
+      }
+    }
+    function checkQSB() {
+      var qsb = document.getElementById("qsb");
+      handleSearchBox(qsb.checked || !document.getElementById("DISPLAYNONE").checked);
+    }
+    function checkFastStart() {
+      var fast_start_show = document.getElementById("fast_start_show");
+      if (fast_start_show.checked) {
+        document.images["qsimg"].src = qsb_images.with_fast_start.src;
+      } else {
+        document.images["qsimg"].src = qsb_images.without_fast_start.src;
+      }
+    }
+    function getAbsPos(e) {
+      var x = y = 0;
+      if (e.offsetParent) {
+        x = e.offsetLeft;
+        y = e.offsetTop;
+        while (e = e.offsetParent) {
+          x += e.offsetLeft;
+          y += e.offsetTop;
+        }
+      }
+      return [x, y];
+    }
+    function showCurtain(show) {
+      var c = document.getElementById("curtain");
+      if (show) {
+        resizeCurtain();
+        c.style.display = "";
+      } else {
+        c.style.display = "none";
+      }
+    }
+    function resizeCurtain() {
+      var first;
+    
+      if (document.getElementById("tab").value == 0) {
+        first = document.getElementById("first_cell");
+      }
+      if (document.getElementById("tab").value == 1) {
+        first = document.getElementById("first_account_cell");
+      }
+    
+      if (document.getElementById("tab").value <= 1) {
+        var c = document.getElementById("curtain");
+        var last = document.getElementById("last_cell");
+        var fpos = getAbsPos(first);
+        var lpos = getAbsPos(last);
+        c.style.left = fpos[0] + "px";
+        c.style.top = fpos[1] + "px";
+        c.style.width = (lpos[0] + last.offsetWidth - fpos[0] - 5) + "px";
+        c.style.height = (lpos[1] - fpos[1] - 5) + "px";
+      }
+    }
+    function checkGdIdx() {
+      content_index = document.getElementById("ENABLE_GD_INDEX_VISTA").checked ||
+        document.getElementById("ENABLE_GD_INDEX_XP").checked;
+    
+      if (document.getElementById("tab").value > 1 || content_index) {
+        showCurtain(false);
+      } else {
+        showCurtain(true);
+      }
+      
+      var msg = document.getElementById("need_gd_idx_for_ga");
+      if (msg) {
+        if (content_index) {
+          msg.style.display = "none";
+        } else {
+          msg.style.display = "";
+        }
+      }
+    }
+    function enableGdIdx(enable) {
+      if (g_gd_idx_check_box)
+        g_gd_idx_check_box.checked = enable;
+      checkGdIdx();
+    }
+    window.onresize=resizeCurtain;
+    // -->
+  </script>
+</head>
+
+<body onload="initialize()">
+  <div id=curtain
+    style="position:absolute;display:none;background:white;filter:alpha(opacity=70);-moz-opacity:.70;opacity:.70;">
+    &nbsp;</div>
+  <table cellspacing=2 cellpadding=0 width="100%" border=0>
+    <tr>
+      <td valign=top width="1%"><a href="/">
+          <img alt="Go to Google Desktop" src="logo3.png" border=0></a></td>
+      <td>&nbsp;</td>
+      <td style="white-space: nowrap">
+        <table class="shaded-header">
+          <tr>
+            <td class="header-element b expand">Preferences</td>
+            <td class="header-element s" style="white-space: nowrap">
+              <a href="http://desktop.google.com/en/preferences_help.html">
+                <nobr>Preferences Help</nobr>
+              </a>
+            </td>
+          </tr>
+        </table>
+    </tr>
+  </table>
+
+  <!-- If scripting is not enabled, this page won't work.  Display an error
+     message to the user -->
+  <noscript>
+    <br />
+    <center>
+      <p><span style="width: 29em;">
+          <font color="#ff6600">
+            <b>Your browser security settings prevent Google Desktop from displaying your preferences.</b>
+          </font>
+      </p>
+    </center>
+    <br />
+  </noscript>
+
+  <!-- Moved form after noscript because in xhtml transitional 1.0 it is illegal
+     to put a noscript element inside a form -->
+  <form name=prefs onsubmit="return GDSPrefs_createCrawlsLists() && GDSPrefs_checkAccountBeforeSubmit();"
+    action="/setprefs&s=-TQnZwNrc5rBmEWgJWLTalaQNCc" method=post><input name=url
+      value="%2F%26s%3D2Akja7U8sdZl%5Fb3LrRO7XCxMXuc" type=hidden>
+
+    <div id=clear_ssd_confirm style="display:none"><br>
+      <table cellpadding=5 align=center>
+        <tr>
+          <td><b>
+              <font color=#ff6600>
+                <center>&nbsp;Your request has been sent.&nbsp;
+            </b></center>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <span class="s"><br></span> <span class="s" id="span_save_message" style="display:none"><b>Save</b> your preferences when finished. Changes apply to Google Desktop.</span>
+    <table class="pref_all" border="0" id="table_pref_all" style="display:none">
+      <tr>
+        <td colspan=2>
+
+          <!-- TABS -->
+          <input type="hidden" name="tab" ID=tab>
+          <table id="HTABS" class="pref_tabs" cellspacing="0" cellpadding="0" border="0">
+            <tr>
+              <td id="HTAB_0" class="tab_selected"><a href="javascript:void(0)" onclick="goToTab(0)">
+                  <nobr>User-side Settings</nobr>
+                </a></td>
+              <td id="HTAB_1" class="tab q"><a href="javascript:void(0)" onclick="goToTab(1)">
+                  <nobr>Server: Default User-side</nobr>
+              </td>
+              <td id="HTAB_2" class="tab q"><a style="white-space: nowrap" href="javascript:void(0)"
+                  onclick="goToTab(2)">
+                  <nobr>Server: Global Settings</nobr>
+              </td>
+              <td id="HTAB_3" class="tab q"><a style="white-space: nowrap" href="javascript:void(0)"
+                  onclick="goToTab(3)">
+                  <nobr>About gs2009</nobr>
+              </td>
+              <td align=right valign=top>
+                <nobr><input type=submit value="Save Preferences" name=submit2 ID="Submit1"></nobr>
+              </td>
+            </tr>
+          </table>
+          <table class="pref_content">
+            <tr>
+              <td>
+
+                <table id="TAB_0" class="prefgroup" cellpadding=0 cellspacing=0>
+
+                  <tr id=vista_idx style="display:">
+                    <td class="phead" width=25% id="vista_idx_head">Enable Enhanced Content Indexing</td>
+                    <td class="pbody">
+                      <table border=0 padding=5>
+                        <tr>
+                          <td style="white-space: nowrap; padding-right: 20px;" valign=top><span class="s">
+                              <input type=checkbox id=ENABLE_GD_INDEX_VISTA name=ENABLE_GD_INDEX_VISTA
+                                onclick="checkGdIdx();">
+                              <label for=ENABLE_GD_INDEX_VISTA>Enables additional features by using Google Desktop's
+                                index:</label><br>
+                              <ul>
+                                <li>Backup and view previous versions of your documents</li>
+                                <li>Search your web history, Gmail, and more</li>
+                                <li>View thumbnail previews of your images, videos, and web history</li>
+                              </ul>
+                            </span></td>
+                        </tr>
+                      </table>
+                  </tr>
+
+      <table id="TAB_1" class="prefgroup" cellpadding=0 cellspacing=0>
+        <script>
+          <!--
+          var gs = null;function GoogleAccountDocElement() {var d = document;this.gmail = d.getElementById("USEGMAIL");this.policy_ssd = d.getElementById("POLICYSSD");this.policy_ssd_out = d.getElementById("POLICYSSDOUT");this.ssd = d.getElementById("remoteshare");this.rs_both = d.getElementById("remoteshare_both");this.rs_doc = d.getElementById("remoteshare_doc");this.rs_web = d.getElementById("remoteshare_web");this.rs_silent = d.getElementById("remoteshare_silent");this.mn = d.getElementById("remoteshare_name");this.acct_r = document.getElementById("acct_remote");this.acct_r_read = document.getElementById("acct_remote_read");this.acct_r_unset = document.getElementById("acct_remote_not_set");this.acct_g = document.getElementById("acct_gmail");this.acct_g_read = document.getElementById("acct_gmail_read");this.acct_g_unset = document.getElementById("acct_gmail_not_set");this.acct_name = document.getElementById("ACCT_NAME");this.acct_pssw = document.getElementById("ACCT_PSSW");}function GDSPrefs_show(elem, show) {elem.style.display = (show) ? "" : "none";}function GDSPrefs_closeAccount() {GDSPrefs_show(gs.acct_r, false);GDSPrefs_show(gs.acct_g, false);GDSPrefs_showUnsetRead();}function GDSPrefs_onGmailClick() {GDSPrefs_closeAccount();if (gs.gmail.checked && GDSPrefs_validAccount() != 1)GDSPrefs_showAccount('g');}function GDSPrefs_onSSDClick() {GDSPrefs_closeAccount();if (gs.ssd.checked && GDSPrefs_validAccount() == -1)GDSPrefs_showAccount('r');}function GDSPrefs_showUnsetRead() {var valid = (GDSPrefs_validAccount() == 1);GDSPrefs_show(gs.acct_g_unset, !valid);GDSPrefs_show(gs.acct_g_read, valid);GDSPrefs_show(gs.acct_r_unset, !valid);GDSPrefs_show(gs.acct_r_read, valid);}function GDSPrefs_showAccount(type) {GDSPrefs_closeAccount();if (type == 'g') {GDSPrefs_show(gs.acct_g_unset, false);GDSPrefs_show(gs.acct_g_read, false);GDSPrefs_show(gs.acct_g, true);} else if (type == 'r') {GDSPrefs_show(gs.acct_r_unset, false);GDSPrefs_show(gs.acct_r_read, false);GDSPrefs_show(gs.acct_r, true);}}function GDSPrefs_updateAccount() {document.getElementById("email_g").value = gs.acct_name.value;document.getElementById("pw_g").value = gs.acct_pssw.value;document.getElementById("email_ssd").value = gs.acct_name.value;document.getElementById("pw_ssd").value = gs.acct_pssw.value;document.getElementById("email_g_txt").innerHTML = escape(gs.acct_name.value);document.getElementById("email_ssd_txt").innerHTML = escape(gs.acct_name.value);GDSPrefs_checkAccount();if (GDSPrefs_validAccount() == -1) {gs.gmail.checked = false;gs.ssd.checked = false;}if (GDSPrefs_validAccount() == 0) {gs.gmail.checked = false;}}function GDSPrefs_setAccount(set_from) {var name = null;var pssw = null;if (set_from == 'g') {name = document.getElementById("email_g").value;pssw = document.getElementById("pw_g").value;} else if (set_from == 'r') {name = document.getElementById("email_ssd").value;pssw = document.getElementById("pw_ssd").value;}if (name == "" || pssw == "") {alert(document.getElementById("acct_error_msg").value);}gs.acct_name.value = name;gs.acct_pssw.value = pssw;GDSPrefs_updateAccount();}function GDSPrefs_checkAccount() {GDSPrefs_showUnsetRead();GDSPrefs_checkRemote();}function GDSPrefs_validAccount() {if (!(gs.acct_name.value) || !(gs.acct_pssw.value))return -1;return 1;}function GDSPrefs_checkRemote() {if (!(gs.ssd.checked) || (gs.ssd.disabled)) {gs.rs_doc.disabled = 1;gs.rs_web.disabled = 1;gs.rs_silent.disabled = 1;gs.mn.disabled = 1;gs.rs_both.disabled = 1;} else {gs.rs_both.disabled = (gs.policy_ssd_out.value == 1);gs.rs_doc.disabled = (gs.policy_ssd_out.value == 1);gs.rs_web.disabled = (gs.policy_ssd_out.value == 1);gs.rs_silent.disabled = 0;gs.mn.disabled = 0;if (gs.policy_ssd_out.value == 1) {gs.rs_silent.checked = true;} else if (!gs.rs_doc.checked && !gs.rs_web.checked&& !gs.rs_both.checked && !gs.rs_silent.checked) {gs.rs_both.checked = true;}}}function GDSPrefs_grayText(togray) {var hcolor="#000000";var bcolor="#000000";if (togray) {hcolor="#888888";bcolor="#676767"}var d = document;d.getElementById("gmailhead").style.color = hcolor;d.getElementById("gmailbody").style.color = bcolor;d.getElementById("remotesharehead").style.color = hcolor;d.getElementById("remotesharebody").style.color = bcolor;}function GDSPrefs_checkAccountBeforeSubmit() {if (gs.acct_g.style.display == "")GDSPrefs_setAccount('g');if (gs.acct_r.style.display == "")GDSPrefs_setAccount('r');if ((GDSPrefs_validAccount() == -1) &&(gs.gmail.checked || gs.ssd.checked)) {alert(document.getElementById("acct_error_msg").value);return false;}return true;}
+          function ShouldEnableSsd() {
+            if (document.getElementById("ENCRYPTINDEX").checked && gs.ssd.checked) {
+              return confirm(document.getElementById("ssd_ecrypted_warning").innerHTML);
+            }
+            return true;
+          }
+          function CheckSsd() {
+            if (gs.ssd.checked) {
+              if (!ShouldEnableSsd()) {
+                gs.ssd.checked = false;
+              }
+            }
+            GDSPrefs_checkRemote();
+            GDSPrefs_onSSDClick();
+          }
+          // -->
+        </script>
+
+        <input id="ACCT_NAME" type=hidden name="ACCT_NAME" value="">
+        <input id="ACCT_PSSW" type=hidden name="ACCT_PSSW">
+        <input id="acct_error_msg" type=hidden name="acct_error_msg"
+          value="You must enter a Google account user name and password to enable searching Gmail or your other computers.">
+        <input id="acct_error_msg1" type=hidden name="acct_error_msg1"
+          value="You must specify a Gmail account to be able to index Gmail.">
+
+        <tr id="need_gd_idx_for_ga">
+          <td class="phead">&nbsp;</td>
+          <td class="pbody"><span class="s">To use Google Account Features, please first <a href="javascript:void(0)"
+                onclick="enableGdIdx(true);" id="idx_head">&nbsp;</a> on the <a href="javascript:void(0)"
+                onclick="goToTab(0);">Desktop Search</a> tab.</span></td>
+        </tr>
+
+        <tr id="first_account_cell" id="gmailsettings">
+          <td class="phead" width=25% id="gmailhead">Gmail</td>
+          <td class="pbody" id="gmailbody">
+            <table>
+              <tr>
+                <td>
+                  <input type="checkbox" name="USEGMAIL" id="USEGMAIL" onclick="GDSPrefs_onGmailClick();">
+                  <input type=hidden value=0 id="POLICYGMAIL" name="POLICYGMAIL">
+                </td>
+                <td>
+                  <label for="USEGMAIL"> <span class="s">Index and search email in my Gmail account</span></label>
+                </td>
+              </tr>
+              <tr id="acct_gmail_not_set">
+                <td>&nbsp;</td>
+                <td><span class="s">Requires a Gmail Account.</span>
+                </td>
+              </tr>
+              <tr id="acct_gmail_read">
+                <td>&nbsp;</td>
+                <td><span class="s">
+                    Use <b><span id="email_g_txt"></span></b>&nbsp;[<a
+                      href="javascript:GDSPrefs_showAccount('g');void(0);">Change account</a>]</span>
+                </td>
+              </tr>
+            </table>
+            <div id="acct_gmail"
+              style="display:none; padding:3px; margin-top:1ex; border:1px solid #C3D9FF; width:25em; "
+              onClick="event.cancelBubble=true; if (event.stopPropagation) event.stopPropagation();">
+              <div style="background-color:#E8EEFA; padding:1ex .5em;">
+                <table cellspacing=0 cellpadding=2 border=0 ID="Table2">
+                  <tr>
+                    <td colspan="100%">
+                      <img src="google_transparent.gif" align=center>
+                      <font size="+0"><b>Account</b></font> <span class="s">(also used for Search Across Computers and
+                        saving of Google Gadget Settings)</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align=right><span class="s">Username:</span></td>
+                    <td><span class="s">
+                        <input id="email_g" type="text" size=24 name="email_g">
+                      </span></td>
+                  </tr>
+                  <tr>
+                    <td align=right><span class="s">Password:</span></td>
+                    <td><span class="s">
+                        <input id="pw_g" type="password" size=24 name="pw_g">
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan=100% align=center><br>
+                      [ <a href="javascript:GDSPrefs_setAccount('g'); GDSPrefs_closeAccount(); void(0);">OK</a> ] [ <a
+                        href="javascript:void(0);"
+                        onClick="GDSPrefs_closeAccount(); GDSPrefs_updateAccount();">Cancel</a> ]</td>
+                  </tr>
+                  <tr>
+                    <td colspan=100% align=center><br>
+                      <span class="s"><b>Don't have a Google Account?<br><a target="_blank"
+                            href="https://www.google.com/accounts/NewAccount?hl=en">Create an account now</a></b></span>
+                    </td>
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+
+        <tr id="sacsettings" style="display:none;">
+          <td class="phead pref-last" id="remotesharehead">
+            <nobr>Search Across Computers</nobr>
+          </td>
+          <td class="pbody pref-last" id="remotesharebody">
+            <table ID="Table3">
+              <tr>
+                <td valign=top>
+                  <input type=hidden name="POLICYSSD" id="POLICYSSD" value=[POLICY-SSD]>
+                  <input type=hidden name="POLICYSSDOUT" id="POLICYSSDOUT" value=[POLICY-SSD-OUT]>
+                  <input type="checkbox" name="remoteshare" id="remoteshare" [DISABLED-SSD] [USE-SSD]
+                    onclick='CheckSsd();'>
+                  <span style="display:none" id=ssd_ecrypted_warning>Your local index is encrypted.
+                    Are you sure you want to share it with your other computers?
+                    It may not be encrypted on your other computers.</span>
+                </td>
+                <td>
+                  <label for="remoteshare"><span class=s>Index and search my documents and viewed web pages from across
+                      all my computers.</span></label>
+                  <br>
+                  <div>
+                    <font size=-1>(This feature transmits the text of your indexed files to Google Desktop servers for
+                      copying to your other computers. Only files you open after turning on this feature will be copied
+                      to your other computers for searching. Learn more about <a target="_blank"
+                        href="http://desktop.google.com/support/bin/answer.py?answer=32889&hl=en">this feature</a> or
+                      our <a target="_blank" href="http://desktop.google.com/privacypolicy.html?hl=en">Privacy
+                        Policy</a>.)</font>
+                  </div>
+                  <span class=s style="font-weight: bold; display:[NOSSD-DISPLAYSTYLE]"><br>(disabled by your
+                    administrator)</span>
+                </td>
+              </tr>
+              <tr id="acct_remote_not_set">
+                <td>&nbsp;</td>
+                <td>
+                  <span class="s">Requires a Google Account</span>
+                </td>
+              </tr>
+              <tr id="acct_remote_read">
+                <td>&nbsp;</td>
+                <td><span class="s">
+                    Use <b><span id="email_ssd_txt"></span></b>&nbsp;[<a
+                      href="javascript:GDSPrefs_showAccount('r');void(0);">Change account</a>]</span>
+                </td>
+              </tr>
+            </table>
+            <div id="acct_remote"
+              style="display:none; padding:3px; margin-top:1ex; border:1px solid #C3D9FF; width:25em;"
+              onClick="event.cancelBubble=true; if (event.stopPropagation) event.stopPropagation();">
+              <div style="background-color:#E8EEFA; padding:1ex .5em;">
+
+                <table cellspacing=0 cellpadding=2 border=0 align="center" ID="Table4">
+                  <tr>
+                    <td colspan="100%">
+                      <img src="google_transparent.gif" align=center>
+                      <font size="+0"><b>Account</b></font> <span class="s">(also used for Gmail search and saving of
+                        Google Gadget Settings)</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align=right><span class="s">Username:</span></td>
+                    <td><span class="s">
+                        <input id="email_ssd" type="text" size=24 name="email_ssd">
+                      </span></td>
+                  </tr>
+                  <tr>
+                    <td align=right><span class="s">Password:</span></td>
+                    <td><span class="s">
+                        <input id="pw_ssd" type="password" size=24 name="pw_ssd">
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan=100% align="center"><br>
+                      [ <a href="javascript:GDSPrefs_setAccount('r'); GDSPrefs_closeAccount(); void(0);">OK</a> ] [ <a
+                        href="javascript:void(0);"
+                        onClick="GDSPrefs_closeAccount(); GDSPrefs_updateAccount();">Cancel</a> ]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan=100% align=center><br>
+                      <span class="s"><b>Don't have a Google Account?<br><a target="_blank"
+                            href="https://www.google.com/accounts/NewAccount?hl=en">Create an account now</a></b></span>
+                    </td>
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+
+            <div style="padding-left:2em; padding-top:.5ex; margin:0;">
+              <span class="s">Name this computer (This name is displayed on your other computers):</span><br>
+              <span class="s">
+                <input type="text" id="remoteshare_name" name="remoteshare_name" [DISABLED-SSD] [MACHINENAME] size=20
+                  maxlength=16><br><br>
+                My other computers can search this computer's:<br>
+              </span>
+
+              <input type=radio name="remoteshare_type" id="remoteshare_both" value=[SSD-BOTH] [USE-SSD-BOTH]
+                [DISABLED-SSD-OUT]>
+              <label for="remoteshare_both"> <span class="s">Documents and web history</span></label><br>
+
+              <input type=radio name="remoteshare_type" id="remoteshare_doc" value=[SSD-DOC] [USE-SSD-DOC]
+                [DISABLED-SSD-OUT]>
+              <label for="remoteshare_doc"><span class=s>Documents only</span></label><br>
+
+              <input type=radio name="remoteshare_type" id="remoteshare_web" value=[SSD-WEB] [USE-SSD-WEB]
+                [DISABLED-SSD-OUT]>
+              <label for="remoteshare_web"><span class=s>Web history only</span></label><br>
+
+              <input type=radio name="remoteshare_type" id="remoteshare_silent" value=[SSD-SILENT] [USE-SSD-SILENT]
+                [DISABLED-SSD]>
+              <label for="remoteshare_silent"><span class=s>Nothing (Only search other computers. No files from this
+                  computer will be searchable from other computers.)</span></label><br>
+
+              <br>
+              <span class="s">
+                &bull; You need to enable this feature (Search Across Computers) on your other computers to search
+                them.<br>
+                &bull; Previously indexed documents and web pages on this computer will not be searchable from your
+                other computers. Only items indexed after you turn on Search Across Computers will be visible on your
+                other computers.
+              </span>
+            </div>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>
+            <script>
+              function SSDRemoveData() {
+                if (confirm('[CLEAR_SSD_STORAGE_CONFIRMATION_MESSAGE]')) {
+                  doHttp('[SSD_CLEAR_URL]', null, null, null,
+                    function (r) {
+                      if (parseInt(r.responseText) == 0) {
+                        document.getElementById("clear_ssd_confirm").style.display = "";
+                        setTimeout('document.getElementById("clear_ssd_confirm").style.display="none";', 10000);
+                      }
+                    },
+                    function (r) { alert('This browser does not support this feature. Supported browsers include Firefox and Internet Explorer.'); });
+                }
+              }
+            </script>
+            <div style="padding-left:2em; padding-top:.5ex; margin:0;">
+              <br>
+              <span class=s style="display:none">
+                <input [DISABLED-SSD] type=button value="Clear my files from Google" onclick="SSDRemoveData();"><br>
+                Clears your files from Google Desktop servers. Note: Any files that have not been copied to your other
+                computers will not be searchable from them.<br><br>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+        </tr>
+
+      </table>
+
+
+      <!-- Display Tab -->
+
+      <table id="TAB_2" class="prefgroup" cellpadding=0 cellspacing=0>
+
+        <script>
+          <!--
+          function enableHyper(bool) {
+            if (document.getElementById("POLICYHYPER").value != 0)
+              bool = false;
+          
+            document.getElementById("HYPERNUMRESULTS").disabled = !bool;
+          }
+          
+          function updateDbLeftCheckboxStatus() {
+            try {
+              var disabled = !document.getElementById("DISPLAYDB").checked;
+              document.getElementById("DBLEFT").disabled = disabled;
+              document.getElementById("DBLEFT_DESC").style.color = disabled ? "gray" : "black";
+            } catch(e) {
+            }
+          }
+          
+          function enableSearchBox(bool) {
+            if (document.getElementById("POLICYHYPER").value != 0)
+              document.getElementById("ENABLEHYPER").disabled = true;
+            else
+            document.getElementById("ENABLEHYPER").disabled = !bool;
+          }
+          
+          function handleHyperClick(checkbox) {
+            enableHyper(checkbox.checked);
+          }
+          
+          function handleSearchBox(bool) {
+            enableSearchBox(bool);
+            enableHyper(bool && document.getElementById("ENABLEHYPER").checked);
+            updateDbLeftCheckboxStatus();
+          }
+          // -->
+        </script>
+
+        <!-- QSB -->
+
+        <tr style="">
+          <td class="phead pref">Quick Search Box</td>
+          <td class="pbody pref">
+            <table border=0 cellpadding=0>
+              <tr style="display:none">
+                <td><input type=CHECKBOX name=FAST_START_SHOW [CHECK-FAST-START-SHOW] id=fast_start_show
+                    onclick="checkFastStart()" /></td>
+                <td><label for=fast_start_show><span class="s">Show application shortcuts</span></label></td>
+              </tr>
+              <tr>
+                <td><input type=CHECKBOX name=QSB checked id=qsb onclick="checkQSB()" /></td>
+                <td>
+                  <label for=qsb>
+                    <span class="s">Enable hotkey (Hit &quot;Ctrl&quot; twice to bring forward)</span>
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td height=2></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td style="padding-left:3px">
+                  <script>var ir = 0</script><img
+                    onerror='javascript:if(ir<5){this.src="/pixel.gif";ir++;this.style.border="0";}' src=""
+                    name="qsimg" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Quick Find -->
+
+        <tr>
+          <td class="phead pref">Quick Find</td>
+          <td class="pbody pref">
+            <table border=0 cellpadding=0>
+              <tr>
+                <td vAlign=top>
+                  <input type=hidden value=0 id="POLICYHYPER" name="POLICYHYPER">
+                  <input name="ENABLEHYPER" id="ENABLEHYPER" type=checkbox checked onclick="handleHyperClick(this)">
+                </td>
+                <td colspan="2"><span class="s"><label for="ENABLEHYPER">Show desktop search results as I
+                      type</label></span> <span class="s" style="font-weight: bold; display:none"> (disabled by your
+                    administrator)</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td colSpan=2 style="padding-top: 5px"><span class=s><label for="HYPERNUMRESULTS">
+                      Display <select id="HYPERNUMRESULTS" name="HYPERNUMRESULTS" disabled>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option selected>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                      </select> Quick Find results</label></span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Display Mode -->
+
+        <tr>
+          <td class="phead pref" width=25%>Display Mode</td>
+          <td class="pbody pref" valign=top width="75%">
+
+            <table border=0 cellpadding=0>
+              <tr>
+                <td valign=top>
+
+                  <input type="radio" name="SBDISPLAY" id="DISPLAYSB" VALUE="DISPLAYSB" onclick=handleSearchBox(true)>
+                </td>
+                <td>
+                  <label for=DISPLAYSB>
+                    <font size=-1>Sidebar - Keep an eye on email, news, weather, photos and more in addition to search.
+                    </font>
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                  <script>var ir = 0</script><img
+                    onerror='javascript:if(ir<5){this.src="/pixel.gif";ir++;this.style.border="0";}'
+                    src="http://desktop.google.com/images/pref_sidebar.jpg" />
+                </td>
+              </tr>
+              <tr>
+                <td height=2></td>
+              </tr>
+
+
+
+              <tr>
+                <td valign=top>
+                  <input type="radio" name="SBDISPLAY" id="DISPLAYMB" VALUE="DISPLAYMB" onclick=handleSearchBox(true)>
+                </td>
+                <td>
+                  <label for=DISPLAYMB>
+                    <font size=-1>Floating Deskbar - A search box you can put anywhere on your desktop</font>
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                  <script>var ir = 0</script><img
+                    onerror='javascript:if(ir<5){this.src="/pixel.gif";ir++;this.style.border="0";}'
+                    src="http://desktop.google.com/images/pref_fdeskbar.jpg" />
+                </td>
+              </tr>
+              <tr>
+                <td height=2></td>
+              </tr>
+
+              <tr>
+                <td valign=top>
+                  <input type=radio name="SBDISPLAY" id="DISPLAYNONE" checked VALUE="DISPLAYNONE"
+                    onclick=handleSearchBox(document.getElementById('qsb').checked)>
+                </td>
+                <td valign=top>
+                  <label for=DISPLAYNONE>
+                    <font size=-1> None</font>
+                  </label>
+                </td>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <!-- Google Gadget Buttons -->
+
+
+        <!-- -->
+
+      </table>
+
+      <table id="TAB_3" class="prefgroup" cellpadding=0 cellspacing=0>
+
+        <tr>
+          <td class="phead pref" width=25%>About gs2009</td>
+          <td class="pbody pref">
+            <span class="s">This server is running version <b>VERSIONHEREBRO</b>.
+            <br><br>
+            gs2009 is a frontend for SearXNG and Google Custom Search JSON API which tries to recreate the experience of the 2009/2010 versions of Google Search page.
+            <br><br>
+            Developed by pap-git (paphere). <b>We're looking for developers!</b>
+            <ul>
+              <li><b>GitHub</b>: <a href="#" onclick="showGitHubLink()">https://github.com/pap-git/gs2009</a></li>
+            </ul>
+            </span>
+            <script>
+              function showGitHubLink() {
+                alert("Please open this link on your favorite modern browser. \n\nhttps://github.com/pap-git/gs2009")
+              }  
+            </script>
+          </td>
+        </tr>
+
+        <!-- -->
+
+
+
+        <!-- -->
+
+
+
+        <!-- -->
+
+
+
+        <!-- -->
+
+
+
+      </table>
+      </td>
+      </tr>
+    </table>
+    </td>
+    </tr>
+
+    <tr>
+      <td><span class="s"><b>Save</b> your preferences when finished. Changes apply to Google Desktop.</span></td>
+      <td id="last_cell" align=right valign=top><input type=submit value="Save Preferences" name=submit2></td>
+    </tr>
+    </table>
+    <p>
+    <div align=center>
+      <font size=-1><a href='/&s=2Akja7U8sdZl_b3LrRO7XCxMXuc'>Google Desktop &nbsp;Home</a></font> - <font size=-1><a
+          href='/docs/privacy.html&s=BDKvrxHlpYv5fwhvAn8dggwnPoU'>Privacy</a></font> - <font size=-1><a
+          href='/about&s=c48voudbAckJMk6zYwgNFLmxr3Y'>About</a></font>
+    </div>
+    <br>
+    <center><span class="s">&copy;2009 Google</span></center>
+  </form>
+</body>
+
+</html>

@@ -1,6 +1,28 @@
+# the node thing
 /node_modules
+
+# the directory i use to store the website data
 /websites
+
+# normal things
 config.json
+
+# i dont actually remember about these thing
 create.js
 output.html
+
+# was testing 
+config.old.json
+config.new.json
+parsertest.js
+
+# the ref for gs2009 settings page
+html/gs2009 copy.html
+
+# wtf??
 .gitignore
+
+# -------------------
+/assets/captcha
+tempf.js
+oldconfigparser.js

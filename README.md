@@ -47,6 +47,8 @@
 1. Stop the server if any gs2009 instance running in machine
 2. `npm update` or `node updater.js` (actually, pulling from git works)
 
+(this version, 1.5.20260808 might makes the break on config! please back up your config before updating)
+
 **Before version `1.1.20251124` (Updating to latest)**
 1. Copy `config.json` to somewhere
 2. Remove gs2009 working folder
