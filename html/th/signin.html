@@ -1,0 +1,448 @@
+<html>
+<style type="text/css">
+  <!--
+  body { font-family: arial,sans-serif; background-color: #fff; margin-top: 2; }
+  .c { width: 4; height: 4; } 
+  a:link { color: #00c; } 
+  a:visited { color: #551a8b; }
+  a:active { color: #f00; }
+  .form-noindent { background-color: #fff; border: 1px solid #c3d9ff; }
+  -->
+</style>
+<style type="text/css"><!--
+.gaia.le.lbl { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.fpwd { font-family: Arial, Helvetica, sans-serif; font-size: 70%; }
+.gaia.le.chusr { font-family: Arial, Helvetica, sans-serif; font-size: 70%; }
+.gaia.le.val { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.button { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.rem { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+
+.gaia.captchahtml.desc { font-family: arial, sans-serif; font-size: smaller; } 
+.gaia.captchahtml.cmt { font-family: arial, sans-serif; font-size: smaller; font-style: italic; }
+  
+--></style>
+  <head>
+  <title>Google Accounts</title>
+  <style type="text/css"><!--
+  
+  
+    body {
+      font-family: arial, sans-serif;
+      margin: 0;
+      padding: 13px 15px 15px;
+      
+    }
+    .body {
+      margin: 0;
+    }
+    div.errorbox-good {}
+
+    div.errorbox-bad {} 
+
+    div.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;}
+    font.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;}
+
+    
+    div.topbar {
+      font-size:smaller;
+      margin-right: -5px;
+      text-align:right;
+      white-space:nowrap;
+    }
+    div.header {
+      margin-bottom: 9px;
+      margin-left: -2px;
+      position:relative;
+      zoom: 1
+    }
+    div.header img.logo {
+      border: 0;
+      float:left;
+    }
+    div.header div.headercontent {
+      float:right;
+      margin-top:17px;
+    }
+    div.header:after{
+      content:".";
+      display:block;
+      height:0;
+      clear:both;
+      visibility:hidden;
+    }
+    div.pagetitle {
+      font-weight:bold;
+    }
+    
+    .footer { 
+      color: #666;
+      font-size: smaller;
+      margin-top: 40px;
+      text-align: center;
+    }
+    
+    table#signupform {
+      left: -5px;
+      top: -7px;
+      position:relative;
+    }
+    table#signupform td{
+      padding: 7px 5px;
+    }
+    table#signupform td table td{
+      padding: 1px;
+    }
+
+    
+    
+    hr {
+      border: 0;
+      background-color:#DDDDDD;
+      height: 1px;
+      width: 100%;
+      text-align: left;
+      margin: 5px;
+    }
+    
+
+    
+    
+  --></style>
+</head>
+  <body dir="ltr"
+        onLoad=
+                 "gaia_setFocus();"
+               >
+  <div id="main">
+<div class=header>
+  <a href='/accounts/'>
+  <img class=logo
+       src='/intl/en/images/logos/accounts_logo.gif'
+       alt="Google" />
+  </img>
+  </a>
+</div>
+  <div id=maincontent>
+  <table border="0" width="100%" cellpadding=0 cellspacing=0>
+  <tr>
+  <td width="75%" valign="top">
+<div style="font-size:83%;">
+<b>
+Sign in to personalize your Google experience.
+</b>
+<br/><br/>
+Google has more to offer when you sign in to your Google Account.
+You can customize pages, view recommendations, and get more relevant search results.
+<br/><br/>
+Sign in on the right or
+<a href="/accounts/NewAccount">
+create one for free</a>
+using just an email address and password you choose.
+<br/><br/>
+<table border="0" cellpadding="4">
+  <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>
+  <img src="/accounts/mail.gif"
+                       alt="Gmail">
+  </img>
+  </td>
+  <td style="font-size:83%">
+  <a href="http://mail.google.com/mail?hl=en">Gmail</a>
+  <br />
+  Get a fresh start with email that has less spam
+  </td>
+  </tr>
+  <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>
+  <img src="/accounts/msh.gif"
+                       alt="Web History">
+  </img>
+  </td>
+  <td style="font-size:83%">
+  <a href="/history/?hl=en">Web History</a>
+  <br />
+  Access and manage your web activity from any computer
+  </td>
+  </tr>
+  <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>
+  <img src="/accounts/ig.gif"
+                       alt="iGoogle">
+  </img>
+  </td>
+  <td style="font-size:83%">
+  <a href="http://www.google.com/ig?source=gapg&amp;hl=en">iGoogle</a>
+  <br />
+  Add news, games and more to the Google homepage
+  </td>
+  </tr>
+  <tr>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+  <td>
+  <img src="/accounts/sierra.gif"
+                       alt="Google Checkout">
+  </img>
+  </td>
+  <td style="font-size:83%">
+  <a href="http://checkout.google.com/?utm_campaign=gaia_em&amp;utm_source=us-en-et-my_accounts&amp;utm_medium=link&amp;hl=en">Google Checkout</a>
+  <br />
+  A faster, safer and more convenient way to shop online
+  </td>
+  </tr>
+</table>
+</div>
+  </td>
+  <td style="padding-left: 10px;" valign="top" align="center">
+  <div id="rhs">
+  <div id="rhs_login_signup_box">
+<script><!--
+
+function gaia_onLoginSubmit() {
+
+  
+  if (window.gaiacb_onLoginSubmit) {
+    return gaiacb_onLoginSubmit();
+  } else {
+    return true;
+  }
+
+}
+
+--></script>
+<style type="text/css"><!--
+  div.errormsg { color: red; font-size: smaller; font-family:arial,sans-serif; }
+  font.errormsg { color: red; font-size: smaller; font-family:arial,sans-serif; }  
+--></style>
+<style type="text/css"><!--
+.gaia.le.lbl { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.fpwd { font-family: Arial, Helvetica, sans-serif; font-size: 70%; }
+.gaia.le.chusr { font-family: Arial, Helvetica, sans-serif; font-size: 70%; }
+.gaia.le.val { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.button { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+.gaia.le.rem { font-family: Arial, Helvetica, sans-serif; font-size: smaller; }
+
+.gaia.captchahtml.desc { font-family: arial, sans-serif; font-size: smaller; } 
+.gaia.captchahtml.cmt { font-family: arial, sans-serif; font-size: smaller; font-style: italic; }
+  
+--></style>
+<form id="gaia_loginform"
+      
+        action="/accounts/LoginAuth" method="post"
+      
+      onsubmit=
+                 "return(gaia_onLoginSubmit());"
+                >
+<div id="gaia_loginbox">
+<table class="form-noindent" cellspacing="3" cellpadding="5" width="100%" border="0">
+  <tr>
+  <td valign="top" style="text-align:center" nowrap="nowrap"
+        bgcolor="#e8eefa">
+  <div class="loginBox">
+  <table id="gaia_table" align="center" border="0" cellpadding="1" cellspacing="0">
+  <tr>
+<td colspan="2" align="center">
+  <font size="-1">
+  Sign in with your
+  </font>
+  <table>
+  <tr>
+  <td valign="top">
+  <img src="/accounts/google_transparent.gif"
+           alt="Google">
+  </img>
+  </td>
+  <td valign="middle">
+  <font size="+0"><b>Account</b></font>
+  </td>
+  </tr>
+</table>
+</td>
+</tr>
+  <script type="text/javascript"><!--
+    function onPreCreateAccount() {
+    
+      return true;
+    
+    }
+
+    function onPreLogin() {
+    
+      
+      if (window["onlogin"] != null) {
+        return onlogin();
+      } else {
+        return true;
+      }
+    
+    }
+  --></script>
+<tr>
+  <td colspan="2" align="center">
+  </td>
+</tr>
+<tr id="email-row">
+  <td nowrap="nowrap">
+  <div align="right">
+  <span class="gaia le lbl">
+  Email:
+  </span>
+  </div>
+  </td>
+  <td>
+  <input type="hidden" name="dsh" id="dsh"
+           value="-2084693332882627545" />
+  <input type="hidden"
+             name="GALX"
+             value="Ya2Xne66eTw" />
+  <input type="text" name="Email"  id="Email"
+  size="18" value=""
+  
+  
+    class='gaia le val'
+  
+  />
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td align="left">
+  </td>
+</tr>
+<tr id="password-row" class="enabled">
+  <td align="right" nowrap="nowrap">
+  <span class="gaia le lbl">
+  Password:
+  </span>
+  </td>
+  <td>
+  <input type="password"
+   name="Passwd" id="Passwd"
+  size="18" 
+  
+  
+
+  
+    class="gaia le val" 
+  
+  />
+  </td>
+</tr>
+<tr>
+  <td> </td>
+  <td align="left">
+  </td>
+</tr>
+  <tr id="rememberme-row" class="enabled">
+  <td align="right" valign="top">
+  <input type="checkbox" name="PersistentCookie" id="PersistentCookie"
+    value="yes"
+  
+    checked='checked'
+  
+  />
+  <input type="hidden" name='rmShown' value="1" />
+  </td>
+  <td>
+  <label for="PersistentCookie" id="PersistentCookieLabel" class="gaia le rem">
+  Stay signed in
+  </label>
+  </td>
+</tr>
+<tr>
+  <td>
+  </td>
+  <td align="left">
+  <input type="submit" class="gaia le button" name="signIn"
+           value="Sign in"
+                  />
+  </td>
+</tr>
+<tr id="ga-fprow">
+  <td colspan="2" height="33.0" class="gaia le fpwd"
+    align="center" valign="bottom">
+  <a href="http://www.google.com/support/accounts/bin/answer.py?answer=48598&amp;hl=en&amp;ctx=ch_Login&amp;fpUrl=https%3A%2F%2Fwww.google.com%2Faccounts%2FForgotPasswd%3FfpOnly%3D1"
+       target=_top>
+  Can&#39;t access your account?
+  </a>
+  </td>
+</tr>
+  </table>
+  </div>
+  </td>
+  </tr>
+</table>
+</div>
+<input type="hidden" name="asts"
+       id="asts"
+       value="">
+</form>
+<script><!--
+var gaia_loginForm;
+if (document.getElementById) {
+  gaia_loginForm = document.getElementById("gaia_loginform");
+} else if (window.gaia_loginform) {
+  gaia_loginForm = window.gaia_loginform;
+}
+
+var gaia_emailHasKeypress = false;
+if (gaia_loginForm && gaia_loginForm.Email) {
+  gaia_loginForm.Email.onkeypress = function() {
+    gaia_emailHasKeypress = true;
+  }
+}
+
+function gaia_setFocus() {
+  if (gaia_loginForm) {
+    if (gaia_loginForm.Email && !gaia_loginForm.Email.value) {
+      gaia_loginForm.Email.focus();
+    } else if (gaia_loginForm.Passwd && !gaia_emailHasKeypress) {
+      gaia_loginForm.Passwd.focus();
+    }
+    
+  }
+}
+
+gaia_setFocus();
+--></script>
+<form id="gaia_universallogin"
+      action="/accounts/LoginAuth" method="post"
+      onsubmit="return(gaia_onLoginSubmit());">
+  <input type="hidden" name="dsh" id="dsh"
+           value="-2084693332882627545" />
+</form>
+  <br/>
+<table class="form-noindent" border="0" cellpadding="6" cellspacing="3" width="100%">
+  <tr>
+  <td bgcolor="#e8eefa" align="center" style="font-size:83%">
+  <b>Don't have a Google Account?
+  </b><br/>
+  <a href='/accounts/NewAccount' >
+  <b>Create an account now</b>
+  </a>
+  </td>
+  </tr>
+</table>
+  </div>
+  <br/>
+  </div>
+  </td>
+  </tr>
+  </table>
+  </div>
+<div class="footer">
+  &copy;2010 Google
+  -
+  <a href='/'>Google Home</a>
+  -
+  <a href='/accounts/TOS?hl=en'>Terms of Service</a>
+  -
+  <a href='/intl/en/privacy.html'>Privacy Policy</a>
+  -
+  <a href='http://www.google.com/support/accounts?hl=en'>Help</a>
+</div>
+  </div>
+  </body>
+</html>

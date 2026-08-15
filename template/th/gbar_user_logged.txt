@@ -1,0 +1,1 @@
+<b>gbar_username</b> | <a href="/url?sa=p&pref=ig&pval=3&q=http://www.google.com/ig%3Fhl%3Den%26source%3Diglk&usg=AFQjCNFA18XPfgb7dKnXfKz7x7g1GDH1tg" class=gb4>iGoogle</a> | <a href="/preferences?hl=en" class=gb4>บัญชีของฉัน</a> | <a href="/clearcookies" class=gb4>ออกจากระบบ</a>

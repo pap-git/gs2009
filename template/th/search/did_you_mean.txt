@@ -1,0 +1,1 @@
+<font color="#cc0000" class="p">Did you mean: </font><a href="/search?hl=ja&amp;sa=X&amp;oi=spell&amp;resnum=0&amp;ct=result&amp;cd=1&amp;q=suggestedQuery&amp;spell=1" class="p"><b><i>suggestedQuery</i></b></a>

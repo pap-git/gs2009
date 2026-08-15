@@ -35,12 +35,16 @@ function pull(query, hl, expIds, cp) {
                 result = parser.parse(result)
                 let send = "window.google.ac.h([\"" + query + "\",[";
                 try {
-                    result.toplevel.CompleteSuggestion.forEach(( content, i ) => {
-                        // let now = "[\"" + content.suggestion.data + "\",\"\",\"" + i + "\"],"
-                        // let now = "[\"" + content.suggestion.data + "\",\"" + content.suggestion.data + "\",\"\",\"\"],"
-                        let now = "[\"" + content.suggestion.data + "\",[0]],"
-                        send = send + now
-                    })
+                    const suggestions = result?.toplevel?.CompleteSuggestion;
+
+                    if (Array.isArray(suggestions)) {
+                        suggestions.forEach((content, i) => {
+                            // let now = "[\"" + content.suggestion.data + "\",\"\",\"" + i + "\"],"
+                            // let now = "[\"" + content.suggestion.data + "\",\"" + content.suggestion.data + "\",\"\",\"\"],"
+                            let now = "[\"" + content.suggestion.data + "\",[0]],"
+                            send = send + now
+                        })
+                    }
                     send = send.replace(/(.*),/, "$1") + `] , {
                         "j":"${expIds}",
                         "client": "hp",
