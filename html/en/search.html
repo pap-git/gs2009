@@ -152,6 +152,29 @@ google.y={};google.x=function(e,g){google.y[e.id]=[e,g];return false};window.gba
           <div style="height:1px;line-height:0"></div>
           <div style="text-align:center;margin-top:1.4em" class="clr">
           <div id="bsf" style="padding:1.8em 0;margin-top:0">
+            <div id="fixMe">
+              <!--
+                okay, so the purpose of this is for 
+                showing when the search results return
+                nothing.
+                
+                this is a really bad implementation
+                please fix this with a better impl, ty
+
+                see index.js:1162 for more info
+              -->
+              <p>
+                <a href="/">Google&nbsp;Home</a>
+                - 
+                <a href="http://www.google.com/intl/en/ads/">Advertising&nbsp;Programs</a>
+                - 
+                <a href="http://www.google.com/services/">Business Solutions</a>
+                - 
+                <a href="http://www.google.com/intl/en/privacy.html">Privacy</a>
+                - 
+                <a href="/intl/ja/about.html">About Google</a>
+              </p>
+            </div>
             <form method="get" action="/search">
               <div>
                 <input type="text" name="q" size="41" maxlength="2048" value="query" title="Search">

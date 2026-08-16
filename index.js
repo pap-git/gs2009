@@ -1156,6 +1156,14 @@ app.get('/search', async (req, res) => {
 
             repl = repl.replace(/topItem/g, ext_t_s_nf);
 
+            // should be good enough to catch no result
+            repl = repl.replace(/(<br clear="all"\/>\s*)?<table id="nav"[\s\S]*?<\/table>/, "")
+
+            // based on https://web.archive.org/web/20090126005121/http://google.com:80/Search%20results=Sexy
+            // the "Google Home" and etc links should be inside bsf.
+            // i don't know how to implement this properly
+            repl = repl.replace(/(<div id="fixMe">[\s\S]*?<\/div>)[\s\S]*?<\/div>\s*<p>[\s\S]*?<\/p>/, '$1\n          </div>')
+            repl = repl.replace(/(<div id="bsf" style=")padding:1\.8em 0;/, '$1')
             repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
             if (only_old == true) {
@@ -1172,6 +1180,9 @@ app.get('/search', async (req, res) => {
             res.send(repl)
             return
         }
+
+        // remove `fixMe` if the result is actually there
+        repl = repl.replace(/<div id="fixMe">[\s\S]*?<\/div>\s*/, "")
         
         if (only_old == true) {
             repl = repl.replace(/query/g, actualq)
