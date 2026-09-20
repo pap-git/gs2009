@@ -15,7 +15,8 @@ import { log } from "./backend/scripts/things.js"
 import strings from "./backend/strings.js"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import tempf from "./backend/template.js"
+import user from "./backend/user.js";
+import toml from "toml"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -23,7 +24,7 @@ const gs2009_version = pjson.version
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-var config = cfg.template
+var config = toml.parse(cfg.template)
 
 var searxng_ishttps = false;
 var searxng_eg = false;
@@ -38,19 +39,21 @@ async function reloadconfig(){
     let tag = "cfg"
     log.i(strings.cfg.reload, "init")
 
-    config = cfg.template
-    if (!cfg.exists()) await cfg.gen()
+    config = toml.parse(cfg.template)
+    if (!cfg.exists(path.join(__dirname, "config.json")) && !cfg.exists(path.join(__dirname, "config.toml"))) await cfg.gen()
 
-    const file = readFileSync("config.json")
+    const file = fs.readFileSync("config.toml")
 
-    if (cfg.isOld(file)) {
-        log.w("old config found, backing up before convert", "config-conversion")
-        fs.writeFileSync("config.old.json", readFileSync("config.json"))
-        fs.writeFileSync("config.json", JSON.stringify(cfg.convertOld(JSON.parse(file))))
-        log.w("config converted to new format, Please check your config is matched with your previous one", "config-conversion")
+    if (cfg.exists(path.join(__dirname, "config.json"))) {
+        if (cfg.isOld(fs.readFileSync("config.json"))) {
+            log.w("old config found, backing up before convert", "config-conversion")
+            fs.writeFileSync("config.old.json", readFileSync("config.json"))
+            fs.writeFileSync("config.toml", JSON.stringify(cfg.convertOld(JSON.parse(fs.readFileSync("config.json")))))
+            log.w("config converted to new format, Please check your config is matched with your previous one", "config-conversion")
+        }
     }
 
-    config = JSON.parse(readFileSync("config.json"))
+    config = toml.parse(fs.readFileSync("config.toml"))
 
     if (config.backend.engine.type == "cse") {
         if (config.backend.engine.config.cse.api_key == "") {
@@ -64,11 +67,9 @@ async function reloadconfig(){
 
 await reloadconfig()
 
-const {google} = googleapis;
-const customSearch = google.customsearch("v1");
-
 const app = express();
 
+/*
 let template_gbar_user = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user.txt"); // ext_t_g_u
 let template_gbar_user_index = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_index.txt"); // ext_t_g_u
 let template_gbar_user_logged = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_logged.txt"); // ext_t_g_u_l
@@ -113,6 +114,42 @@ function reloadtemplate(){
 }
 
 reloadtemplate();
+*/
+
+function retriveTemplate(lang) {
+    function GiveMeTheResult(lang, next_path) {
+        const langTemplatePath = path.join(__dirname, "/template/", lang)
+        const enTemplatePath = path.join(__dirname, "/template/", "en")
+        return fs.existsSync(path.join(langTemplatePath, next_path)) ? path.join(langTemplatePath, next_path) : path.join(enTemplatePath, next_path)
+    }
+
+    const paths = {
+        gbar_user: GiveMeTheResult(lang, "/gbar_user.txt"), // ext_t_g_u
+        gbar_user_index: GiveMeTheResult(lang, "/gbar_user_index.txt"), // ext_t_g_u
+        gbar_user_logged: GiveMeTheResult(lang, "/gbar_user_logged.txt"), // ext_t_g_u_l
+
+        search_normal: GiveMeTheResult(lang, "/search/normal.txt"), // ext_t_s_n
+        search_more: GiveMeTheResult(lang, "/search/more.txt"), // ext_t_s_m
+        search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
+
+        did_you_mean: GiveMeTheResult(lang, "/search/did_you_mean.txt"), // ext_t_dym
+    }
+
+    const data = {
+        gbar_user: fs.readFileSync(paths.gbar_user, "utf8"),
+        gbar_user_index: fs.readFileSync(paths.gbar_user_index, "utf8"),
+        gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
+
+        search_normal: fs.readFileSync(paths.search_normal, "utf8"),
+        search_more: fs.readFileSync(paths.search_more, "utf8"),
+        search_EOM: fs.readFileSync(paths.search_EOM, "utf8"),
+
+        did_you_mean: fs.readFileSync(paths.did_you_mean, "utf8")
+    }
+    return {
+        paths, data
+    }
+}
 
 var redirector = true;
 
@@ -129,6 +166,9 @@ let SimLogin = [];
 // im using the google search example from here v (thx for og author)
 
 async function search(event) {
+    const {google} = googleapis;
+    const customSearch = google.customsearch("v1");
+
     if (isNaN(start) == true) {
         start = 0;
     }
@@ -137,13 +177,14 @@ async function search(event) {
 
     let result;
 
+    /*
     if (config.backend.engine.type == "searxng") {
         let temp_searxng_ishttps
         if (config.backend.engine.config.searxng.match(/https:\/\//) || config.backend.engine.config.searxng.match(/http:\/\//)) {
             temp_searxng_ishttps = searxng_ishttps
             searxng_ishttps = undefined
         }
-            result = await searxngfetch(config.backend.engine.config.searxng, searxng_ishttps, searxng_eg, query, lr, start)
+        result = await searxngfetch(config.backend.engine.config.searxng, searxng_ishttps, searxng_eg, query, lr, start)
         searxng_ishttps = temp_searxng_ishttps
     } else {
         result = await customSearch.cse.list({
@@ -161,7 +202,9 @@ async function search(event) {
             start: start
         });
     }
+    */
 
+    throw new Error("test")
     return(result);
 }
 
@@ -196,6 +239,9 @@ app.get('/setprefs', (req, res) => {
         return
     }
 
+    res.send("this code is so FUCKED LOL")
+    return
+    /*
     let redir_temp
     let redirhttp_temp
     let onlyold_temp
@@ -255,6 +301,7 @@ app.get('/setprefs', (req, res) => {
     reloadconfig();
     reloadtemplate();
     res.redirect('/');
+    */
 })
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
@@ -266,56 +313,57 @@ app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
     switch(nowdate){
         case "0209":
             logo_path = './assets/logos/soseki10-hp.gif'
+            break;
         default:
             logo_path = './assets/images/ja_jp/logo.gif';
     }
 
-    res.type("gif")
-    res.send(fs.readFileSync(logo_path))
+    res.type("gif").send(fs.readFileSync(logo_path))
 })
 
 app.get('/logos/olympics10.png', (req, res) => {
     let now = new Date
     let nowmonth = now.getMonth() + 1
     let tmp = now.getDay()
-    let nowday 
-    if (tmp < 10) {
-        nowday = 0 + tmp.toString()
-    } else {
-        nowday = tmp
-    }
+    let nowday
+    nowday = tmp < 10 ? 0 + tmp.toString() : tmp
     let nowdate = nowmonth.toString() + nowday.toString()
-    
     let logo_path = './assets/images/ja_jp/logo.gif';
-
-    if (nowdate == "0213") {
-        if (serverlanguage == "ja") {
-            logo_path = './assets/logos/olympics10-opening-nr-hp.png'
-        } else {
-            logo_path = './assets/logos/olympics10-opening-hp.png'
-        }
-    } else if (nowdate == "0214" || nowdate == "0215") {
-        logo_path = './assets/logos/olympics10-snowboarding-hp.png'
-    } else if (nowdate == "0216") {
-        logo_path = './assets/logos/olympics10-xcskiing-hp.png'
-    } else if (nowdate == "0217") {
-        logo_path = './assets/logos/olympics10-curling-hp.png'
-    } else if (nowdate == "0218") {
-        logo_path = './assets/logos/olympics10-xcskiiing2-hp.png'
-    } else if (nowdate == "0219" || nowdate == "0220") {
-        logo_path = './assets/logos/olympics10-apskiing-hp.png'
-    } else if (nowdate == "0221") {
-        logo_path = './assets/logos/olympics10-skijump-hp.png'
-    } else if (nowdate == "0222") {
-        logo_path = './assets/logos/olympics10-bobsleigh-hp.png'
-    } else if (nowdate == "0223") {
-        logo_path = './assets/logos/olympics10-icedance-hp.png'
+    switch (nowdate) {
+        case "0213":
+            logo_path = serverlanguage == "ja" ? './assets/logos/olympics10-opening-nr-hp.png' : './assets/logos/olympics10-opening-hp.png'
+            break;
+        case "0214":
+        case "0215":
+            logo_path = './assets/logos/olympics10-snowboarding-hp.png'
+            break;
+        case "0216":
+            logo_path = './assets/logos/olympics10-xcskiing-hp.png'
+            break;
+        case "0217":
+            logo_path = './assets/logos/olympics10-curling-hp.png'
+            break;
+        case "0218":
+            logo_path = './assets/logos/olympics10-xcskiiing2-hp.png'
+            break;
+        case "0219":
+        case "0220":
+            logo_path = './assets/logos/olympics10-apskiing-hp.png'
+            break;
+        case "0221":
+            logo_path = './assets/logos/olympics10-skijump-hp.png'
+            break;
+        case "0222":
+            logo_path = './assets/logos/olympics10-bobsleigh-hp.png'
+            break;
+        case "0223":
+            logo_path = './assets/logos/olympics10-icedance-hp.png'
+            break;
+        default:
+            logo_path = './assets/images/ja_jp/logo.gif'
     }
 
-    fs.readFile(logo_path, (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
+    res.type('png').send(fs.readFileSync(logo_path))
 })
 
 app.get('/intl/en_ALL/images/logo.gif', (req, res) => {
@@ -575,6 +623,7 @@ app.get('/imghp', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+    const template = retriveTemplate("en")
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = req.cookies.SimLogin;
 
@@ -597,17 +646,11 @@ app.get('/', (req, res) => {
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
-        if (serverlanguage == "ja") {
-            repl = iconv.decode(data, 'shift_jis')
-        } else {
-            repl = data.toString();
-        }
+        repl = serverlanguage == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
 
-        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_i)
-        } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
-        }
+        repl = (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") ? 
+                repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
+                repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
 
         let messagelist = JSON.parse(fs.readFileSync('./assets/messages/' + serverlanguage + '.json', 'utf8'))
 
@@ -719,17 +762,12 @@ app.get('/gs2009settings', (req, res) => {
 })
 
 app.get('/accounts/Login', (req, res) => {
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/signin.html");
+    const file = path.join(__dirname, "/html/" + serverlanguage + "/signin.html");
     if (serverlanguage == "ja") {
-        fs.readFile(filePath, (err, data) => {
-            res.set("Content-Type", "text/html;charset=Shift_JIS")
-            res.send(data)
-        })
+        res.set("Content-Type", "text/html;charset=Shift_JIS")
+        res.send(fs.readFileSync(file))
     } else {
-        fs.readFile(filePath, (err, data) => {
-            data = data.toString();
-            res.send(data)
-        })
+        res.send(fs.readFileSync(file).toString())
     }
 })
 
@@ -749,6 +787,7 @@ app.get('/firefox', (req, res) => {
 })
 
 app.post('/accounts/LoginAuth', (req, res) => {
+    /*
     // console.log(req.body);
     var SimLogin = req.body.Email;
     /*
@@ -759,8 +798,11 @@ app.post('/accounts/LoginAuth', (req, res) => {
         res.end();
     }
     */
+    /*
     res.cookie('SimLogin', SimLogin, { maxAge: 2592000000 });
     res.redirect('/');
+    */
+    user.get(req.body.Email, req.body.Passwd)
 })
 
 app.get('/setCookie', (req, res) => {
@@ -971,10 +1013,13 @@ app.get('/search', async (req, res) => {
     filePath = path.join(__dirname, "/html/" + serverlanguage + "/search.html");
     
     fs.readFile(filePath, (err, data) => {
+        /*
         const ext_t_s_n = fs.readFileSync(template_search_normal, "utf8")
         const ext_t_s_m = fs.readFileSync(template_search_more, "utf8")
         const ext_t_s_eom = fs.readFileSync(template_search_EOM, "utf8")
         const ext_t_s_nf = fs.readFileSync(template_search_notfound, "utf8")
+        */
+        const template = retriveTemplate(serverlanguage)
 
         let repl = "";
         

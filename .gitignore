@@ -20,9 +20,12 @@ parsertest.js
 html/gs2009 copy.html
 
 # wtf??
-.gitignore
+config.toml
 
 # -------------------
 /assets/captcha
 tempf.js
 oldconfigparser.js
+.env
+userdb.json
+secretdb.json

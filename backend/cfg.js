@@ -1,9 +1,11 @@
+import toml from "toml"
 import fs from "node:fs"
 import {log} from "./scripts/things.js";
 import strings from "./strings.js";
 import path from "node:path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { config } from "googleapis/build/src/apis/config/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,43 +23,7 @@ const internal = {
 
 const cfg = {
     tag: "cfg",
-    template: {
-        "server": {
-            "port": 3000,
-            "enableServerSettingsPage": true
-        },
-        "backend": {
-            "engine": {
-                "type": "searxng",
-                "config": {
-                    "searxng": {
-                        "url": "",
-                        "forceGoogle": false
-                    },
-                    "cse": {
-                        "api_key": "",
-                        "cse_id": ""
-                    }
-                }
-            },
-            "searchQuery": false
-        },
-        "frontend": {
-            "enableCookieBasedSettings": false,
-            "default": {
-                "language": "ja",
-                "searchQuery": false,
-                "before": false,
-                "redirect": {
-                    "enabled": ["wayback", "yt2009", "http"],
-                    "properties": {
-                        "wayback_date": 20100324182056,
-                        "yt2009_url": ""
-                    }
-                }
-            }
-        }
-    },
+    template: fs.readFileSync(path.join("backend", "config.template.toml")),
 
     isOld: function(json) {
         const waybackdate = "20100324182056";
@@ -152,12 +118,13 @@ const cfg = {
     },
 
     gen: async function (pathtoconfig, force) {
-        const p = pathtoconfig ? path.join(__dirname, "../", pathtoconfig) : path.join(__dirname, "../config.json")
+        const p = pathtoconfig ? path.join(__dirname, "../", pathtoconfig) : path.join(__dirname, "../config.toml")
         if (!cfg.exists() || force) {
             log.i(force ? "re" + strings.cfg.gen : strings.cfg.gen, cfg.tag)
             log.w(strings.l + strings.cfg.gen_w + strings.l, cfg.tag)
 
-            fs.writeFileSync(p, JSON.stringify(cfg.template));
+            console.log(cfg.template)
+            fs.writeFileSync(p, cfg.template);
             log.i(strings.cfg.gen_after + p)
         }
     },

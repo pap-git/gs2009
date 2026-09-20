@@ -1,0 +1,45 @@
+# This is configuration file for this gs2009 instance.
+
+[server]
+port=3000
+
+[server.settingsPage]
+enabled=false
+authEnabled=true
+auth.user=""
+auth.password=""
+
+[engine]
+order=["cse", "searxng"]
+
+[engine.searxng]
+url=""
+enginesToUse=[]
+
+[engine.csjapi]
+api_key=""
+cse_id=""
+
+[users]
+# users: User system for managing settings on this instance. An feature added from gs2009 version 2.0.0.
+# You need to set location.userdb to use this feature.
+
+# enabled: Enables this feature.
+# Disable this feature if you want "simulated-login" feature like in version before 1.4.20260420.
+enabled=true
+
+# enablePasswordAuth: Enable users to authenticate with password.
+# You will have to set GS2009_AUTH_SECRET1 and GS2009_AUTH_SECRET2 on .env file, and set location for secretdb.json in here.
+# disabling this with the instance shared with someone will make disaster lol go ahead if you wanna
+enablePasswordAuth=true
+
+location.secretdb="secretdb.json"
+location.userdb="userdb.json"
+
+[frontend]
+# forceDefaults: Force the default settings instead of using user-side settings.
+# Not recommended to enable this for public instances.
+forceDefaults=true
+[frontend.defaults]
+# language: 
+language="en"

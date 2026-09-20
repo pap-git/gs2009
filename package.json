@@ -1,6 +1,6 @@
 {
   "name": "gs2009",
-  "version": "1.4.20260402.1",
+  "version": "2.0.0",
   "description": "google.co.jp 2009 recreation with nodejs",
   "homepage": "https://github.com/pap-git/gs2009#readme",
   "bugs": {
@@ -34,6 +34,7 @@
     "qs": "^6.14.0",
     "readline-sync": "^1.4.10",
     "request": "^2.88.2",
-    "then-request": "^6.0.2"
+    "then-request": "^6.0.2",
+    "toml": "^5.0.0"
   }
 }
