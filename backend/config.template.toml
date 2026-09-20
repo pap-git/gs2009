@@ -1,23 +1,40 @@
 # This is configuration file for this gs2009 instance.
+# Generated from templates via gs2009 version OKAYGIMMETHEVERSIONPLEASE??
 
 [server]
+# port: The port number to host this instance.
 port=3000
 
 [server.settingsPage]
+# enabled: Enabling this will allows users to edit server settings from client-side.
+# Recommended to use with authEnabled option.
 enabled=false
+# authEnabled: Require username and password on accessing to settings page.
+# Both auth.user and auth.password needs to be set properly.
 authEnabled=true
+# auth.user: Username for settings page.
 auth.user=""
+# auth.password: Password for settings page.
 auth.password=""
 
 [engine]
+# order: The order to use these engines. Available options: "cse", "searxng"
+# Add the engines you want to use to the list.
 order=["cse", "searxng"]
 
 [engine.searxng]
+# In order to use SearXNG as engine, You will have to use the instance that supports JSON format.
+# Please refer the documentation of SearXNG to enabling them.
+#
+# url: Instance URL.
 url=""
+# enginesToUse: idk will i implement this??
 enginesToUse=[]
 
 [engine.csjapi]
+# api_key: API key to use "Custom Search JSON API".
 api_key=""
+# cse_id: Search engine ID from "Programmable Search Engine ID".
 cse_id=""
 
 [users]
@@ -33,7 +50,9 @@ enabled=true
 # disabling this with the instance shared with someone will make disaster lol go ahead if you wanna
 enablePasswordAuth=true
 
+# location.secretdb: The json database location to store user secrets.
 location.secretdb="secretdb.json"
+# location.userdb: The json database location to store user datas.
 location.userdb="userdb.json"
 
 [frontend]
@@ -41,5 +60,24 @@ location.userdb="userdb.json"
 # Not recommended to enable this for public instances.
 forceDefaults=true
 [frontend.defaults]
-# language: 
+# language: Languages of the page. If Language doesn't exist, it will use English as fallback.
 language="en"
+# eras: Keeping for future use.
+eras=""
+# before: Limits search results to before specific date. Only tested with Custom Search JSON API (Google).
+# Should be same format with Google's one, for example: 2009-12-31
+# Leave it 0000-00-00 if you don't use them.
+before=2009-12-31
+# redirects.enabled: Enables editing URL for redirecting. Available options: "wayback", "yt2009", "http"
+#         "wayback": Replace URL with Wayback Machine in specific date.
+#                    Will be automatically disabled if wayback_date is not defined or wrong format.
+#          "yt2009": Replace YouTube URL with yt2009 address.
+#                    Will be automatically disabled if yt2009_address is not defined.
+#            "http": Replace HTTPS links with HTTP link.
+redirects.enabled=["wayback", "http"]
+# redirects.wayback_date: Wayback Machine date for redirecting.
+# Format: YYYYMMDDhhmmss, Example: 20091231235959
+redirects.wayback_date=20100101012345
+# redirects.yt2009_address: yt2009 instance address for redirecting from YouTube addresses.
+# Example: If you have address like "http://192.168.0.10:8080/" then should be "192.168.0.10:8080".
+redirects.yt2009_address=""
