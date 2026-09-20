@@ -32,8 +32,11 @@ var searxng_eg = false;
 var redirector_only = "none"; // keeping this shit for a while its so messy here
 var only_old = false;
 var only_old_date = "2010-03-20";
-var serverlanguage = "en";
 var searchqueryEnabled = true;
+
+function getLanguage(userAuth) {
+    user.get()
+}
 
 async function reloadconfig(){
     let tag = "cfg"
@@ -55,14 +58,35 @@ async function reloadconfig(){
 
     config = toml.parse(fs.readFileSync("config.toml"))
 
+    /*
     if (config.backend.engine.type == "cse") {
-        if (config.backend.engine.config.cse.api_key == "") {
-            log.w("Custom Search API (backend.engine.config.cse.api_key) is not set correctly! PLease see /gs2009settings")
+        if (config.config.engine.csjapi.api_key == "") {
+            log.w("Custom Search API (config.engine.csjapi.api_key) is not set correctly! PLease see /gs2009settings")
         }
-        if (config.backend.engine.config.cse.cse_id == "") {
-            log.w("Search Engine ID (backend.engine.config.cse.cse_id) is not set correctly! PLease see /gs2009settings")
+        if (config.config.engine.csjapi.cse_id == "") {
+            log.w("Search Engine ID (config.engine.csjapi.cse_id) is not set correctly! PLease see /gs2009settings")
         }
     }
+    */
+    config.engine.order.forEach((engineName) => {
+        switch (engineName) {
+            case "cse":
+                if (config.engine.csjapi.api_key == "") {
+                    log.w("Custom Search API (config.engine.csjapi.api_key) is not set correctl! Please check your config.toml")
+                }
+                if (config.engine.csjapi.cse_id == "") {
+                    log.w("Search Engine ID (config.engine.csjapi.cse_id) is not set correctly! Please check your config.toml")
+                }
+                break;
+            case "searxng":
+                if (config.engine.searxng.url == "") {
+                    log.w("SearXNG instance URL (config.engine.searxng.url) is not set correctly! Please check your config.toml")
+                }
+                break;
+            default:
+                throw new Error("Unknown engine name:", engineName)
+        }
+    })
 }
 
 await reloadconfig()
@@ -189,9 +213,9 @@ async function search(event) {
     } else {
         result = await customSearch.cse.list({
 
-            auth: config.backend.engine.config.cse.api_key,
+            auth: config.config.engine.csjapi.api_key,
 
-            cx: config.backend.engine.config.cse.cse_id,
+            cx: config.config.engine.csjapi.cse_id,
 
             q: query,
 
@@ -715,8 +739,8 @@ app.get('/gs2009settings', (req, res) => {
             repl = repl.replace(/searxng_eg value=1/, "searxng_eg value=1 checked")
         }
 
-        repl = repl.replace("api-key-replace-this", config.backend.engine.config.cse.api_key)
-        repl = repl.replace("cse-id-replace-this", config.backend.engine.config.cse.cse_id)
+        repl = repl.replace("api-key-replace-this", config.config.engine.csjapi.api_key)
+        repl = repl.replace("cse-id-replace-this", config.config.engine.csjapi.cse_id)
         repl = repl.replace("value=" + serverlanguage, "value=" + serverlanguage + " selected")
 
         repl = repl.replace(/wayback" checked/, "wayback\"")
@@ -802,7 +826,8 @@ app.post('/accounts/LoginAuth', (req, res) => {
     res.cookie('SimLogin', SimLogin, { maxAge: 2592000000 });
     res.redirect('/');
     */
-    user.get(req.body.Email, req.body.Passwd)
+    
+    user.get(req.body.Email, user.md5saltMe(req.body.Passwd))
 })
 
 app.get('/setCookie', (req, res) => {
@@ -836,7 +861,7 @@ app.get('/search', async (req, res) => {
     console.log("[INFO] search: got an /search GET")
     switch (config.backend.engine.type) {
         case "cse":
-            if (config.backend.engine.config.cse.api_key == "" || config.backend.engine.config.cse.cse_id == "") {
+            if (config.config.engine.csjapi.api_key == "" || config.config.engine.csjapi.cse_id == "") {
                 console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set! redirecting to /gs2009settings")
                 res.redirect("/gs2009settings")
                 return

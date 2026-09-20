@@ -119,17 +119,16 @@ const cfg = {
 
     gen: async function (pathtoconfig, force) {
         const p = pathtoconfig ? path.join(__dirname, "../", pathtoconfig) : path.join(__dirname, "../config.toml")
-        if (!cfg.exists() || force) {
+        if (!(cfg.exists(path.join(__dirname, "config.json")) && cfg.exists(path.join(__dirname, "config.toml"))) || force) {
             log.i(force ? "re" + strings.cfg.gen : strings.cfg.gen, cfg.tag)
             log.w(strings.l + strings.cfg.gen_w + strings.l, cfg.tag)
 
-            console.log(cfg.template)
             fs.writeFileSync(p, cfg.template);
             log.i(strings.cfg.gen_after + p)
         }
     },
     exists: function (pathtoconfig) {
-        const p = pathtoconfig ? path.join(__dirname, "../", pathtoconfig) : path.join(__dirname, "../config.json")
+        const p = pathtoconfig ? pathtoconfig : path.join(__dirname, "../config.json")
         return fs.existsSync(p)
     }
 }
