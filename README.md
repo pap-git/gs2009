@@ -15,11 +15,11 @@
 > For the future questions/help, **[Join the Discord server](https://discord.gg/pkmJweRZuU) and post it to #support forum.**
 
 ## Features
- - **2009 google**
+ - **2009/2010 Google recreation using snapshots from Wayback Machine!**
  - **Search features (with SearXNG/Custom Search JSON API)** (images/videos search are not implemented yet)
- - **Simulated login feature**
+ - **Simulated login / Actual User feature**
  - I'm feeling lucky
- - **Add `before:` option automatically**
+ - **Add `before:` option automatically (works only with Custom Search JSON API method)**
  - Redirector to **HTTP / [yt2009](https://github.com/ftde0/yt2009) & [Wayback Machine](https://web.archive.org)**
 
 ## Usage

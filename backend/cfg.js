@@ -1,6 +1,6 @@
 import toml from "toml"
 import fs from "node:fs"
-import {log} from "./scripts/things.js";
+import {log} from "./things.js";
 import strings from "./strings.js";
 import path from "node:path";
 import { fileURLToPath } from 'url';

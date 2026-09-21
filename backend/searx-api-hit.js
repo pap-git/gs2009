@@ -33,8 +33,8 @@ export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnab
     } else { 
         query = encodeURIComponent(query)
     }
-    if (start != undefined) {
-        page = 1 + (start / 10)
+    if (start !== undefined) {
+        page = 1 + parseInt(start / 10)
     } else {
         page = 1
     }

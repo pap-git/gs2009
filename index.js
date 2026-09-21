@@ -1,4 +1,4 @@
-import fs, { readFileSync } from "fs"
+import fs, { lchown, readFileSync } from "fs"
 import iconv from 'iconv-lite'
 import path from "path"
 import express from "express"
@@ -11,7 +11,7 @@ import autocomplete from './extern_js/pull_autocomplete.js'
 import * as readline from 'readline-sync'
 import searxngfetch from './backend/searx-api-hit.js'
 import cfg from "./backend/cfg.js";
-import { log } from "./backend/scripts/things.js"
+import { log } from "./backend/things.js"
 import strings from "./backend/strings.js"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -20,6 +20,8 @@ import toml from "toml"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
+
+const serviceID = "a5a0d64a-ae61-4972-81cd-97f3e2ee73a9"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,8 +36,25 @@ var only_old = false;
 var only_old_date = "2010-03-20";
 var searchqueryEnabled = true;
 
-function getLanguage(userAuth) {
-    user.get()
+function getLanguage(settings) {
+    if (!settings) return "en"
+    const j = JSON.parse(settings)
+
+    if (!j) return "en"
+    else try {
+        return j.language
+    } catch {
+        return "en"
+    }
+}
+
+function grabSettings(settings) {
+    if (!settings) return config.frontend.defaults
+    try {
+        return JSON.parse(settings)
+    } catch {
+        return config.frontend.defaults
+    }
 }
 
 async function reloadconfig(){
@@ -93,53 +112,6 @@ await reloadconfig()
 
 const app = express();
 
-/*
-let template_gbar_user = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user.txt"); // ext_t_g_u
-let template_gbar_user_index = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_index.txt"); // ext_t_g_u
-let template_gbar_user_logged = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_logged.txt"); // ext_t_g_u_l
-
-let template_search_normal = path.join(__dirname, "/template/" + serverlanguage + "/search/normal.txt"); // ext_t_s_n
-let template_search_more = path.join(__dirname, "/template/" + serverlanguage + "/search/more.txt"); // ext_t_s_m
-let template_search_EOM = path.join(__dirname, "/template/" + serverlanguage + "/search/more_eom.txt"); // ext_t_s_EOM
-let template_search_notfound = path.join(__dirname, "/template/" + serverlanguage + "/search/not_found.txt"); // ext_t_s_nf
-
-let template_did_you_mean = path.join(__dirname, "/template/" + serverlanguage + "/search/did_you_mean.txt"); // ext_t_dym
-
-let ext_t_g_u = fs.readFileSync(template_gbar_user, "utf8")
-console.log("[INFO] loaded template (template_gbar_user)")
-let ext_t_g_u_i = fs.readFileSync(template_gbar_user_index, "utf8")
-console.log("[INFO] loaded template (template_gbar_user_index)")
-let ext_t_g_u_l = fs.readFileSync(template_gbar_user_logged, "utf8")
-console.log("[INFO] loaded template (template_gbar_user_logged)")
-let ext_t_dym = fs.readFileSync(template_did_you_mean, "utf8")
-console.log("[INFO] loaded template (template_did_you_mean)")
-
-function reloadtemplate(){
-
-    template_gbar_user = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user.txt"); // ext_t_g_u
-    template_gbar_user_index = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_index.txt"); // ext_t_g_u
-    template_gbar_user_logged = path.join(__dirname, "/template/" + serverlanguage + "/gbar_user_logged.txt"); // ext_t_g_u_l
-
-    template_search_normal = path.join(__dirname, "/template/" + serverlanguage + "/search/normal.txt"); // ext_t_s_n
-    template_search_more = path.join(__dirname, "/template/" + serverlanguage + "/search/more.txt"); // ext_t_s_m
-    template_search_EOM = path.join(__dirname, "/template/" + serverlanguage + "/search/more_eom.txt"); // ext_t_s_EOM
-
-    template_did_you_mean = path.join(__dirname, "/template/" + serverlanguage + "/search/did_you_mean.txt"); // ext_t_dym
-
-    ext_t_g_u = fs.readFileSync(template_gbar_user, "utf8")
-    console.log("[INFO] reloaded template (template_gbar_user)")
-    ext_t_g_u_i = fs.readFileSync(template_gbar_user_index, "utf8")
-    console.log("[INFO] reloaded template (template_gbar_user_index)")
-    ext_t_g_u_l = fs.readFileSync(template_gbar_user_logged, "utf8")
-    console.log("[INFO] reloaded template (template_gbar_user_logged)")
-    ext_t_dym = fs.readFileSync(template_did_you_mean, "utf8")
-    console.log("[INFO] loaded template (template_did_you_mean)")
-    console.log("[INFO] reloaded all template/template paths")
-}
-
-reloadtemplate();
-*/
-
 function retriveTemplate(lang) {
     function GiveMeTheResult(lang, next_path) {
         const langTemplatePath = path.join(__dirname, "/template/", lang)
@@ -155,6 +127,7 @@ function retriveTemplate(lang) {
         search_normal: GiveMeTheResult(lang, "/search/normal.txt"), // ext_t_s_n
         search_more: GiveMeTheResult(lang, "/search/more.txt"), // ext_t_s_m
         search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
+        search_notfound: GiveMeTheResult(lang, "/search/not_found.txt"), // ext_t_s_nf
 
         did_you_mean: GiveMeTheResult(lang, "/search/did_you_mean.txt"), // ext_t_dym
     }
@@ -167,6 +140,7 @@ function retriveTemplate(lang) {
         search_normal: fs.readFileSync(paths.search_normal, "utf8"),
         search_more: fs.readFileSync(paths.search_more, "utf8"),
         search_EOM: fs.readFileSync(paths.search_EOM, "utf8"),
+        search_notfound: fs.readFileSync(paths.search_notfound, "utf8"),
 
         did_you_mean: fs.readFileSync(paths.did_you_mean, "utf8")
     }
@@ -190,17 +164,59 @@ let SimLogin = [];
 // im using the google search example from here v (thx for og author)
 
 async function search(event) {
-    const {google} = googleapis;
-    const customSearch = google.customsearch("v1");
 
     if (isNaN(start) == true) {
         start = 0;
     }
 
-    console.log(start)
-
     let result;
+    let errorCounts = 0;
 
+    for (let i = 0; i < config.engine.order.length; i++) {
+        log.i("trying engine: " + config.engine.order[i], "search")
+        switch (config.engine.order[i]) {
+            case "cse":
+                if (!config.engine.csjapi.api_key || !config.engine.csjapi.cse_id) throw new Error("Either API key or CSE ID is missing on Custom Search JSON API settings")
+
+                try {
+                    const {google} = googleapis;
+                    const customSearch = google.customsearch("v1");
+                    result = await customSearch.cse.list({
+                        auth: config.engine.csjapi.api_key,
+                        cx: config.engine.csjapi.cse_id,
+                        q: query,
+                        hl: hl,
+                        lr: lr,
+                        start: start
+                    });
+                    i = config.engine.order.length
+                } catch(e) {
+                    log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
+                    log.e(e.trace)
+                    errorCounts++
+                }
+                break;
+            case "searxng":
+                try {
+                    let temp_searxng_ishttps
+                    if (config.engine.searxng.url.match(/https:\/\//) || config.engine.searxng.url.match(/http:\/\//)) {
+                        temp_searxng_ishttps = searxng_ishttps
+                        searxng_ishttps = undefined
+                    }
+                    result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr)
+                    searxng_ishttps = temp_searxng_ishttps
+
+                    if (result.data.error) throw new Error("bye bro")
+                    i = config.engine.order.length
+                } catch(e) {
+                    log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
+                    errorCounts++
+                }
+                break;
+            default:
+                throw new Error("??? got new engine called " + config.engine.order[i])
+        }
+    }
     /*
     if (config.backend.engine.type == "searxng") {
         let temp_searxng_ishttps
@@ -228,7 +244,7 @@ async function search(event) {
     }
     */
 
-    throw new Error("test")
+    if (errorCounts == config.engine.order.length) log.e("Failed to retrive results on every engine", "search")
     return(result);
 }
 
@@ -243,6 +259,27 @@ app.use(async (req, res, next) => {
     // for some of server like in the issue #18 
     if (Array.from(req.url)[0] + Array.from(req.url)[1] == "//") {
         req.url = req.url.slice(1)
+    }
+
+    if (req.cookies.GS2009_ACCOUNTS) {
+        let age = {};
+        if (JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe) {
+            age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
+        }
+        let userdata;
+
+        try { 
+            userdata = await user.get(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, JSON.parse(req.cookies.GS2009_ACCOUNTS).auth, serviceID)
+            res.cookie('GS2009_ACCOUNTS', JSON.stringify({
+                email: JSON.parse(req.cookies.GS2009_ACCOUNTS).email,
+                auth: JSON.parse(req.cookies.GS2009_ACCOUNTS).auth,
+                stayWithMe: JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe
+            }), age)
+            res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
+        } catch {
+            res.clearCookie('GS2009_ACCOUNTS');
+            res.clearCookie('GS2009_SETTINGS');
+        }
     }
 
     if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
@@ -346,6 +383,8 @@ app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
 })
 
 app.get('/logos/olympics10.png', (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+
     let now = new Date
     let nowmonth = now.getMonth() + 1
     let tmp = now.getDay()
@@ -355,7 +394,7 @@ app.get('/logos/olympics10.png', (req, res) => {
     let logo_path = './assets/images/ja_jp/logo.gif';
     switch (nowdate) {
         case "0213":
-            logo_path = serverlanguage == "ja" ? './assets/logos/olympics10-opening-nr-hp.png' : './assets/logos/olympics10-opening-hp.png'
+            logo_path = language == "ja" ? './assets/logos/olympics10-opening-nr-hp.png' : './assets/logos/olympics10-opening-hp.png'
             break;
         case "0214":
         case "0215":
@@ -447,14 +486,16 @@ app.get('/images/yellow_warning.gif', (req, res) => {
 })
 
 app.get('/extern_js/f/autocomplete.js', (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+
     fs.readFile('./extern_js/autocomplete.js', (err, data) => {
         let repl = data.toString();
 
-        const filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+        const filePath = path.join(__dirname, "/html/" + language + "/index.html");
         fs.readFile(filePath, (err, data) => {
             let conv;
 
-            if (serverlanguage == "ja") {
+            if (language == "ja") {
                 conv = iconv.decode(data, 'shift_jis')
             } else {
                 conv = data.toString();
@@ -478,19 +519,21 @@ app.get('/extern_js/f/autocomplete.js', (req, res) => {
 })
 
 app.get('/complete/search', async (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+
     let result = "";
     let hl = "";
 
     // console.log(req.query)
     // console.log(req.originalUrl)
     if (req.query.hl == "" || req.query.hl == undefined) {
-        hl = serverlanguage;
+        hl = language;
     } else {
         hl = req.query.hl;
     }
 
     result = await autocomplete.pull(req.query.q, hl, req.query.expIds, req.query.cp)
-    if (serverlanguage == "ja") {
+    if (language == "ja") {
         result = iconv.encode(result.toString(), 'shift_jis')
         res.set('Content-Type','text/javascript; charset=Shift_JIS')
     } else {
@@ -585,13 +628,17 @@ app.get('/notepad', (req, res) => {
 });
 
 app.get('/search_csstest', (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
-    let SimLogin = req.cookies.SimLogin;
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/search.html");
+    let SimLogin = undefined;
+    try {
+        SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+    } catch {}
+    const filePath = path.join(__dirname, "/html/" + language + "/search.html");
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
-        if (serverlanguage == "ja") {
+        if (language == "ja") {
             repl = iconv.decode(data, 'shift_jis')
         } else {
             repl = data.toString();
@@ -604,7 +651,7 @@ app.get('/search_csstest', (req, res) => {
         }
         
         repl = repl.replace(/gbar_username/g, SimLogin)
-        if (serverlanguage == "ja"){
+        if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(encoded)
@@ -617,25 +664,21 @@ app.get('/search_csstest', (req, res) => {
 });
 
 app.get('/imghp', (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    let SimLogin = undefined;
+    try {
+        SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+    } catch {}
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
-    if (req.cookies.SimLogin === undefined) {
-        const filePath = path.join(__dirname, "/html/" + serverlanguage + "/images/index.html");
+    if (SimLogin === undefined && SimLogin == 'undefined') {
+        const filePath = path.join(__dirname, "/html/" + language + "/images/index.html");
             fs.readFile(filePath, (err, data) => {
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(data)
         } )
         return
     }
-    if (req.cookies.SimLogin == 'undefined') {
-        const filePath = path.join(__dirname, "/html/" + serverlanguage + "/images/index.html");
-            fs.readFile(filePath, (err, data) => {
-            res.set("Content-Type", "text/html;charset=Shift_JIS")
-            res.send(data)
-        } )
-        return
-    }
-    let SimLogin = req.cookies.SimLogin;
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/images/index_signed_in.html");
+    const filePath = path.join(__dirname, "/html/" + language + "/images/index_signed_in.html");
     fs.readFile(filePath, (err, data) => {
         let decoded = iconv.decode(data, 'shift_jis')
         let replaced = decoded.replace(/username/g, SimLogin)
@@ -647,9 +690,13 @@ app.get('/imghp', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    const template = retriveTemplate("en")
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const template = retriveTemplate(language)
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
-    let SimLogin = req.cookies.SimLogin;
+    let SimLogin = undefined;
+    try {
+        SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+    } catch {}
 
     let now = new Date
     let nowmonth = now.getMonth() + 1
@@ -659,24 +706,24 @@ app.get('/', (req, res) => {
 
     if (nowmonth == 2){
         if (tmp >= 12 && tmp <= 23) {
-            filePath = path.join(__dirname, "/html/" + serverlanguage + "/index-olympics10.html");
+            filePath = path.join(__dirname, "/html/" + language + "/index-olympics10.html");
         } else {
-            filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+            filePath = path.join(__dirname, "/html/" + language + "/index.html");
         }
     } else {
-        filePath = path.join(__dirname, "/html/" + serverlanguage + "/index.html");
+        filePath = path.join(__dirname, "/html/" + language + "/index.html");
     }
         
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
-        repl = serverlanguage == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
+        repl = language == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
 
         repl = (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") ? 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
 
-        let messagelist = JSON.parse(fs.readFileSync('./assets/messages/' + serverlanguage + '.json', 'utf8'))
+        let messagelist = JSON.parse(fs.readFileSync('./assets/messages/' + language + '.json', 'utf8'))
 
         let now = new Date
         let nowmonth = now.getMonth() + 1
@@ -700,7 +747,7 @@ app.get('/', (req, res) => {
         
         repl = repl.replace(/undefined/g, "")
         repl = repl.replace(/gbar_username/g, SimLogin)
-        if (serverlanguage == "ja"){
+        if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(encoded)
@@ -714,6 +761,8 @@ app.get('/', (req, res) => {
 
 
 app.get('/gs2009settings', (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+
     if (config.server.enableServerSettingsPage == false) {
         res.send("This feature is disabled due to settings page is disabled.<br>Please contact your administrator to change the settings.")
         return
@@ -741,7 +790,7 @@ app.get('/gs2009settings', (req, res) => {
 
         repl = repl.replace("api-key-replace-this", config.config.engine.csjapi.api_key)
         repl = repl.replace("cse-id-replace-this", config.config.engine.csjapi.cse_id)
-        repl = repl.replace("value=" + serverlanguage, "value=" + serverlanguage + " selected")
+        repl = repl.replace("value=" + language, "value=" + language + " selected")
 
         repl = repl.replace(/wayback" checked/, "wayback\"")
 
@@ -786,8 +835,9 @@ app.get('/gs2009settings', (req, res) => {
 })
 
 app.get('/accounts/Login', (req, res) => {
-    const file = path.join(__dirname, "/html/" + serverlanguage + "/signin.html");
-    if (serverlanguage == "ja") {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const file = path.join(__dirname, "/html/" + language + "/signin.html");
+    if (language == "ja") {
         res.set("Content-Type", "text/html;charset=Shift_JIS")
         res.send(fs.readFileSync(file))
     } else {
@@ -796,8 +846,8 @@ app.get('/accounts/Login', (req, res) => {
 })
 
 app.get('/firefox', (req, res) => {
-    const filePath = path.join(__dirname, "/html/" + serverlanguage + "/firefox/index.html");
-    if (serverlanguage == "ja") {
+    const filePath = path.join(__dirname, "/html/" + language + "/firefox/index.html");
+    if (language == "ja") {
         fs.readFile(filePath, (err, data) => {
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(data)
@@ -810,7 +860,7 @@ app.get('/firefox', (req, res) => {
     }
 })
 
-app.post('/accounts/LoginAuth', (req, res) => {
+app.post('/accounts/LoginAuth', async (req, res) => {
     /*
     // console.log(req.body);
     var SimLogin = req.body.Email;
@@ -827,54 +877,54 @@ app.post('/accounts/LoginAuth', (req, res) => {
     res.redirect('/');
     */
     
-    user.get(req.body.Email, user.md5saltMe(req.body.Passwd))
-})
-
-app.get('/setCookie', (req, res) => {
-    const userlogin = {
-        "email": "paphere124@hotmail.com",
-        "auth": ""
-    }
-    const usersettings = {
-        "language": "en",
-        "searchQuery": false,
-        "before": {
-            "enabled": true,
-            "date": "2010-01-24"
-        },
-        "redirect": {
-            "enabled": ["wayback", "yt2009", "http"],
-            "properties": {
-                "wayback_date": 20100324182056,
-                "yt2009_url": ""
-            }
+    if (await user.auth(req.body.Email, user.md5saltMe(req.body.Passwd))) {
+        // would implement session id
+        let age = {};
+        if (req.body.PersistentCookie) {
+            age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
         }
+        let userdata;
+
+        try { 
+            userdata = await user.get(req.body.Email, user.md5saltMe(req.body.Passwd), serviceID) } 
+        catch {
+            userdata = await user.modifyData(req.body.Email, serviceID, {
+                "language": "en",
+                "searchQuery": true,
+                "before": {
+                    "enabled": true,
+                    "date": "2010-01-24"
+                },
+                "redirect": {
+                    "enabled": ["wayback", "yt2009", "http"],
+                    "properties": {
+                        "wayback_date": 20100324182056,
+                        "yt2009_url": ""
+                    }
+                }
+            }, true)
+        }
+        res.cookie('GS2009_ACCOUNTS', JSON.stringify({
+            email: req.body.Email,
+            auth: user.md5saltMe(req.body.Passwd),
+            stayWithMe: req.body.PersistentCookie ? JSON.parse(true) : JSON.parse(false)
+        }), age)
+        res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
+        res.redirect("/")
+    } else {
+        res.send("Email or password is incorrect.")
     }
 })
 
 app.get('/clearcookies', (req, res) => {
-    res.clearCookie('SimLogin');
+    res.clearCookie('GS2009_ACCOUNTS');
+    res.clearCookie('GS2009_SETTINGS');
     res.redirect('/');
 })
 
 app.get('/search', async (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
     console.log("[INFO] search: got an /search GET")
-    switch (config.backend.engine.type) {
-        case "cse":
-            if (config.config.engine.csjapi.api_key == "" || config.config.engine.csjapi.cse_id == "") {
-                console.log("[WARN] search: Google Custom Search API or Programmable Search Engine ID is not set! redirecting to /gs2009settings")
-                res.redirect("/gs2009settings")
-                return
-            }
-            break;
-        case "searxng":
-            if (config.backend.engine.config.searxng == "" || config.backend.engine.config.searxng == undefined) {
-                console.log("[WARN] search: SearXNG Search API selected but API URL is not set on config! redirecting to /gs2009settings")
-                res.redirect("/gs2009settings")
-                return
-            }
-            break;
-    }
     const startTime = Date.now();
     let nowTime = 0;
     var sqparam = qs.parse(parseurl(req).query);
@@ -905,7 +955,7 @@ app.get('/search', async (req, res) => {
     // console.log(req.query)
 
     if (req.query.hl == "" || req.query.hl == undefined) {
-        hl = serverlanguage;
+        hl = language;
     } else {
         hl = req.query.hl;
     }
@@ -925,6 +975,7 @@ app.get('/search', async (req, res) => {
     try {
         result = await search();
     } catch(e) {
+        /*
         if (config.backend.engine.type == "cse") {
             console.error("[ERROR] GaxiosError:", e.cause.status);
             console.error("[ERROR]", e.cause.message);
@@ -953,6 +1004,7 @@ app.get('/search', async (req, res) => {
                 res.send(repl)
             })
         }
+        */
         
         return
     }
@@ -1035,31 +1087,28 @@ app.get('/search', async (req, res) => {
     console.log("[INFO] search: Sorted Number list:")
     console.log(linknumlist);
 
-    filePath = path.join(__dirname, "/html/" + serverlanguage + "/search.html");
+    filePath = path.join(__dirname, "/html/" + language + "/search.html");
     
     fs.readFile(filePath, (err, data) => {
-        /*
-        const ext_t_s_n = fs.readFileSync(template_search_normal, "utf8")
-        const ext_t_s_m = fs.readFileSync(template_search_more, "utf8")
-        const ext_t_s_eom = fs.readFileSync(template_search_EOM, "utf8")
-        const ext_t_s_nf = fs.readFileSync(template_search_notfound, "utf8")
-        */
-        const template = retriveTemplate(serverlanguage)
+        const template = retriveTemplate(language)
 
         let repl = "";
         
-        if (serverlanguage == "ja") {
+        if (language == "ja") {
             repl = iconv.decode(data, 'shift_jis')
         } else {
             repl = data.toString();
         }
 
-        let SimLogin = req.cookies.SimLogin;
+        let SimLogin = undefined;
+        try {
+            SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+        } catch {}
 
         if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u)
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user)
         } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
         }
 
         if (result.data.items.length < 1) {
@@ -1067,7 +1116,7 @@ app.get('/search', async (req, res) => {
             repl = repl.replace(/didyoumean/g, "");
             repl = repl.replace(/item/g, "");
 
-            repl = repl.replace(/topItem/g, ext_t_s_nf);
+            repl = repl.replace(/topItem/g, template.data.search_notfound);
 
             repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
@@ -1076,7 +1125,7 @@ app.get('/search', async (req, res) => {
             } else {
                 repl = repl.replace(/query/g, query)
             }
-            if (serverlanguage == "ja"){
+            if (language == "ja"){
                 let encoded = iconv.encode(repl, 'shift_jis')
                 res.set("Content-Type", "text/html;charset=Shift_JIS")
                 res.send(encoded)
@@ -1113,17 +1162,12 @@ app.get('/search', async (req, res) => {
 
         result.data.items.forEach((item, i) => {
             if (typeof linkalplist[i] !== 'number') {
-                repl = repl.replace(/item/, ext_t_s_m)
+                repl = repl.replace(/item/, template.data.search_more)
                 return
             }
-            repl = repl.replace(/item/, ext_t_s_n)
-            repl = repl.replace(/lastone/, ext_t_s_eom)
+            repl = repl.replace(/item/, template.data.search_normal)
+            repl = repl.replace(/lastone/, template.data.search_EOM)
         })
-
-        repl = repl.replace(/htmlTitle/, result.data.items[0].htmlTitle)
-        if (config.frontend.default.redirect.enabled.includes("http") == true) {
-            result.data.items[0].link = result.data.items[0].link.replace("https://", "http://")
-        }
 
         const search = [];
         search.htmlTitle = "";
@@ -1131,56 +1175,6 @@ app.get('/search', async (req, res) => {
         search.htmlSnippet = "";
         search.htmlFormattedUrl = "";
         search.displayLink = "";
-
-        search.htmlTitle = result.data.items[0].htmlTitle;
-        search.link = result.data.items[0].link;
-        search.htmlFormattedUrl = result.data.items[0].htmlFormattedUrl;
-        search.htmlSnippet = result.data.items[0].htmlSnippet;
-        search.displayLink = result.data.items[0].displayLink;
-
-        if (redirector == true) {
-            let waybacklink
-            if (redirector_only == "yt2009") {
-                if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
-                    return
-                }
-
-                search.link = search.link.replace("www.youtube.com", config.frontend.default.redirect.properties.yt2009_url)
-                search.link = search.link.replace("youtube.com", config.frontend.default.redirect.properties.yt2009_url)
-            } else if (redirector_only == "wayback") {
-                if (config.frontend.default.redirect.properties.wayback_date == undefined) {
-                    waybacklink = "http://web.archive.org/web/20100324182056/"
-                } else {
-                    waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
-                }
-                search.link = search.link.replace("http://", waybacklink)
-                search.link = search.link.replace("https://", waybacklink)
-            } else if (redirector_only == "none") {
-            } else if (redirector_only == "both") {
-                if (config.frontend.default.redirect.properties.wayback_date == undefined) {
-                    waybacklink = "http://web.archive.org/web/20100324182056/"
-                } else {
-                    waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
-                }
-                search.link = search.link.replace("http://", waybacklink)
-                search.link = search.link.replace("https://", waybacklink)
-
-                if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
-                } else {
-                    let yt2009link = "http://" + config.frontend.default.redirect.properties.yt2009_url;
-                    let ytlink0 = waybacklink + "https://www.youtube.com"
-                    let ytlink1 = waybacklink + "http://www.youtube.com"
-                    let ytlink2 = waybacklink + "www.youtube.com"
-                    search.link = search.link.replace(ytlink0, yt2009link)
-                    search.link = search.link.replace(ytlink1, yt2009link)
-                    search.link = search.link.replace(ytlink2, yt2009link)
-                }
-            }
-        }
-        repl = repl.replace(/relatedUrlLink/, search.link)
-        repl = repl.replace(/UrlLink/, search.link)
-        repl = repl.replace(/htmlSnippet/, search.htmlSnippet)
-        repl = repl.replace(/htmlFormattedUrl/, search.htmlFormattedUrl)
 
         result.data.items.forEach((item, i) => {
             const search = [];
@@ -1205,6 +1199,7 @@ app.get('/search', async (req, res) => {
                     search.displayLink = item.displayLink;
                 }
             } catch {
+                console.log("catched!")
                 search.htmlTitle = item.htmlTitle;
                 search.link = item.link;
                 search.htmlFormattedUrl = item.htmlFormattedUrl;
@@ -1213,11 +1208,61 @@ app.get('/search', async (req, res) => {
             }
             
             repl = repl.replace(/htmlTitle/, search.htmlTitle)
-            if (config.frontend.default.redirect.enabled.includes("http") == true) {
+            if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("http") == true) {
                 search.link = search.link.replace("https://", "http://")
             }
-            if (redirector == true) {
-                let waybacklink
+            if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.length < 1) {
+                grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.forEach(target => {
+                    let waybacklink
+                    switch (target) {
+                        case "wayback":
+                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("yt2009")) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date == undefined) {
+                                    waybacklink = "http://web.archive.org/web/20100324182056/"
+                                } else {
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date + "/"
+                                }
+                                search.link = search.link.replace("http://", waybacklink)
+                                search.link = search.link.replace("https://", waybacklink)
+                                break;
+                            }
+                        case "yt2009":
+                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("wayback")) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                    return
+                                }
+                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url)
+                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url)
+                            } else {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                    return
+                                }
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date == undefined) {
+                                    waybacklink = "http://web.archive.org/web/20100324182056/"
+                                } else {
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date + "/"
+                                }
+                                search.link = search.link.replace("http://", waybacklink)
+                                search.link = search.link.replace("https://", waybacklink)
+
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                } else {
+                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url;
+                                    let ytlink0 = waybacklink + "https://www.youtube.com"
+                                    let ytlink1 = waybacklink + "http://www.youtube.com"
+                                    let ytlink2 = waybacklink + "www.youtube.com"
+                                    search.link = search.link.replace(ytlink0, yt2009link)
+                                    search.link = search.link.replace(ytlink1, yt2009link)
+                                    search.link = search.link.replace(ytlink2, yt2009link)
+                                }
+                            }
+                            break;
+                        case "http":
+                            break;
+                    } 
+                });
+                /*
+                
                 if (redirector_only == "yt2009") {
                     if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
                         return
@@ -1253,6 +1298,7 @@ app.get('/search', async (req, res) => {
                         search.link = search.link.replace(ytlink2, yt2009link)
                     }
                 }
+                */
             }
 
             if (typeof linkalplist[i] !== 'number') {
@@ -1341,7 +1387,7 @@ app.get('/search', async (req, res) => {
         repl = repl.replace(/gbar_username/g, SimLogin)
         repl = repl.replace(/topItem/g, "")
         console.log("[INFO] search: Sending replaced result")
-        if (serverlanguage == "ja"){
+        if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(encoded)
