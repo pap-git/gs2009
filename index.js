@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import user from "./backend/user.js";
 import toml from "toml"
+import { url } from "inspector";
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -54,6 +55,34 @@ function grabSettings(settings) {
         return JSON.parse(settings)
     } catch {
         return config.frontend.defaults
+    }
+}
+
+async function followPath(urlPath) {
+    const pathes = [
+        ["/images/logo_sm.gif", './assets/images/logo_sm.gif'],
+        ['/accounts/msh.gif', './assets/images/accounts/msh.gif'],
+        ['/intl/ja_ALL/images/logos/images_logo_lg.gif', './assets/images/ja-ALL/images_logo_lg.gif'],
+        ['/accounts/ig.gif', './assets/images/accounts/ig.gif'],
+        ['/accounts/sierra.gif', './assets/images/accounts/sierra.gif'],
+        ['/accounts/google_transparent.gif', './assets/images/accounts/google_transparent.gif'],
+        ['/intl/ja/images/logos/accounts_logo.gif', './assets/images/ja/accounts_logo.gif'],
+        ['/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
+        ['/favicon.ico', './assets/favicon.ico'],
+        ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
+        ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
+        ['/logos/olympics10-bg.jpg', './assets/logos/olympics10-bg.jpg'],
+        ['/images/firefox/firefox35_v1.png', './assets/images/firefox/firefox35_v1.png'],
+        ['/images/firefox/sprite2.png', './assets/images/firefox/sprite2.png'],
+        ['/images/firefox/gradsprite2.png', './assets/images/firefox/gradsprite2.png'],
+        ['/accounts/mail.gif', './assets/images/accounts/mail.gif'],
+        ['/images/yellow_warning.gif', './assets/images/yellow_warning.gif']
+    ]
+
+    for (let i = 0; i < pathes.length; i++) {
+        if (pathes[i][0] == urlPath) {
+            return fs.readFileSync(pathes[i][1])
+        }
     }
 }
 
@@ -282,6 +311,11 @@ app.use(async (req, res, next) => {
         }
     }
 
+    const assets = await followPath(req._parsedUrl.pathname)
+    if (assets) {
+        res.send(assets)
+        return;
+    }
     if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
     next()
 })
@@ -429,62 +463,6 @@ app.get('/logos/olympics10.png', (req, res) => {
     res.type('png').send(fs.readFileSync(logo_path))
 })
 
-app.get('/intl/en_ALL/images/logo.gif', (req, res) => {
-    fs.readFile('./assets/images/en-ALL/logo.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/images/nav_logo3.png', (req, res) => {
-    fs.readFile('./assets/images/nav_logo3.png', (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
-})
-
-app.get('/logos/olympics10-bg.jpg', (req, res) => {
-    fs.readFile('./assets/logos/olympics10-bg.jpg', (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
-})
-
-app.get('/images/firefox/firefox35_v1.png', (req, res) => {
-    fs.readFile('./assets/images/firefox/firefox35_v1.png', (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
-})
-
-app.get('/images/firefox/sprite2.png', (req, res) => {
-    fs.readFile('./assets/images/firefox/sprite2.png', (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
-})
-
-app.get('/images/firefox/gradsprite2.png', (req, res) => {
-    fs.readFile('./assets/images/firefox/gradsprite2.png', (err, data) => {
-      res.type('png');
-      res.send(data);
-    });
-})
-
-app.get('/accounts/mail.gif', (req, res) => {
-    fs.readFile('./assets/images/accounts/mail.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/images/yellow_warning.gif', (req, res) => {
-    fs.readFile('./assets/images/yellow_warning.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
 app.get('/extern_js/f/autocomplete.js', (req, res) => {
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
 
@@ -548,71 +526,8 @@ app.get('/complete/search', async (req, res) => {
     }
 })
 
-app.get('/images/logo_sm.gif', (req, res) => {
-    fs.readFile('./assets/images/logo_sm.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
 app.get('/generate_204'), ((req, res) => {
     res.status(204).send("");
-})
-
-app.get('/accounts/msh.gif', (req, res) => {
-    fs.readFile('./assets/images/accounts/msh.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/intl/ja_ALL/images/logos/images_logo_lg.gif', (req, res) => {
-    fs.readFile('./assets/images/ja-ALL/images_logo_lg.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/accounts/ig.gif', (req, res) => {
-    fs.readFile('./assets/images/accounts/ig.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/accounts/sierra.gif', (req, res) => {
-    fs.readFile('./assets/images/accounts/sierra.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/accounts/google_transparent.gif', (req, res) => {
-    fs.readFile('./assets/images/accounts/google_transparent.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/intl/ja/images/logos/accounts_logo.gif', (req, res) => {
-    fs.readFile('./assets/images/ja/accounts_logo.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/intl/en/images/logos/accounts_logo.gif', (req, res) => {
-    fs.readFile('./assets/images/en/accounts_logo.gif', (err, data) => {
-      res.type('gif');
-      res.send(data);
-    });
-})
-
-app.get('/favicon.ico', (req, res) => {
-    fs.readFile('./assets/favicon.ico', (err, data) => {
-      res.type('ico');
-      res.send(data);
-    });
 })
 
 app.get('/notepad', (req, res) => {
@@ -1395,6 +1310,10 @@ app.get('/search', async (req, res) => {
         }
         res.send(repl)
     } )
+})
+
+app.get('/gs2009', async (req, res) => {
+    
 })
 
 process.on('SIGINT', function() {
