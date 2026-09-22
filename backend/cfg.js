@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { config } from "googleapis/build/src/apis/config/index.js";
 
+const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+const gs2009_version = pjson.version
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -66,9 +69,11 @@ const cfg = {
     convertOld: function(oldjson) {
         let serverpage = true
         if (!internal.isJSON(oldjson)) throw new Error("Not JSON")
-        if (!cfgparser.isOld(oldjson)) throw new Error("Not an old configuration file")
+        if (!cfg.isOld(oldjson)) throw new Error("Not an old configuration file")
         if (typeof(oldjson.ENABLE_SERVER_SETTINGS_PAGE)) serverpage = true
         else serverpage = oldjson.ENABLE_SERVER_SETTINGS_PAGE
+
+        /*
         const result = {
             "server": {
                 "port": oldjson.PORT,
@@ -106,14 +111,81 @@ const cfg = {
                 }
             }
         }
+        */
 
-        if (typeof(result.frontend.default.redirect.properties.wayback_date) == "undefined") {
-            result.frontend.default.redirect.enabled.splice(result.frontend.redirect.properties.enabled.indexOf("wayback"), 1)
+        const result = {
+            server: {
+                port: oldjson.PORT,
+                settingsPage: {
+                    enabled: serverpage,
+                    authEnabled: false,
+                    auth: {
+                        user: "",
+                        password: ""
+                    }
+                }
+            },
+            engine: {
+                order: [],
+                searxng: {
+                    url: oldjson.SEARXNG_URL,
+                    enginesToUse: []
+                },
+                csjapi: {
+                    api_key: oldjson.API_KEY,
+                    cse_id: oldjson.CSE_ID
+                }
+            },
+            users: {
+                enabled: false,
+                enablePasswordAuth: true,
+                location: {
+                    secretdb: "secretdb.json",
+                    userdb: "userdb.json"
+                }
+            },
+            frontend: {
+                forceDefaults: false,
+                defaults: {
+                    language: oldjson.LANGUAGE,
+                    eras: "early2010",
+                    roll_eras: false,
+                    roll_stucknine: false,
+                    before: oldjson.ONLY_OLD ? oldjson.ONLY_OLD_DATE : "",
+                    redirects: {
+                        enabled: [],
+                        wayback_date: oldjson.WAYBACKDATE,
+                        yt2009_address: oldjson.YT2009_ADDRESS
+                    }
+                }
+            }
         }
-        if (typeof(result.frontend.default.redirect.properties.yt2009_url) == "undefined") {
-            result.frontend.default.redirect.enabled.splice(result.frontend.redirect.properties.enabled.indexOf("yt2009"), 1)
+        
+        switch (oldjson.ENGINE) {
+            case "cse":
+                result.engine.order.push("cse")
+                if (result.engine.searxng.url) result.engine.order.push("searxng")
+                break;
+            case "searxng":
+                result.engine.order.push("searxng")
+                if (result.engine.csjapi.api_key || result.engine.csjapi.cse_id) result.engine.order.push("cse")
+                break;
         }
 
+        switch (oldjson.REDIRECTOR_OPTION) {
+            case "both":
+                result.frontend.defaults.redirects.enabled.push("wayback")
+                result.frontend.defaults.redirects.enabled.push("yt2009")
+                break;
+            case "yt2009":
+                result.frontend.defaults.redirects.enabled.push("yt2009")
+                break;
+            case "wayback":
+                result.frontend.defaults.redirects.enabled.push("wayback")
+                break;
+        }
+
+        if (oldjson.REDIRECTOR_HTTP) result.frontend.defaults.redirects.enabled.push("http")
         return result
     },
 
@@ -123,7 +195,7 @@ const cfg = {
             log.i(force ? "re" + strings.cfg.gen : strings.cfg.gen, cfg.tag)
             log.w(strings.l + strings.cfg.gen_w + strings.l, cfg.tag)
 
-            fs.writeFileSync(p, cfg.template);
+            fs.writeFileSync(p, cfg.template.toString().replace("OKAYGIMMETHEVERSIONPLEASE??", gs2009_version));
             log.i(strings.cfg.gen_after + p)
         }
     },

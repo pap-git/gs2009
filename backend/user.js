@@ -21,8 +21,15 @@ async function sendDB(path, object) {
 const user = {
     secretDB: path.join("secretdb.json"),
     userdataDB: path.join("userdb.json"),
-    add: function(email, auth) {
-        const db = getDB(user.secretDB)
+    add: async function(email, auth) {
+        let db = await getDB(user.secretDB)
+        if (await user.exists(email, "boolean")) return false;
+        db.push({
+            "email": email,
+            "auth": auth
+        })
+        const result = await sendDB(user.secretDB, db)
+        return result
     },
     exists: async function(email, type) {
         const secretdb = await getDB(user.secretDB)
@@ -38,7 +45,7 @@ const user = {
 
         switch (type) {
             case "boolean":
-                return ArrayResult.length < 1 ? false : true
+                return ArrayResult.length == 0 ? false : true
             case "array":
             default:
                 return ArrayResult

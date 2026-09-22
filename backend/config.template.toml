@@ -64,6 +64,11 @@ forceDefaults=true
 language="en"
 # eras: Keeping for future use.
 eras=""
+# roll_eras: Force to change eras depends on the date.
+# Time table: Jan -> Feb: early2010, Mar: early2009, Apr -> Sep: mid2009, Oct -> Dec: late2009
+roll_eras=true
+# roll_stucknine: Use early2009 instead of early2010 in Jan to Feb, on roll_eras.
+roll_stucknine=true
 # before: Limits search results to before specific date. Only tested with Custom Search JSON API (Google).
 # Should be same format with Google's one, for example: 2009-12-31
 # Leave it 0000-00-00 if you don't use them.

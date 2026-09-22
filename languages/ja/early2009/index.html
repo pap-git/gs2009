@@ -1,0 +1,460 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Google</title>
+    <style>
+        body,
+        td,
+        a,
+        p,
+        .h {
+            font-family: arial, sans-serif
+        }
+
+        .h {
+            font-size: 20px
+        }
+
+        .h {
+            color: #36c
+        }
+
+        .q {
+            color: #00c
+        }
+
+        .ts td {
+            padding: 0
+        }
+
+        .ts {
+            border-collapse: collapse
+        }
+
+        #content {
+            width: 600px;
+            text-align: left;
+            padding: 0
+        }
+
+        #content img {
+            border: 0
+        }
+
+        #content a {
+            text-decoration: none
+        }
+
+        #content a:hover {
+            text-decoration: underline
+        }
+
+        a.nodeco {
+            color: #000;
+            text-decoration: none
+        }
+
+        a.nodeco:hover {
+            color: #000;
+            text-decoration: underline
+        }
+
+        #rtt {
+            border-top: 1px solid #cde;
+            padding: .4em 0 .4em 10px
+        }
+
+        #prodlinks {
+            border-top: 1px solid #cde;
+            padding: 12px 0 .4em 10px
+        }
+
+        #rtt ul {
+            font-size: 82%;
+            margin: 0;
+            padding: 0
+        }
+
+        .rttpadding {
+            padding-left: 15px
+        }
+
+        #news {
+            border-top: 1px solid #cde;
+            padding: .5em 10px
+        }
+
+        #content h2 {
+            vertical-align: medium;
+            font-size: 82%;
+            margin: 0
+        }
+
+        .morel {
+            text-align: right;
+            vertical-align: bottom;
+            font-size: 64%
+        }
+
+        #prodlinks ul {
+            font-size: 82%;
+            list-style-type: none;
+            margin: 0;
+            padding: 0
+        }
+
+        #prodlinks li {
+            overflow: hidden;
+            margin: 0;
+            padding: 3px 0;
+            vertical-align: middle
+        }
+
+        .plpadding {
+            width: 115px
+        }
+
+        .wicon1 {
+            vertical-align: middle
+        }
+
+        .wicon2 {
+            overflow: hidden;
+            position: relative;
+            width: 20px;
+            height: 20px
+        }
+
+        .wicon2 img {
+            position: absolute;
+            top: 0
+        }
+
+        .wtext {
+            padding: 2px 0 0 4px
+        }
+
+        #articles {
+            font-size: 82%;
+            list-style-type: none;
+            margin: 5px 0 0;
+            padding: 0 0 0 5px;
+            line-height: 1.33em
+        }
+
+        #articles li {
+            margin: 0 0 5px;
+            padding: 0
+        }
+
+        .source {
+            white-space: nowrap;
+            color: #666
+        }
+
+        html>body .gib {
+            display: -moz-inline-box;
+            display: inline-block
+        }
+
+        .gib {
+            position: relative;
+            display: inline-block
+        }
+
+        * html .gib {
+            display: inline
+        }
+
+        *:first-child+html .gib {
+            display: inline
+        }
+
+        #gbar {
+            height: 22px;
+            padding-left: 10px
+        }
+
+        .gbh,
+        .gbd {
+            border-top: 1px solid #c9d7f1;
+            font-size: 1px
+        }
+
+        .gbh {
+            height: 0;
+            position: absolute;
+            top: 24px;
+            width: 100%
+        }
+
+        #gbi,
+        #gbs {
+            background: #fff;
+            left: 0;
+            position: absolute;
+            top: 24px;
+            visibility: hidden;
+            z-index: 1000
+        }
+
+        #gbi {
+            border: 1px solid;
+            border-color: #c9d7f1 #36c #36c #a2bae7;
+            z-index: 1001
+        }
+
+        #guser {
+            padding-bottom: 7px !important
+        }
+
+        #gbar,
+        #guser {
+            font-size: 13px;
+            padding-top: 4px !important
+        }
+
+        @media all {
+
+            .gb1,
+            .gb3 {
+                height: 22px;
+                margin-right: .73em;
+                vertical-align: top
+            }
+
+            #gbar {
+                float: left
+            }
+        }
+
+        .gb2 {
+            display: block;
+            padding: .2em .5em
+        }
+
+        a.gb1,
+        a.gb2,
+        a.gb3 {
+            color: #00c !important
+        }
+
+        .gb2,
+        .gb3 {
+            text-decoration: none
+        }
+
+        a.gb2:hover {
+            background: #36c;
+            color: #fff !important
+        }
+
+        #gbar {
+            height: 22px;
+            padding-left: 2px !important
+        }
+
+        #gbar,
+        #guser {
+            font-size: 13px;
+            padding-top: 1px !important
+        }
+    </style>
+    <script>function sf() { document.f.q.focus() } window.gbar = {}; (function () { var b = window.gbar, f, h; b.qs = function (a) { var c = window.encodeURIComponent && (document.forms[0].q || "").value; if (c) a.href = a.href.replace(/([?&])q=[^&]*|$/, function (i, g) { return (g || "&") + "q=" + encodeURIComponent(c) }) }; function j(a, c) { a.visibility = h ? "hidden" : "visible"; a.left = c + "px" } b.tg = function (a) { a = a || window.event; var c = 0, i, g = window.navExtra, d = document.getElementById("gbi"), e = a.target || a.srcElement; a.cancelBubble = true; if (!f) { f = document.createElement(Array.every || window.createPopup ? "iframe" : "div"); f.frameBorder = "0"; f.src = "#"; d.parentNode.appendChild(f).id = "gbs"; if (g) for (i in g) d.insertBefore(g[i], d.firstChild).className = "gb2"; document.onclick = b.close } if (e.className != "gb3") e = e.parentNode; do c += e.offsetLeft; while (e = e.offsetParent); j(d.style, c); f.style.width = d.offsetWidth + "px"; f.style.height = d.offsetHeight + "px"; j(f.style, c); h = !h }; b.close = function (a) { h && b.tg(a) } })();</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0000cc" vlink="#551a8b" alink="#ff0000" onload="sf();" topmargin="3"
+    marginheight="3">
+    <div id="gbar">
+        <nobr><b class="gb1">ウェブ</b> <a href="http://images.google.co.jp/imghp?hl=ja&amp;tab=wi" onclick="gbar.qs(this)"
+                class="gb1">画像</a> <a href="http://maps.google.co.jp/maps?hl=ja&amp;tab=wl" onclick="gbar.qs(this)"
+                class="gb1">地図</a> <a href="http://news.google.co.jp/nwshp?hl=ja&amp;tab=wn" onclick="gbar.qs(this)"
+                class="gb1">ニュース</a> <a href="http://video.google.co.jp/?hl=ja&amp;tab=wv" onclick="gbar.qs(this)"
+                class="gb1">動画</a> <a href="http://mail.google.com/mail/?hl=ja&amp;tab=wm" class="gb1">Gmail</a> <a
+                href="/intl/ja/options/" onclick="this.blur();gbar.tg(event);return !1"
+                class="gb3"><u>more</u> <small>&#9660;</small></a>
+            <div id="gbi"> <a href="http://groups.google.co.jp/grphp?hl=ja&amp;tab=wg" onclick="gbar.qs(this)"
+                    class="gb2">グループ</a> <a href="http://books.google.co.jp/bkshp?hl=ja&amp;tab=wp"
+                    onclick="gbar.qs(this)" class="gb2">書籍</a> <a
+                    href="http://blogsearch.google.co.jp/?hl=ja&amp;tab=wb" onclick="gbar.qs(this)" class="gb2">ブログ</a>
+                <div class="gb2">
+                    <div class="gbd"></div>
+                </div> <a href="http://jp.youtube.com/?hl=ja&amp;tab=w1" onclick="gbar.qs(this)" class="gb2">YouTube</a>
+                <a href="calendar/render?hl=ja&amp;tab=wc" class="gb2">カレンダー</a> <a
+                    href="http://picasaweb.google.co.jp/home?hl=ja&amp;tab=wq" onclick="gbar.qs(this)"
+                    class="gb2">写真</a> <a href="http://docs.google.com/?hl=ja&amp;tab=wo" class="gb2">ドキュメント</a> <a
+                    href="/reader/view/?hl=ja&amp;tab=wy" class="gb2">リーダー</a> <a
+                    href="http://sites.google.com/?hl=ja&amp;tab=w3" class="gb2">サイト</a>
+                <div class="gb2">
+                    <div class="gbd"></div>
+                </div> <a href="/intl/ja/options/" class="gb2">その他 &raquo;</a>
+            </div>
+        </nobr>
+    </div>
+    <div class="gbh" style="left:0"></div>
+    <div align="right" id="guser" style="font-size:84%;padding:0 0 4px" width="100%">
+        <nobr>gbar_user_REPLACE_HERE</nobr>
+    </div>
+    <center><br clear="all" id="lgpd" /><img id="logo" width="276" height="110" alt="Google"
+            src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/logo.gif" /><br /><br />
+        <form action="/search" name="f"><input name="hl" type="hidden" value="ja" /><input
+                autocomplete="off" maxlength="2048" name="q" size="55" style="border:solid 1px #7f9db9"
+                title="Google 検索" value="" /> <input name="btnG" type="submit" value="Google 検索" style="height:1.8em" />
+            <div style="padding:5px 0">
+                <font size="-1"><input id="all" type="radio" name="meta" value="lr=" checked /><label for="all">
+                        ウェブ全体から検索 </label><input id="il" type="radio" name="meta" value="lr=lang_ja" /><label for="il">
+                        日本語のページを検索 </label></font>
+                <font size="-1">&nbsp;&nbsp;<a
+                        href="/advanced_search?hl=ja">検索オプション</a>&nbsp;|&nbsp;<a
+                        href="/preferences?hl=ja">表示設定</a>&nbsp;|&nbsp;<a
+                        href="/language_tools?hl=ja">言語ツール</a></font>
+            </div>
+        </form><br />
+        <div id="content">
+            <div id="rtt">
+                <div id="rtt-words" class="gib">
+                    <h2 class="gib">
+                        <div class="wicon1 gib" style="margin-right:4px">
+                            <div class="wicon2"><img src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt=""
+                                    height="20" width="260" style="left:-240px" /></div>
+                        </div><b>急上昇ワード:</b>
+                    </h2>
+                    <ul class="gib">
+                        <li class="gib rttpadding"><a
+                                href="/search?q=%E6%9C%89%E5%90%89&amp;hl=ja&amp;source=zeitgeist&amp;trndrnk=1&amp;trndscr=470&amp;corpus=1&amp;utm_source=jahpwp">有吉</a>
+                        </li>
+                        <li class="gib rttpadding"><a
+                                href="/search?q=%E9%87%91%E3%82%B9%E3%83%9E&amp;hl=ja&amp;source=zeitgeist&amp;trndrnk=5&amp;trndscr=233&amp;corpus=1&amp;utm_source=jahpwp">金スマ</a>
+                        </li>
+                        <li class="gib rttpadding"><a
+                                href="/search?q=%E7%AF%A0%E5%8E%9F%E6%B6%BC%E5%AD%90&amp;hl=ja&amp;source=zeitgeist&amp;trndrnk=6&amp;trndscr=210&amp;corpus=1&amp;utm_source=jahpwp">篠原涼子</a>
+                        </li>
+                        <li class="gib rttpadding"><a
+                                href="/search?q=50TA&amp;hl=ja&amp;source=zeitgeist&amp;trndrnk=12&amp;trndscr=105&amp;corpus=1&amp;utm_source=jahpwp">50TA</a>
+                        </li>
+                        <li class="gib rttpadding"><a
+                                href="/search?q=MEGUMI&amp;hl=ja&amp;source=zeitgeist&amp;trndrnk=15&amp;trndscr=92&amp;corpus=2&amp;utm_source=jahpwp">MEGUMI</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="prodlinks">
+                <ul>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1" href="http://jp.youtube.com/?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-0px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="http://jp.youtube.com/?utm_source=jahpwp">YouTube</a></div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://news.google.co.jp/nwshp?hl=ja&amp;utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-60px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a
+                                href="http://news.google.co.jp/nwshp?hl=ja&amp;utm_source=jahpwp">ニュース</a></div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://maps.google.co.jp/maps?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-20px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="http://maps.google.co.jp/maps?utm_source=jahpwp">地図</a></div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://images.google.co.jp/imghp?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-40px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="http://images.google.co.jp/imghp?utm_source=jahpwp">画像検索</a>
+                        </div>
+                    </li>
+                    <li class="gib">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="/transit?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-80px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="/transit?utm_source=jahpwp">乗換案内</a>
+                        </div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://mail.google.com/mail?hl=ja&amp;utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-100px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="http://mail.google.com/mail?hl=ja&amp;utm_source=jahpwp">メール</a>
+                        </div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://picasaweb.google.co.jp/home?hl=ja&amp;utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png" alt="" height="20"
+                                        width="260" style="left:-120px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a
+                                href="http://picasaweb.google.co.jp/home?hl=ja&amp;utm_source=jahpwp">写真管理</a></div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="http://toolbar.google.com/intl/ja/?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png"
+                                        alt="" height="20" width="260" style="left:-160px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="http://toolbar.google.com/intl/ja/?utm_source=jahpwp">ツールバー</a>
+                        </div>
+                    </li>
+                    <li class="gib plpadding">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="/chrome?utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png"
+                                        alt="" height="20" width="260" style="left:-180px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="/chrome?utm_source=jahpwp">ブラウザ</a></div>
+                    </li>
+                    <li class="gib">
+                        <div class="wicon1 gib">
+                            <div class="wicon2"><a tabindex="-1"
+                                    href="/mobile/#utm_source=jahpwp"><img
+                                        src="/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png"
+                                        alt="" height="20" width="260" style="left:-140px" /></a></div>
+                        </div>
+                        <div class="wtext gib"><a href="/mobile/#utm_source=jahpwp">モバイル</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="morel" style="margin-top:.5em;margin-right:10px"><a
+                    href="/intl/ja/options/"
+                    onclick="this.href='/url?q=/intl/ja/options/&amp;ct=pl&amp;cd=0&amp;utm_source=jahpwp';return true;">サービス一覧
+                    &raquo;</a></div>
+        </div><br />
+        <font size="-1"><a href="/intl/ja/ads/">広告掲載</a> - <a
+                href="/intl/ja/services/">ビジネス ソリューション</a> - <a
+                href="/intl/ja/about.html">Google について</a> - <a
+                href="/">Google 日本へ移動</a>
+            <p>
+                <font size="-1">&copy;2009 - <a href="/intl/ja/privacy.html">プライバシー</a></font>
+            </p>
+    </center>
+</body>
+<script>if (!window.google) { window.google = {}; }</script>
+<script src="/ig/f/6ULrcrp42tM/intl/ALL_jp/homepage.js"></script>
+<script>if (!window.google.kHL) { window.google.kHL = 'ja'; } window.setTimeout('window.google.ac.install(document.f,document.f.q,"",true,"閉じる",true,"","")', 100);</script>
+
+</html>

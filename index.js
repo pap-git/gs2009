@@ -1,4 +1,4 @@
-import fs, { lchown, readFileSync } from "fs"
+import fs, { existsSync, lchown, readFileSync } from "fs"
 import iconv from 'iconv-lite'
 import path from "path"
 import express from "express"
@@ -7,7 +7,7 @@ import parseurl from 'parseurl';
 import qs from 'qs';
 import googleapis from 'googleapis';
 import Encoding from 'encoding-japanese';
-import autocomplete from './extern_js/pull_autocomplete.js'
+import autocomplete from './backend/pull_autocomplete.js'
 import * as readline from 'readline-sync'
 import searxngfetch from './backend/searx-api-hit.js'
 import cfg from "./backend/cfg.js";
@@ -18,6 +18,8 @@ import { dirname } from 'path';
 import user from "./backend/user.js";
 import toml from "toml"
 import { url } from "inspector";
+import { runInNewContext } from "vm";
+import { dump } from "js-toml";
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -38,14 +40,14 @@ var only_old_date = "2010-03-20";
 var searchqueryEnabled = true;
 
 function getLanguage(settings) {
-    if (!settings) return "en"
+    if (!settings) return config.frontend.defaults.language
     const j = JSON.parse(settings)
 
-    if (!j) return "en"
+    if (!j) return config.frontend.defaults.language
     else try {
         return j.language
     } catch {
-        return "en"
+        return config.frontend.defaults.language
     }
 }
 
@@ -58,8 +60,25 @@ function grabSettings(settings) {
     }
 }
 
-async function followPath(urlPath) {
+async function grabEraPath(afterPath, language, era){
     const pathes = [
+        path.join(__dirname, "/languages/", language, era, afterPath),
+        path.join(__dirname, "/languages/", config.frontend.defaults.language, era, afterPath),
+        path.join(__dirname, "/languages/", "en", era, afterPath),
+        path.join(__dirname, "/languages/", language, "/defaults/", afterPath),
+        path.join(__dirname, "/languages/", config.frontend.defaults.language, "/defaults/", afterPath),
+        path.join(__dirname, "/languages/", "en", "/defaults/", afterPath)
+    ]
+
+    for (let i = 0; i < pathes.length; i++) {
+        if (fs.existsSync(pathes[i])) { return pathes[i] }
+    }
+}
+
+async function followPath(urlPath) {
+    let result = undefined;
+    const pathes = [
+        // [original path, folder path]
         ["/images/logo_sm.gif", './assets/images/logo_sm.gif'],
         ['/accounts/msh.gif', './assets/images/accounts/msh.gif'],
         ['/intl/ja_ALL/images/logos/images_logo_lg.gif', './assets/images/ja-ALL/images_logo_lg.gif'],
@@ -68,6 +87,7 @@ async function followPath(urlPath) {
         ['/accounts/google_transparent.gif', './assets/images/accounts/google_transparent.gif'],
         ['/intl/ja/images/logos/accounts_logo.gif', './assets/images/ja/accounts_logo.gif'],
         ['/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
+        ['/accounts/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
         ['/favicon.ico', './assets/favicon.ico'],
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
@@ -76,14 +96,27 @@ async function followPath(urlPath) {
         ['/images/firefox/sprite2.png', './assets/images/firefox/sprite2.png'],
         ['/images/firefox/gradsprite2.png', './assets/images/firefox/gradsprite2.png'],
         ['/accounts/mail.gif', './assets/images/accounts/mail.gif'],
-        ['/images/yellow_warning.gif', './assets/images/yellow_warning.gif']
+        ['/images/yellow_warning.gif', './assets/images/yellow_warning.gif'],
+        ['/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png', './assets/images/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/jawh_vprodicons.png'],
+        ['/intl/ja/images/jawh_prodiconl6.png', './assets/images/ja/jawh_prodiconl6.png'],
+        ['/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/logo.gif', './assets/images/ig/f/q-xfFF7Vi4Y/intl/ALL_jp/logo.gif'],
+        ['/accounts/googleaccountslogo.gif', './assets/images/accounts/googleaccountslogo.gif'],
+        ['/ig/f/6ULrcrp42tM/intl/ALL_jp/homepage.js', './assets/ig/f/6ULrcrp42tM/intl/ALL_jp/homepage.js'],
+        ['/intl/ja/images/productlinktabs.png', './assets/images/ja/productlinktabs.png'],
+        ['/images/nav_logo6.png', './assets/images/nav_logo6.png'],
+        ['/intl/ja/images/jawh_prodicons1.png', './assets/images/ja/jawh_prodicons1.png']
     ]
 
     for (let i = 0; i < pathes.length; i++) {
-        if (pathes[i][0] == urlPath) {
-            return fs.readFileSync(pathes[i][1])
-        }
+        try {
+            if (pathes[i][0] == urlPath) {
+                result = fs.readFileSync(pathes[i][1])
+                break;
+            }
+        } catch {}
     }
+
+    return result
 }
 
 async function reloadconfig(){
@@ -93,13 +126,11 @@ async function reloadconfig(){
     config = toml.parse(cfg.template)
     if (!cfg.exists(path.join(__dirname, "config.json")) && !cfg.exists(path.join(__dirname, "config.toml"))) await cfg.gen()
 
-    const file = fs.readFileSync("config.toml")
-
-    if (cfg.exists(path.join(__dirname, "config.json"))) {
-        if (cfg.isOld(fs.readFileSync("config.json"))) {
+    if (cfg.exists(path.join(__dirname, "config.json")) && !cfg.exists(path.join(__dirname, "config.toml"))) {
+        if (cfg.isOld(JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"))))) {
             log.w("old config found, backing up before convert", "config-conversion")
-            fs.writeFileSync("config.old.json", readFileSync("config.json"))
-            fs.writeFileSync("config.toml", JSON.stringify(cfg.convertOld(JSON.parse(fs.readFileSync("config.json")))))
+            fs.renameSync(path.join(__dirname, "config.json"), path.join(__dirname, "config.old.json"))
+            fs.writeFileSync(path.join(__dirname, "config.toml"), ("# This is configuration file for this gs2009 instance.\n# Converted from previous version (1.x) via gs2009 version " + gs2009_version + "\n# Please refer '/backend/config.template.toml' for the explaination of each options.\n\n" + dump(cfg.convertOld(JSON.parse(fs.readFileSync(path.join(__dirname, "config.old.json")))))))
             log.w("config converted to new format, Please check your config is matched with your previous one", "config-conversion")
         }
     }
@@ -143,8 +174,8 @@ const app = express();
 
 function retriveTemplate(lang) {
     function GiveMeTheResult(lang, next_path) {
-        const langTemplatePath = path.join(__dirname, "/template/", lang)
-        const enTemplatePath = path.join(__dirname, "/template/", "en")
+        const langTemplatePath = path.join(__dirname, "/languages/", lang, "/defaults/_templates")
+        const enTemplatePath = path.join(__dirname, "/languages/", "en", "/defaults/_templates")
         return fs.existsSync(path.join(langTemplatePath, next_path)) ? path.join(langTemplatePath, next_path) : path.join(enTemplatePath, next_path)
     }
 
@@ -463,13 +494,24 @@ app.get('/logos/olympics10.png', (req, res) => {
     res.type('png').send(fs.readFileSync(logo_path))
 })
 
-app.get('/extern_js/f/autocomplete.js', (req, res) => {
+app.get('/extern_js/f/autocomplete.js', async (req, res) => {
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    let jsFilePath
+    switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+        case "early2009":
+            jsFilePath = './assets/extern_js/autocomplete_early2009.js'
+            break;
+        case "mid2009":
+            jsFilePath = './assets/extern_js/autocomplete_mid2009.js'
+            break;
+        default:
+            jsFilePath = './assets/extern_js/autocomplete.js'
+    }
 
-    fs.readFile('./extern_js/autocomplete.js', (err, data) => {
+    fs.readFile(jsFilePath, async (err, data) => {
         let repl = data.toString();
 
-        const filePath = path.join(__dirname, "/html/" + language + "/index.html");
+        const filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
         fs.readFile(filePath, (err, data) => {
             let conv;
 
@@ -549,7 +591,7 @@ app.get('/search_csstest', (req, res) => {
     try {
         SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
     } catch {}
-    const filePath = path.join(__dirname, "/html/" + language + "/search.html");
+    const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html");
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
@@ -586,14 +628,14 @@ app.get('/imghp', (req, res) => {
     } catch {}
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     if (SimLogin === undefined && SimLogin == 'undefined') {
-        const filePath = path.join(__dirname, "/html/" + language + "/images/index.html");
+        const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/images/index.html");
             fs.readFile(filePath, (err, data) => {
             res.set("Content-Type", "text/html;charset=Shift_JIS")
             res.send(data)
         } )
         return
     }
-    const filePath = path.join(__dirname, "/html/" + language + "/images/index_signed_in.html");
+    const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/images/index_signed_in.html");
     fs.readFile(filePath, (err, data) => {
         let decoded = iconv.decode(data, 'shift_jis')
         let replaced = decoded.replace(/username/g, SimLogin)
@@ -604,7 +646,12 @@ app.get('/imghp', (req, res) => {
     return
 });
 
-app.get('/', (req, res) => {
+app.get('/csi', async (req, res) => {
+    // does do anything?
+    res.send("")
+})
+
+app.get('/', async (req, res) => {
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
     const template = retriveTemplate(language)
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
@@ -619,14 +666,21 @@ app.get('/', (req, res) => {
 
     let filePath
 
-    if (nowmonth == 2){
-        if (tmp >= 12 && tmp <= 23) {
-            filePath = path.join(__dirname, "/html/" + language + "/index-olympics10.html");
-        } else {
-            filePath = path.join(__dirname, "/html/" + language + "/index.html");
-        }
-    } else {
-        filePath = path.join(__dirname, "/html/" + language + "/index.html");
+    switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+        case "early2010":
+            if (nowmonth == 2){
+                if (tmp >= 12 && tmp <= 23) {
+                    filePath = await grabEraPath("/index-olympics10.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+                } else {
+                    filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+                }
+            } else {
+                filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+            }
+            break;
+        default:
+            filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
+            break;
     }
         
     fs.readFile(filePath, (err, data) => {
@@ -638,7 +692,7 @@ app.get('/', (req, res) => {
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
 
-        let messagelist = JSON.parse(fs.readFileSync('./assets/messages/' + language + '.json', 'utf8'))
+        let messagelist = JSON.parse(fs.readFileSync('languages/' + language + "/defaults/" + 'messages.json', 'utf8'))
 
         let now = new Date
         let nowmonth = now.getMonth() + 1
@@ -749,9 +803,9 @@ app.get('/gs2009settings', (req, res) => {
     })
 })
 
-app.get('/accounts/Login', (req, res) => {
+app.get('/accounts/Login', async (req, res) => {
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
-    const file = path.join(__dirname, "/html/" + language + "/signin.html");
+    const file = await grabEraPath("/signin.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
     if (language == "ja") {
         res.set("Content-Type", "text/html;charset=Shift_JIS")
         res.send(fs.readFileSync(file))
@@ -761,7 +815,7 @@ app.get('/accounts/Login', (req, res) => {
 })
 
 app.get('/firefox', (req, res) => {
-    const filePath = path.join(__dirname, "/html/" + language + "/firefox/index.html");
+    const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/firefox/index.html");
     if (language == "ja") {
         fs.readFile(filePath, (err, data) => {
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -795,40 +849,67 @@ app.post('/accounts/LoginAuth', async (req, res) => {
     if (await user.auth(req.body.Email, user.md5saltMe(req.body.Passwd))) {
         // would implement session id
         let age = {};
-        if (req.body.PersistentCookie) {
+        if (req.body.PersistentCookie === "yes") {
             age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
         }
         let userdata;
 
         try { 
-            userdata = await user.get(req.body.Email, user.md5saltMe(req.body.Passwd), serviceID) } 
-        catch {
-            userdata = await user.modifyData(req.body.Email, serviceID, {
-                "language": "en",
-                "searchQuery": true,
-                "before": {
-                    "enabled": true,
-                    "date": "2010-01-24"
-                },
-                "redirect": {
-                    "enabled": ["wayback", "yt2009", "http"],
-                    "properties": {
-                        "wayback_date": 20100324182056,
-                        "yt2009_url": ""
-                    }
-                }
-            }, true)
+            userdata = await user.get(req.body.Email, user.md5saltMe(req.body.Passwd), serviceID)
+            
+            if (!userdata) userdata = await user.modifyData(req.body.Email, serviceID, config.frontend.defaults, true)
+        } catch {
+            await user.modifyData(req.body.Email, serviceID, config.frontend.defaults, false)
+            userdata = await user.get(req.body.Email, user.md5saltMe(req.body.Passwd), serviceID)
         }
+
         res.cookie('GS2009_ACCOUNTS', JSON.stringify({
             email: req.body.Email,
             auth: user.md5saltMe(req.body.Passwd),
-            stayWithMe: req.body.PersistentCookie ? JSON.parse(true) : JSON.parse(false)
+            stayWithMe: req.body.PersistentCookie === "yes" ? JSON.parse(true) : JSON.parse(false)
         }), age)
         res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
-        res.redirect("/")
+        res.send("<script>document.location.href = '/'</script>")
     } else {
         res.send("Email or password is incorrect.")
     }
+})
+
+app.get('/accounts/NewAccount', async (req, res) => {
+    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const filePath = await grabEraPath("/signup.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
+    fs.readFile(filePath, (err, data) => {
+        let repl = "";
+        
+        repl = language == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
+        if (language == "ja"){
+            let encoded = iconv.encode(repl, 'shift_jis')
+            res.set("Content-Type", "text/html;charset=Shift_JIS")
+            res.send(encoded)
+            return
+        }
+        res.send(repl)
+    } )
+    return
+})
+
+app.post('/accounts/CreateAccount', async (req, res) => {
+    if (await user.exists(req.body.Email, "boolean")) { log.e("Failed to register the user '" + req.body.Email + "' to database: User already exists"); return; }
+    if (!(req.body.Passwd == req.body.PasswdAgain) || (req.body.Passwd.length < 8 || req.body.PasswdAgain.length < 8)) { log.e("Failed to register the user '" + req.body.Email + "' to database: Password mismatch"); return; }
+    await user.add(req.body.Email, user.md5saltMe(req.body.Passwd))
+
+    let age = {};
+    if (req.body.PersistentCookie === "yes") {
+        age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
+    }
+    const userdata = await user.modifyData(req.body.Email, serviceID, config.frontend.defaults, true)
+    res.cookie('GS2009_ACCOUNTS', JSON.stringify({
+        email: req.body.Email,
+        auth: user.md5saltMe(req.body.Passwd),
+        stayWithMe: req.body.PersistentCookie === "yes" ? JSON.parse(true) : JSON.parse(false)
+    }), age)
+    res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
+    res.send()
 })
 
 app.get('/clearcookies', (req, res) => {
@@ -1002,7 +1083,7 @@ app.get('/search', async (req, res) => {
     console.log("[INFO] search: Sorted Number list:")
     console.log(linknumlist);
 
-    filePath = path.join(__dirname, "/html/" + language + "/search.html");
+    filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html");
     
     fs.readFile(filePath, (err, data) => {
         const template = retriveTemplate(language)
@@ -1114,7 +1195,6 @@ app.get('/search', async (req, res) => {
                     search.displayLink = item.displayLink;
                 }
             } catch {
-                console.log("catched!")
                 search.htmlTitle = item.htmlTitle;
                 search.link = item.link;
                 search.htmlFormattedUrl = item.htmlFormattedUrl;
@@ -1132,10 +1212,10 @@ app.get('/search', async (req, res) => {
                     switch (target) {
                         case "wayback":
                             if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("yt2009")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date == undefined) {
                                     waybacklink = "http://web.archive.org/web/20100324182056/"
                                 } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date + "/"
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date + "/"
                                 }
                                 search.link = search.link.replace("http://", waybacklink)
                                 search.link = search.link.replace("https://", waybacklink)
@@ -1143,26 +1223,26 @@ app.get('/search', async (req, res) => {
                             }
                         case "yt2009":
                             if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("wayback")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
                                     return
                                 }
-                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url)
-                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url)
+                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address)
+                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address)
                             } else {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
                                     return
                                 }
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date == undefined) {
                                     waybacklink = "http://web.archive.org/web/20100324182056/"
                                 } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.wayback_date + "/"
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date + "/"
                                 }
                                 search.link = search.link.replace("http://", waybacklink)
                                 search.link = search.link.replace("https://", waybacklink)
 
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
                                 } else {
-                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.properties.yt2009_url;
+                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address;
                                     let ytlink0 = waybacklink + "https://www.youtube.com"
                                     let ytlink1 = waybacklink + "http://www.youtube.com"
                                     let ytlink2 = waybacklink + "www.youtube.com"
