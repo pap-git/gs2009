@@ -1154,46 +1154,46 @@ app.get('/search', async (req, res) => {
             }
             
             repl = repl.replace(/htmlTitle/, search.htmlTitle)
-            if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("http") == true) {
+            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
                 search.link = search.link.replace("https://", "http://")
             }
-            if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.length < 1) {
-                grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.forEach(target => {
+            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
+                grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
                     let waybacklink
                     switch (target) {
                         case "wayback":
-                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("yt2009")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date == undefined) {
+                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
                                     waybacklink = "http://web.archive.org/web/20100324182056/"
                                 } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date + "/"
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
                                 }
                                 search.link = search.link.replace("http://", waybacklink)
                                 search.link = search.link.replace("https://", waybacklink)
                                 break;
                             }
                         case "yt2009":
-                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirect.enabled.includes("wayback")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
+                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
                                     return
                                 }
-                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address)
-                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address)
+                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
                             } else {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
                                     return
                                 }
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
                                     waybacklink = "http://web.archive.org/web/20100324182056/"
                                 } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.wayback_date + "/"
+                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
                                 }
                                 search.link = search.link.replace("http://", waybacklink)
                                 search.link = search.link.replace("https://", waybacklink)
 
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address == undefined) {
+                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
                                 } else {
-                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirect.yt2009_address;
+                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
                                     let ytlink0 = waybacklink + "https://www.youtube.com"
                                     let ytlink1 = waybacklink + "http://www.youtube.com"
                                     let ytlink2 = waybacklink + "www.youtube.com"
@@ -1210,32 +1210,32 @@ app.get('/search', async (req, res) => {
                 /*
                 
                 if (redirector_only == "yt2009") {
-                    if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
+                    if (config.frontend.default.redirects.properties.yt2009_url == undefined) {
                         return
                     }
-                    search.link = search.link.replace("www.youtube.com", config.frontend.default.redirect.properties.yt2009_url)
-                    search.link = search.link.replace("youtube.com", config.frontend.default.redirect.properties.yt2009_url)
+                    search.link = search.link.replace("www.youtube.com", config.frontend.default.redirects.properties.yt2009_url)
+                    search.link = search.link.replace("youtube.com", config.frontend.default.redirects.properties.yt2009_url)
                 } else if (redirector_only == "wayback") {
-                    if (config.frontend.default.redirect.properties.wayback_date == undefined) {
+                    if (config.frontend.default.redirects.properties.wayback_date == undefined) {
                         waybacklink = "http://web.archive.org/web/20100324182056/"
                     } else {
-                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
+                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirects.properties.wayback_date + "/"
                     }
                     search.link = search.link.replace("http://", waybacklink)
                     search.link = search.link.replace("https://", waybacklink)
                 } else if (redirector_only == "none") {
                 } else if (redirector_only == "both") {
-                    if (config.frontend.default.redirect.properties.wayback_date == undefined) {
+                    if (config.frontend.default.redirects.properties.wayback_date == undefined) {
                         waybacklink = "http://web.archive.org/web/20100324182056/"
                     } else {
-                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirect.properties.wayback_date + "/"
+                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirects.properties.wayback_date + "/"
                     }
                     search.link = search.link.replace("http://", waybacklink)
                     search.link = search.link.replace("https://", waybacklink)
 
-                    if (config.frontend.default.redirect.properties.yt2009_url == undefined) {
+                    if (config.frontend.default.redirects.properties.yt2009_url == undefined) {
                     } else {
-                        let yt2009link = "http://" + config.frontend.default.redirect.properties.yt2009_url;
+                        let yt2009link = "http://" + config.frontend.default.redirects.properties.yt2009_url;
                         let ytlink0 = waybacklink + "https://www.youtube.com"
                         let ytlink1 = waybacklink + "http://www.youtube.com"
                         let ytlink2 = waybacklink + "www.youtube.com"
@@ -1379,6 +1379,6 @@ app.post('/__gs2009_wallma_/LoginAuth', (req, res) => {
 })
 
 process.on('SIGINT', function() {
-    log.i("Server stopped by interrupt signal", tag);
+    log.i("Server stopped by interrupt signal");
     process.exit();
 });
