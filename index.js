@@ -12,7 +12,6 @@ import * as readline from 'readline-sync'
 import searxngfetch from './backend/searx-api-hit.js'
 import cfg from "./backend/cfg.js";
 import { log } from "./backend/things.js"
-import strings from "./backend/strings.js"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import user from "./backend/user.js";
@@ -32,12 +31,6 @@ const __dirname = dirname(__filename);
 var config = toml.parse(cfg.template)
 
 var searxng_ishttps = false;
-var searxng_eg = false;
-
-var redirector_only = "none"; // keeping this shit for a while its so messy here
-var only_old = false;
-var only_old_date = "2010-03-20";
-var searchqueryEnabled = true;
 
 function getLanguage(settings) {
     if (!settings || config.frontend.forceDefaults) return config.frontend.defaults.language
@@ -133,33 +126,23 @@ async function followPath(urlPath) {
 }
 
 async function reloadconfig(){
-    let tag = "cfg"
-    log.i(strings.cfg.reload, "init")
+    const tag = "cfg"
+    log.i("reloading config", tag)
 
     config = toml.parse(cfg.template)
     if (!cfg.exists(path.join(__dirname, "config.json")) && !cfg.exists(path.join(__dirname, "config.toml"))) await cfg.gen()
 
     if (cfg.exists(path.join(__dirname, "config.json")) && !cfg.exists(path.join(__dirname, "config.toml"))) {
         if (cfg.isOld(JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"))))) {
-            log.w("old config found, backing up before convert", "config-conversion")
+            log.w("old config found, backing up before convert", tag)
             fs.renameSync(path.join(__dirname, "config.json"), path.join(__dirname, "config.old.json"))
             fs.writeFileSync(path.join(__dirname, "config.toml"), ("# This is configuration file for this gs2009 instance.\n# Converted from previous version (1.x) via gs2009 version " + gs2009_version + "\n# Please refer '/backend/config.template.toml' for the explaination of each options.\n\n" + dump(cfg.convertOld(JSON.parse(fs.readFileSync(path.join(__dirname, "config.old.json")))))))
-            log.w("config converted to new format, Please check your config is matched with your previous one", "config-conversion")
+            log.w("config converted to new format, Please check your config is matched with your previous one", tag)
         }
     }
 
     config = toml.parse(fs.readFileSync("config.toml"))
 
-    /*
-    if (config.backend.engine.type == "cse") {
-        if (config.config.engine.csjapi.api_key == "") {
-            log.w("Custom Search API (config.engine.csjapi.api_key) is not set correctly! PLease see /gs2009settings")
-        }
-        if (config.config.engine.csjapi.cse_id == "") {
-            log.w("Search Engine ID (config.engine.csjapi.cse_id) is not set correctly! PLease see /gs2009settings")
-        }
-    }
-    */
     config.engine.order.forEach((engineName) => {
         switch (engineName) {
             case "cse":
@@ -182,15 +165,17 @@ async function reloadconfig(){
 
     if (config.users.enabled) {
         if (config.users.location.secretdb.toString().length < 1 || config.users.location.userdb.toString().length < 1) {
-            throw new Error(config.users.location.secretdb.toString().length < 1 ? "config: invaild path: users.location.secretdb" : "config: invaild path: users.location.userdb")
+            log.e((config.users.location.secretdb.toString().length < 1 ? "config: invaild path: users.location.secretdb" : "config: invaild path: users.location.userdb"), tag)
+            log.e("exiting!", tag)
+            process.exit(1)
         }
         if (!fs.existsSync(path.join(config.users.location.secretdb))) {
             fs.writeFileSync(config.users.location.secretdb, JSON.stringify([]))
-            log("Created new database: " + path.join(config.users.location.secretdb), "init")
+            log("Created new database: " + path.join(config.users.location.secretdb), tag)
         }
         if (!fs.existsSync(path.join(config.users.location.userdb))) {
             fs.writeFileSync(config.users.location.userdb, JSON.stringify([]))
-            log("Created new database: " + path.join(config.users.location.userdb), "init")
+            log("Created new database: " + path.join(config.users.location.userdb), tag)
         }
     }
 }
@@ -240,16 +225,12 @@ function retriveTemplate(lang) {
     }
 }
 
-var redirector = true;
-
 var query;
 var actualq;
 
 var hl;
 var lr;
 var start;
-
-let SimLogin = [];
 
 // https://qiita.com/ganyariya/items/23d51b05bacdcb27fce6
 // im using the google search example from here v (thx for og author)
@@ -368,7 +349,8 @@ app.use(async (req, res, next) => {
 })
 
 app.listen(config.server.port, () => {
-    log.i(`Server started at port ${config.server.port} in ` + Date());
+    const tag = "init"
+    log.i(`Server started at port ${config.server.port} in ` + Date(), tag);
 });
 
 app.get('/setprefs', (req, res) => {
@@ -576,12 +558,7 @@ app.get('/complete/search', async (req, res) => {
         res.set('Content-Type','text/javascript')
     }
     res.status(200)
-    if (searchqueryEnabled == true) {
-        res.send(result)
-    } else {
-        res.send()
-        return
-    }
+    res.send(result)
 })
 
 app.get('/generate_204'), ((req, res) => {
@@ -744,79 +721,8 @@ app.get('/', async (req, res) => {
     return
 });
 
-
 app.get('/gs2009settings', (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
-
-    if (config.server.enableServerSettingsPage == false) {
-        res.send("This feature is disabled due to settings page is disabled.<br>Please contact your administrator to change the settings.")
-        return
-    }
-    const filePath = path.join(__dirname, "/html/gs2009settings.html");
-    fs.readFile(filePath, (err, data) => {
-        let repl;
-        repl = data.toString();
-
-        if (config.backend.engine.type == "cse") {
-            repl = repl.replace(/cse"/, "cse\" checked")
-        } else {
-            repl = repl.replace(/searxng"/, "searxng\" checked")
-        }
-
-        if (config.backend.engine.config.searxng == undefined) {
-            repl = repl.replace("searxng_url-replace-this", "")
-        } else {
-            repl = repl.replace("searxng_url-replace-this", config.backend.engine.config.searxng)
-        }
-
-        if (searxng_eg == true) {
-            repl = repl.replace(/searxng_eg value=1/, "searxng_eg value=1 checked")
-        }
-
-        repl = repl.replace("api-key-replace-this", config.config.engine.csjapi.api_key)
-        repl = repl.replace("cse-id-replace-this", config.config.engine.csjapi.cse_id)
-        repl = repl.replace("value=" + language, "value=" + language + " selected")
-
-        repl = repl.replace(/wayback" checked/, "wayback\"")
-
-        if (!config.frontend.default.redirect.enabled.includes("wayback") && !config.frontend.default.redirect.enabled.includes("yt2009")) {
-            repl = repl.replace(/off"/, "off\" checked")
-        } else if (config.frontend.default.redirect.enabled.includes("wayback") && !config.frontend.default.redirect.enabled.includes("yt2009")) {
-            repl = repl.replace(/wayback"/, "wayback\" checked")
-        } else if (!config.frontend.default.redirect.enabled.includes("wayback") && config.frontend.default.redirect.enabled.includes("yt2009")) {
-            if (config.frontend.default.redirect.properties.yt2009_url == "") {
-                repl = repl.replace(/off"/, "off\" checked")
-            } else {
-                repl = repl.replace(/yt2009"/, "yt2009\" checked")
-            }
-        } else if (config.frontend.default.redirect.enabled.includes("wayback") && config.frontend.default.redirect.enabled.includes("yt2009")) {
-            if (config.frontend.default.redirect.properties.yt2009_url == "") {
-                repl = repl.replace(/wayback"/, "wayback\" checked")
-            } else {
-                repl = repl.replace(/on"/, "on\" checked")
-            }
-        }
-
-        repl = repl.replace("waybackdate-replace-this", config.frontend.default.redirect.properties.wayback_date)
-        repl = repl.replace("yt2009addr-replace-this", config.frontend.default.redirect.properties.yt2009_url)
-
-        if (config.frontend.default.redirect.enabled.includes("http") == true) {
-            repl = repl.replace(/p value=1/, "p value=1 checked")
-        }
-
-        if (only_old == true) {
-            repl = repl.replace(/d value=1/, "d value=1 checked")
-        }
-
-        if (searchqueryEnabled == true) {
-            repl = repl.replace(/enablesq value=1/, "enablesq value=1 checked")
-        }
-
-        repl = repl.replace("onlyolddate-replace-this", only_old_date)
-        repl = repl.replace("VersionNumber", gs2009_version)
-
-        res.send(repl)
-    })
+    res.redirect("/__gs2009_wallma_/ig")
 })
 
 app.get('/accounts/Login', async (req, res) => {
@@ -976,13 +882,10 @@ app.get('/search', async (req, res) => {
     }
     console.log("[INFO] search: extracted query: " + query)
 
-    if (only_old == true) {
-        console.log("[INFO] search: only_old is enabled, adding before:")
+    if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
+        log("before date was not 0000-00-00, adding before: param to query")
         actualq = query
-        if (only_old_date == undefined) {
-            query = query + " before:2010-03-21";
-        }
-        query = query + " before:" + only_old_date;
+        query = query + " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before;
     }
 
     // console.log(req.query)
@@ -1153,7 +1056,7 @@ app.get('/search', async (req, res) => {
 
             repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
-            if (only_old == true) {
+            if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
                 repl = repl.replace(/query/g, actualq)
             } else {
                 repl = repl.replace(/query/g, query)
@@ -1168,7 +1071,7 @@ app.get('/search', async (req, res) => {
             return
         }
         
-        if (only_old == true) {
+        if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
             repl = repl.replace(/query/g, actualq)
         } else {
             repl = repl.replace(/query/g, query)
@@ -1351,8 +1254,8 @@ app.get('/search', async (req, res) => {
                 repl = repl.replace(/didyoumean/g, ext_t_dym)
                 let suggested = result.data.spelling.correctedQuery;
                 let date;
-                if (only_old == true) {
-                    date = " before:" + only_old_date
+                if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
+                    date = " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before
                     suggested = suggested.replace(date, "")
                 }
                 repl = repl.replace(/suggestedQuery/g, suggested);

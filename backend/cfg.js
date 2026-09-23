@@ -1,7 +1,6 @@
 import toml from "toml"
 import fs from "node:fs"
 import {log} from "./things.js";
-import strings from "./strings.js";
 import path from "node:path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -192,11 +191,11 @@ const cfg = {
     gen: async function (pathtoconfig, force) {
         const p = pathtoconfig ? path.join(__dirname, "../", pathtoconfig) : path.join(__dirname, "../config.toml")
         if (!(cfg.exists(path.join(__dirname, "config.json")) && cfg.exists(path.join(__dirname, "config.toml"))) || force) {
-            log.i(force ? "re" + strings.cfg.gen : strings.cfg.gen, cfg.tag)
-            log.w(strings.l + strings.cfg.gen_w + strings.l, cfg.tag)
+            log.i(force ? "re" + "generated config" : "generated config", cfg.tag)
+            log.w("================================\n" + "Configure your instance by editing config.toml via text editor!\n\nYou will need the instance of SearXNG that supporting JSON format for API, \nor You can use existing Google Search JSON API key with Programmable Search Engine ID for Google Search.\n\nIt is recommended to have your private instance of SearXNG.\nPlease refer the SearXNG documentation for running your own instance.\n\nIf neither of them does not configured to use, gs2009 will warn you when you tried to use them." + "================================\n", cfg.tag)
 
             fs.writeFileSync(p, cfg.template.toString().replace("OKAYGIMMETHEVERSIONPLEASE??", gs2009_version));
-            log.i(strings.cfg.gen_after + p)
+            log.i("generated config to path: " + p, tag)
         }
     },
     exists: function (pathtoconfig) {
