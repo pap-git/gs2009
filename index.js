@@ -90,6 +90,7 @@ async function grabEraPath(afterPath, language, era){
 async function followPath(urlPath) {
     let result = undefined;
     const pathes = [
+        // i would move these thing to another json file or js
         // [original path, folder path]
         ["/__gs2009_wallma_/ig_main.js", "./assets/admin/assets/ig_main.js"],
         ["/__gs2009_wallma_/lib/libdrag.js", "./assets/admin/assets/libdrag.js"],
@@ -1343,7 +1344,7 @@ app.get('/search', async (req, res) => {
 })
 
 app.get('/gs2009', async (req, res) => {
-    
+    // here will be user configuration
 })
 
 app.get('/__gs2009_wallma_/ig', async (req, res) => {
