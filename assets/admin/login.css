@@ -1,0 +1,134 @@
+body { text-align: center; margin: 50px 0px; padding: 0px; }
+.login-outer { border: none; color: black; background-color: #dddddd; margin: 0px auto; padding: 0px; border-collapse: collapse; }
+.login-outer-header { color: white; background-color: #440099;
+  padding: 0px; margin: 0px; border: none; }
+.title-div { font-size: x-large; font-family: sans-serif; font-weight: bold; padding: 4px; }
+.login-outer-body { vertical-align: top }
+.login-form-cell {  }
+.login-form-table { border: none; margin: 8px;  }
+.error-row { font-size: 83%; color: red; font-weight: bold; }
+.field-row {  }
+.label-cell { text-align: right; }
+.field-cell { text-align: left; }
+.small-note { font-size: x-small; text-align: right; color: #666; }
+.submit-cell { text-align: right; }
+.image-cell {  }
+.image-frame { border: 10px; }
+.login-image { border: 1px solid black; margin: 8px; }
+
+
+body,td,div,p,a,font,span {font-family: arial,sans-serif}
+body {margin-top:2}
+
+.bubble img {
+  width: 4;
+  height: 4;
+}
+
+.bubble {
+  background-color: #86EEAD;
+}
+.bubble-gnubby {
+  text-align: left;
+  padding: 3px;
+  background-color: #EBDF35;
+}
+th.bubble, th.bubble a:link, th.bubble a:visited {
+  color: black;
+}
+
+td.bubble, td.bubble a:link, td.bubble a:visited {
+  color: black;
+}
+
+.signin {
+  border: #86EEAD 2px solid;
+  background-color: #DAFAE6;
+}
+.gnubby-signin {
+  border: #EBDF35 2px solid;
+  background-color: lightYellow;
+}
+.signin td {
+  padding: 5px;
+}
+.gnubby-success-title {
+  color: green;
+}
+
+.gnubby-success-text {
+  color: blue;
+}
+
+.iframesignin {
+  background-color: #DAFAE6;
+}
+
+th.bubble {
+  font-family: arial;
+  text-align: left;
+  font-weight: bold;
+  padding: 3 0;
+}
+
+.footer th.bubble {
+  font-weight: normal;
+  text-align: center;
+}
+.footer th.bubble span {
+  font-size: 83%;
+}
+
+.tl {padding: 0; width: 4; text-align: left; vertical-align: top}
+.tr {padding: 0; width: 4; text-align: right; vertical-align: top}
+.bl {padding: 0; width: 4; text-align: left; vertical-align: bottom}
+.br {padding: 0; width: 4; text-align: right; vertical-align: bottom}
+
+.caption {
+  font-weight: bold;
+  font-size: 83%;
+  color: black;
+  white-space: nowrap;
+  text-align:center;
+  margin-top: 3;
+  margin-bottom: 7;
+}
+
+li {
+  font-weight: bold;
+  font-size: 83%;
+  margin-top: 1.3ex;
+  margin-bottom: 1.3ex;
+}
+
+.errormsg {
+  font-weight: bold;
+  color: red;
+}
+
+.serviceStats {
+  font-size:66%;
+  color:gray;
+  width: 100%;
+  padding-left: 3%;
+  text-align: left;
+}
+
+.fake-login-entry {
+  background-color: #AAAAAA;
+}
+/*
+     FILE ARCHIVED ON 20:51:53 Aug 06, 2013 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 17:03:47 Sep 22, 2026.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  capture_cache.get: 0.344
+  load_resource: 58.469
+  PetaboxLoader3.resolve: 28.376
+  PetaboxLoader3.datanode: 18.107
+*/

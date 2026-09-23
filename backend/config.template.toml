@@ -58,7 +58,7 @@ location.userdb="userdb.json"
 [frontend]
 # forceDefaults: Force the default settings instead of using user-side settings.
 # Not recommended to enable this for public instances.
-forceDefaults=true
+forceDefaults=false
 [frontend.defaults]
 # language: Languages of the page. If Language doesn't exist, it will use English as fallback.
 language="en"

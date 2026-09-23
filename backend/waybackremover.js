@@ -2,7 +2,7 @@ import fs from "node:fs"
 import jschardet from "jschardet"
 import iconv from "iconv-lite"
 
-let repl = fs.readFileSync("Google.html")
+let repl = fs.readFileSync("moma.html")
 
 // repl = iconv.decode(repl, jschardet.detect(repl).encoding)
 // repl = iconv.decode(repl, "shiftjis")

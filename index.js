@@ -40,7 +40,7 @@ var only_old_date = "2010-03-20";
 var searchqueryEnabled = true;
 
 function getLanguage(settings) {
-    if (!settings) return config.frontend.defaults.language
+    if (!settings || config.frontend.forceDefaults) return config.frontend.defaults.language
     const j = JSON.parse(settings)
 
     if (!j) return config.frontend.defaults.language
@@ -52,7 +52,7 @@ function getLanguage(settings) {
 }
 
 function grabSettings(settings) {
-    if (!settings) return config.frontend.defaults
+    if (!settings || config.frontend.forceDefaults) return config.frontend.defaults
     try {
         return JSON.parse(settings)
     } catch {
@@ -79,6 +79,19 @@ async function followPath(urlPath) {
     let result = undefined;
     const pathes = [
         // [original path, folder path]
+        ["/__gs2009_wallma_/ig_main.js", "./assets/admin/assets/ig_main.js"],
+        ["/__gs2009_wallma_/lib/libdrag.js", "./assets/admin/assets/libdrag.js"],
+        ["/__gs2009_wallma_/lib/libtabs.js", "./assets/admin/assets/libtabs.js"],
+        ["/__gs2009_wallma_/ig.css", "./assets/admin/assets/ig.css"],
+        ["/__gs2009_wallma_/gs2009_wallma.png", "./assets/admin/assets/images/gs2009_wallma.png"],
+        ["/__gs2009_wallma_/smiley.png", "./assets/admin/assets/images/smiley.png"],
+        ["/__gs2009_wallma_/balls.gif", "./assets/images/balls.gif"],
+        ["/__gs2009_wallma_/tl.gif", "./assets/admin/assets/images/tl.gif"],
+        ["/__gs2009_wallma_/bl.gif", "./assets/admin/assets/images/bl.gif"],
+        ["/__gs2009_wallma_/tr.gif", "./assets/admin/assets/images/tr.gif"],
+        ["/__gs2009_wallma_/br.gif", "./assets/admin/assets/images/br.gif"],
+        ["/__gs2009_wallma_/login.css", "./assets/admin/login.css"],
+        ["/gs2009.png", "./assets/images/gs2009.png"],
         ["/images/logo_sm.gif", './assets/images/logo_sm.gif'],
         ['/accounts/msh.gif', './assets/images/accounts/msh.gif'],
         ['/intl/ja_ALL/images/logos/images_logo_lg.gif', './assets/images/ja-ALL/images_logo_lg.gif'],
@@ -104,7 +117,7 @@ async function followPath(urlPath) {
         ['/ig/f/6ULrcrp42tM/intl/ALL_jp/homepage.js', './assets/ig/f/6ULrcrp42tM/intl/ALL_jp/homepage.js'],
         ['/intl/ja/images/productlinktabs.png', './assets/images/ja/productlinktabs.png'],
         ['/images/nav_logo6.png', './assets/images/nav_logo6.png'],
-        ['/intl/ja/images/jawh_prodicons1.png', './assets/images/ja/jawh_prodicons1.png']
+        ['/intl/ja/images/jawh_prodicons1.png', './assets/images/ja/jawh_prodicons1.png'],
     ]
 
     for (let i = 0; i < pathes.length; i++) {
@@ -166,6 +179,20 @@ async function reloadconfig(){
                 throw new Error("Unknown engine name:", engineName)
         }
     })
+
+    if (config.users.enabled) {
+        if (config.users.location.secretdb.toString().length < 1 || config.users.location.userdb.toString().length < 1) {
+            throw new Error(config.users.location.secretdb.toString().length < 1 ? "config: invaild path: users.location.secretdb" : "config: invaild path: users.location.userdb")
+        }
+        if (!fs.existsSync(path.join(config.users.location.secretdb))) {
+            fs.writeFileSync(config.users.location.secretdb, JSON.stringify([]))
+            log("Created new database: " + path.join(config.users.location.secretdb), "init")
+        }
+        if (!fs.existsSync(path.join(config.users.location.userdb))) {
+            fs.writeFileSync(config.users.location.userdb, JSON.stringify([]))
+            log("Created new database: " + path.join(config.users.location.userdb), "init")
+        }
+    }
 }
 
 await reloadconfig()
@@ -184,6 +211,8 @@ function retriveTemplate(lang) {
         gbar_user_index: GiveMeTheResult(lang, "/gbar_user_index.txt"), // ext_t_g_u
         gbar_user_logged: GiveMeTheResult(lang, "/gbar_user_logged.txt"), // ext_t_g_u_l
 
+        auth_mismatch: GiveMeTheResult(lang, "/auth_mismatch.txt"),
+
         search_normal: GiveMeTheResult(lang, "/search/normal.txt"), // ext_t_s_n
         search_more: GiveMeTheResult(lang, "/search/more.txt"), // ext_t_s_m
         search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
@@ -196,6 +225,8 @@ function retriveTemplate(lang) {
         gbar_user: fs.readFileSync(paths.gbar_user, "utf8"),
         gbar_user_index: fs.readFileSync(paths.gbar_user_index, "utf8"),
         gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
+
+        auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
 
         search_normal: fs.readFileSync(paths.search_normal, "utf8"),
         search_more: fs.readFileSync(paths.search_more, "utf8"),
@@ -277,32 +308,6 @@ async function search(event) {
                 throw new Error("??? got new engine called " + config.engine.order[i])
         }
     }
-    /*
-    if (config.backend.engine.type == "searxng") {
-        let temp_searxng_ishttps
-        if (config.backend.engine.config.searxng.match(/https:\/\//) || config.backend.engine.config.searxng.match(/http:\/\//)) {
-            temp_searxng_ishttps = searxng_ishttps
-            searxng_ishttps = undefined
-        }
-        result = await searxngfetch(config.backend.engine.config.searxng, searxng_ishttps, searxng_eg, query, lr, start)
-        searxng_ishttps = temp_searxng_ishttps
-    } else {
-        result = await customSearch.cse.list({
-
-            auth: config.config.engine.csjapi.api_key,
-
-            cx: config.config.engine.csjapi.cse_id,
-
-            q: query,
-
-            hl: hl,
-
-            lr: lr,
-
-            start: start
-        });
-    }
-    */
 
     if (errorCounts == config.engine.order.length) log.e("Failed to retrive results on every engine", "search")
     return(result);
@@ -322,20 +327,31 @@ app.use(async (req, res, next) => {
     }
 
     if (req.cookies.GS2009_ACCOUNTS) {
+        let clear = false;
+        if (config.users.enablePasswordAuth) {
+            const result = await user.auth(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, JSON.parse(req.cookies.GS2009_ACCOUNTS).auth)
+            if (!result) {
+                clear = true;
+                res.clearCookie('GS2009_ACCOUNTS');
+                res.clearCookie('GS2009_SETTINGS');
+            }
+        }
+
         let age = {};
         if (JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe) {
             age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
         }
         let userdata;
 
-        try { 
+        try {
+            if (clear) throw new Error("e")
             userdata = await user.get(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, JSON.parse(req.cookies.GS2009_ACCOUNTS).auth, serviceID)
             res.cookie('GS2009_ACCOUNTS', JSON.stringify({
                 email: JSON.parse(req.cookies.GS2009_ACCOUNTS).email,
                 auth: JSON.parse(req.cookies.GS2009_ACCOUNTS).auth,
                 stayWithMe: JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe
             }), age)
-            res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
+            res.cookie('GS2009_SETTINGS', config.frontend.forceDefaults ? JSON.stringify(config.frontend.defaults) : JSON.stringify(userdata.settings), age);
         } catch {
             res.clearCookie('GS2009_ACCOUNTS');
             res.clearCookie('GS2009_SETTINGS');
@@ -805,13 +821,29 @@ app.get('/gs2009settings', (req, res) => {
 
 app.get('/accounts/Login', async (req, res) => {
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const template = retriveTemplate(language)
     const file = await grabEraPath("/signin.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+    let repl = fs.readFileSync(file)
+    
     if (language == "ja") {
         res.set("Content-Type", "text/html;charset=Shift_JIS")
-        res.send(fs.readFileSync(file))
+        repl = iconv.decode(repl, "shiftjis")
     } else {
-        res.send(fs.readFileSync(file).toString())
+        repl = repl.toString()
     }
+
+    if (req.cookies.GS2009_AUTH_MISMATCH) {
+        switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+            case "early2009":
+                repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr>[^{a-z}]*td align="right" va/, '<td align="left">' + template.data.auth_mismatch + '</td></tr><tr><td align="right" va')
+            default:
+                repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr id="re/, '<td align="left">' + template.data.auth_mismatch + '</td></tr><tr id="re')
+        }
+        res.clearCookie("GS2009_AUTH_MISMATCH")
+    }
+
+    if (language == "ja") repl = iconv.encode(repl, "shiftjis")
+    res.send(repl)
 })
 
 app.get('/firefox', (req, res) => {
@@ -846,7 +878,7 @@ app.post('/accounts/LoginAuth', async (req, res) => {
     res.redirect('/');
     */
     
-    if (await user.auth(req.body.Email, user.md5saltMe(req.body.Passwd))) {
+    if (config.users.enablePasswordAuth ? (await user.auth(req.body.Email, user.md5saltMe(req.body.Passwd))) : await user.exists(req.body.Email, "boolean")) {
         // would implement session id
         let age = {};
         if (req.body.PersistentCookie === "yes") {
@@ -871,7 +903,8 @@ app.post('/accounts/LoginAuth', async (req, res) => {
         res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
         res.send("<script>document.location.href = '/'</script>")
     } else {
-        res.send("Email or password is incorrect.")
+        res.cookie("GS2009_AUTH_MISMATCH", JSON.stringify(true))
+        res.redirect("/accounts/Login")
     }
 })
 
@@ -893,9 +926,13 @@ app.get('/accounts/NewAccount', async (req, res) => {
     return
 })
 
+app.get("/accounts/ServiceLogin", (req, res) => {
+    res.redirect("/accounts/Login")
+})
+
 app.post('/accounts/CreateAccount', async (req, res) => {
-    if (await user.exists(req.body.Email, "boolean")) { log.e("Failed to register the user '" + req.body.Email + "' to database: User already exists"); return; }
-    if (!(req.body.Passwd == req.body.PasswdAgain) || (req.body.Passwd.length < 8 || req.body.PasswdAgain.length < 8)) { log.e("Failed to register the user '" + req.body.Email + "' to database: Password mismatch"); return; }
+    if (await user.exists(req.body.Email, "boolean")) { log.e("Failed to register the user '" + req.body.Email + "' to database: User already exists"); res.send("<head><title>gogul account</title></head>you failed to register the user but i am so tired to implement the feature to show proper error so go back to previous page bro"); return; }
+    if (!(req.body.Passwd == req.body.PasswdAgain) || (req.body.Passwd.length < 8 || req.body.PasswdAgain.length < 8)) { log.e("Failed to register the user '" + req.body.Email + "' to database: Password mismatch"); res.send("<head><title>gogul account</title></head>you failed to register the user but i am so tired to implement the feature to show proper error so go back to previous page bro"); return; }
     await user.add(req.body.Email, user.md5saltMe(req.body.Passwd))
 
     let age = {};
@@ -1394,6 +1431,37 @@ app.get('/search', async (req, res) => {
 
 app.get('/gs2009', async (req, res) => {
     
+})
+
+app.get('/__gs2009_wallma_/ig', async (req, res) => {
+    if (!req.cookies.GS2009_ACCOUNTS_ADMIN) { res.redirect("/__gs2009_wallma_/Login"); return }
+    const userinfo = JSON.parse(req.cookies.GS2009_ACCOUNTS_ADMIN)
+    if (!(userinfo.user == config.server.settingsPage.auth.user && userinfo.auth == user.md5saltMe(config.server.settingsPage.auth.password))) {
+        res.redirect("/__gs2009_wallma_/Login"); return 
+    }
+    res.send(fs.readFileSync("./assets/admin/iguess.html").toString())
+})
+
+app.get('/__gs2009_wallma_/Login', (req, res) => {
+    if (config.server.settingsPage.enabled) {
+        res.clearCookie("GS2009_AUTH_MISMATCH")
+        res.send(fs.readFileSync(path.join("./assets/admin/login.html")).toString().replace(req.cookies.GS2009_AUTH_MISMATCH === "true" ? "" : "<div class=\"errormsg\">The username or password you entered is incorrect.</div>", ""))
+    } else {
+        res.status(404).send("")
+    }
+})
+
+app.post('/__gs2009_wallma_/LoginAuth', (req, res) => {
+    if (req.body.u == config.server.settingsPage.auth.user && req.body.pw == config.server.settingsPage.auth.password) {
+        res.cookie("GS2009_ACCOUNTS_ADMIN", JSON.stringify({
+            user: req.body.u,
+            auth: user.md5saltMe(req.body.pw)
+        }))
+        res.redirect("/__gs2009_wallma_/ig")
+    } else {
+        res.cookie("GS2009_AUTH_MISMATCH", JSON.stringify(true))
+        res.redirect("/__gs2009_wallma_/Login")
+    }
 })
 
 process.on('SIGINT', function() {

@@ -1,0 +1,1717 @@
+
+<html>
+  <head>
+
+  <title>Google アカウント</title>
+  <style type="text/css"><!--
+  
+    .body { margin-left: 3em;
+            margin-right: 5em;
+            font-family: arial,sans-serif; }
+
+  
+    div.errorbox-good {}
+
+    div.errorbox-bad {} 
+
+    div.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;}
+    font.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;}
+  
+    
+    
+
+    
+    
+  --></style>
+</head>
+<style type="text/css"><!--
+  
+   
+  .gaia.ops.gsl { font-family: arial, sans-serif; color: #3366cc; font-weight: bold;} 
+  
+  
+  .gaia.sub.el { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+  .gaia.sub.pl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold; }
+  .gaia.sub.rpl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold; }
+  .gaia.sub.es { font-family: arial, sans-serif; font-size: smaller; font-style: italic; }
+  .gaia.sub.seex { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+  .gaia.sub.pc { font-family: arial,sans-serif; font-size: smaller; color: #6f6f6f; }
+   
+    
+   .gaia.cca.al { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+  .gaia.cca.ol { font-family: arial, sans-serif; font-size: x-small;}
+  .gaia.cca.cmt { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+      
+    
+   .gaia.cud.cl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+   
+    
+  .gaia.captchahtml.desc { font-family: arial, sans-serif; font-size: smaller; } 
+  .gaia.captchahtml.cmt { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+
+--></style>
+  <body bgcolor="#ffffff" text="#000000" link="#0000cc" vlink="#551a8b" alink="#ff0000" dir="ltr" onload="return(doKtInit());">
+  <!-- NewAccount.naui=default -->
+  <script type="text/javascript"><!--  
+  if (top.location != self.location) {  
+   top.location = self.location.href;
+  }
+
+  --></script>
+<script type="text/javascript"><!--
+  function doKtInit() {
+    
+    return true;
+  }
+
+  function doKtSubmit() {
+    
+    return true;
+  }
+--></script>
+  <script type="text/javascript"><!--
+    function onPreCreateAccount() {
+    
+      return true;
+    
+    }
+
+    function onPreLogin() {
+    
+      
+      if (window["onlogin"] != null) {
+        return onlogin();
+      } else {
+        return true;
+      }
+    
+    }
+  --></script>
+  <table width="100%" border="0" cellpadding="2" cellspacing="0">
+  <tr>
+  <td colspan="2"><img width="1" height="2" alt=""/></td>
+  </tr>
+  <tr>
+  <td valign="top" width="1%">
+  <a href="/accounts/">
+  <img src="/accounts/googleaccountslogo.gif" border="0" align="left" alt="Google"/>
+  </img>
+  </a>
+  </td>
+  <td valign="top">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+  <td colspan="2"><img width="1" height="15" alt=""/></td>
+  </tr>
+  <tr bgcolor="#3366cc">
+  <td><img height="1" width="1" alt=""/></td>
+  </tr>
+  <tr bgcolor="#e5ecf9">
+  <td style="padding-left: 4px; padding-bottom:3px; padding-top:2px; font-family:arial,sans-serif;">
+  <b>Google アカウントを作成</b>
+  </td>
+  </tr>
+  <tr>
+  <td colspan="2"><img width="1" height="5" alt=""/></td>
+  </tr>
+  </table>
+  </td>
+  </tr>
+  </table>
+  <div class="body">
+  <h3>
+  アカウントを作成
+</h3>
+<table width="700">
+  <tr>
+  <td>
+  <font size="-1">
+  Google アカウントを既にお持ちの場合は、<a href="/accounts/ServiceLogin?hl=ja">ここからログイン</a>できます。
+  </font>
+  </td>
+  </tr>
+</table>
+<br/>
+  <script type="text/javascript"><!--
+    function onPreCreateAccountSubmit() {
+      doKtSubmit();
+      
+      return onPreCreateAccount();
+    }
+  --></script>
+  <form id="createaccount" name="createaccount" action="/accounts/CreateAccount?hl=ja" method="post" onsubmit="return(onPreCreateAccountSubmit());">
+  <input type="hidden" name="dsh" id="dsh" value="8835422997203776832"/>
+  <input type="hidden" name="ktl" id="ktl" value="">
+  <input type="hidden" name="ktf" id="ktf" value="">
+  <table cellpadding="2" bgcolor="white" cellspacing="0" border="0" width="1%">
+  <tr><td>
+  <table bgcolor="#cbdced" border="0" cellpadding="2" cellspacing="0" width="1%">
+  <tr><td>
+  <table bgcolor="#eeeeee" border="0" cellpadding="2" cellspacing="0" width="100%">
+  <tr><td bgcolor="#ffffff" valign="top" align="center">
+  <table cellspacing="0" cellpadding="5" width="100%" bgcolor="#ffffff" border="0">
+  <tr>
+  <td colspan="2" valign="top">
+  <span class="gaia ops gsl">
+  Google アカウントに必要な情報
+  </span>
+  </td>
+  </tr>
+  <tr>
+<td valign="top" nowrap="nowrap"><span class="gaia sub el">現在のメール アドレス:</span></td>
+  <td>
+  <div>
+  <input type="text" name="Email" id="Email" size="30" value="" class="gaia sub emailtxtfield" onblur="ES_spellCheckEmail('createaccount')"/>
+  <div class="errormsg" id="ES_emailSuggestionBlock" style="display:none">
+ もしかして: <a href="javascript:ES_correctEmailField()"><span id="ES_suggestedEmail"></span></a>
+</div>
+<div class="errormsg" id="ES_emailErrorMessage" style="display:none">
+</div>
+<script type="text/javascript"> <!--
+
+  function ES(a){if(document.getElementById)return document.getElementById(a);if(document.all)return document.all(a)}var ESa;function ESb(){ES("ES_emailSuggestionBlock").style.display="none"}function ESc(){ES("ES_emailErrorMessage").style.display="none"}function ESd(a){ESb();var b=ES("ES_emailErrorMessage");b.innerHTML=a;b.style.display="block"}function ESe(a){var b=ES_Messages[a];b?ESd(b):ESc()}
+ES_spellCheckEmail=function(a){if(!ES("errormsg_0_Email")){var b;try{b=document.forms[a].Email.value}catch(j){if(j instanceof TypeError)return;else throw j;}if(!(b.length==0)){var g=/([^@]*)@(.*)/.exec(b);if(g){var k=g[1],c=g[2];if(k.length==0)ESe("USERNAME_MISSING");else if(c.length==0)ESe("DOMAIN_MISSING");else if(c.indexOf("@")>=0)ESe("TOO_MANY_SEPERATORS");else if(c.length<=256&&/^[^.]+\..*[^.]$/.test(c)&&!/\.\./.test(c)&&!/\.[^.]{64}\./.test(c)){var e;a:{var h=c,f=[["generalmail.com","general-mail.com"],
+["bol.com.br","bol.com","bo.com.br","boi.com.br","bol.cm.br","bol.co.br","bol.com.be","bol.com.r","bol.combr","bola.com.br","boll.com.br","box.com.br","nol.com.br","ol.com.br","uol.com.br","vol.com.br"],["gmail.com","gmail.com.br","_gmail.com","g-mail.com","g.mail.com","g_mail.com","gamail.com","gamil.com","gemail.com","ggmail.com","gimail.com","gmai.com","gmail.cim","gmail.co","gmaill.com","gmain.com","gmaio.com","gmal.com","gmali.com","gmeil.com","gmial.com","gmil.com","gtmail.com","igmail.com"],
+["hotmail.co.uk","hotmail.com.uk"],["hotmail.com","hotmail.com.br","hotmail.br","0hotmail.com","8hotmail.com","_hotmail.com","ahotmail.com","ghotmail.com","gotmail.com","hatmail.com","hhotmail.com","ho0tmail.com","hogmail.com","hoimail.com","hoitmail.com","homail.com","homtail.com","hootmail.com","hopmail.com","hoptmail.com","hormail.com","hot.mail.com","hot_mail.com","hotail.com","hotamail.com","hotamil.com","hotemail.com","hotimail.com","hotlmail.com","hotmaail.com","hotmael.com","hotmai.com","hotmaial.com",
+"hotmaiil.com","hotmail.acom","hotmail.bom","hotmail.ccom","hotmail.cm","hotmail.co","hotmail.coml","hotmail.comm","hotmail.con","hotmail.coom","hotmail.copm","hotmail.cpm","hotmail.lcom","hotmail.ocm","hotmail.om","hotmail.xom","hotmail2.com","hotmail_.com","hotmailc.com","hotmaill.com","hotmailo.com","hotmaio.com","hotmaiol.com","hotmais.com","hotmal.com","hotmall.com","hotmamil.com","hotmaol.com","hotmayl.com","hotmeil.com","hotmial.com","hotmil.com","hotmmail.com","hotmnail.com","hotmsil.com",
+"hotnail.com","hotomail.com","hottmail.com","hotymail.com","hoymail.com","hptmail.com","htmail.com","htomail.com","ohotmail.com","otmail.com","rotmail.com","shotmail.com"],["ig.com.br","ig.com","ieg.com.br","ig.com.brr","igb.com.br","igp.com.br","pig.com.br","rg.com.br"],["rediffmail.com","reaiffmail.com","redffmail.com","redifemail.com","rediff.mail.com","rediffemail.com","rediffmai.com","rediffmaill.com","redifmail.com","redoffmail.com"],["yahoo.co.in","yaho.co.in","yahoo.co.cn","yahoo.co.n","yahoo.co.on",
+"yahoo.coin","yahoo.com.in","yahoo.cos.in","yahoo.oc.in","yaoo.co.in","yhoo.co.in"],["yahoo.com.br","1yahoo.com.br","5yahoo.com.br","_yahoo.com.br","ayhoo.com.br","tahoo.com.br","uahoo.com.br","yagoo.com.br","yahho.com.br","yaho.com.br","yahoo.cm.br","yahoo.co.br","yahoo.com.ar","yahoo.com.b","yahoo.com.be","yahoo.com.ber","yahoo.com.bl","yahoo.com.brr","yahoo.com.brv","yahoo.com.bt","yahoo.com.nr","yahoo.coml.br","yahoo.con.br","yahoo.om.br","yahool.com.br","yahooo.com.br","yahoou.com.br","yaoo.com.br",
+"yaroo.com.br","yhaoo.com.br","yhoo.com.br","yuhoo.com.br"],["yahoo.com","yahoomail.com","_yahoo.com","ahoo.com","ayhoo.com","eyahoo.com","hahoo.com","sahoo.com","yahho.com","yaho.com","yahol.com","yahoo.co","yahoo.con","yahoo.vom","yahoo0.com","yahoo1.com","yahool.com","yahooo.com","yahoou.com","yahoow.com","yahopo.com","yaloo.com","yaoo.com","yaroo.com","yayoo.com","yhaoo.com","yhoo.com","yohoo.com"],["ymail.com","y7mail.com"]];h=h.toLowerCase();for(var m=f.length,d=0;d<m;d++)for(var n=f[d].length,
+i=1;i<n;i++)if(h==f[d][i]){e=f[d][0];break a}e=null}if(e){var o=k+"@"+e;ESc();ES("ES_suggestedEmail").innerHTML=o;ES("ES_emailSuggestionBlock").style.display="block";ESa=a}else{ESb();ESc()}}else{var l=ES_Messages.DOMAIN_INVALID;l?ESd(l.replace("%1",c)):ESc()}}else ESe("SEPARATOR_MISSING")}}};ES_correctEmailField=function(){if(ESa){var a=ES("ES_suggestedEmail").innerHTML;ESb();ESc();document.forms[ESa].Email.value=a}};
+
+  ES_Messages = {
+    
+    SEPARATOR_MISSING: '「@」マークを忘れずに入力してください。',
+    
+    USERNAME_MISSING: '「@」マークの前にユーザー名を入力してください。',
+    
+    DOMAIN_INVALID: 'メールアドレスに無効なドメイン名「%1」が含まれています。',
+    
+    DOMAIN_MISSING: '「@」マークの後ろにドメイン名を入力してください。',
+    
+    TOO_MANY_SEPERATORS: 'メールアドレスには 1 つだけ「@」マークを入れてください。'
+    
+  };
+
+--> </script>
+  </div>
+  <span class="gaia sub seex">
+  例: myname@example.com。 これを使ってアカウントにログインします。
+  </span>
+  </td>
+  </tr>
+  <tr><td valign="top" nowrap="nowrap"><span class="gaia sub pl">パスワードの設定:</span><b>&nbsp;&nbsp;</b></td>
+  <td>
+  <table cellpadding="0" cellspacing="0" border="0">
+  <tbody>
+  <tr>
+  <td><div>
+  <input type="password" name="Passwd" id="Passwd" size="30" class="gaia sub passwdtxtfield" onkeyup="CreateRatePasswdReq('createaccount')"/>
+  </div>
+  <span class="gaia sub pc">8 文字以上を指定してください。</span>
+  <span class="gaia sub pc" id="passwordHelpLink" style="display:none;"><a href="PasswordHelp" target="_blank" style="text-decoration:none;">[?]</a></span>
+  <noscript>
+  <span class="gaia sub pc"><a href="PasswordHelp" target="_blank" style="text-decoration:none;">[?]</a></span>
+  </noscript>
+  </td>
+<script type="text/javascript" src="/accounts/GaiaCaribou.js"></script>
+<script type="text/javascript">
+  <!--
+  var myxmlhttp;
+  var isBrowserCompatible;
+  ratingMsgs = new Array(6);
+  ratingMsgColors = new Array(6);
+  barColors = new Array(6);
+
+  ratingMsgs[0] = "短すぎます";
+  ratingMsgs[1] = "低";
+  ratingMsgs[2] = "中";
+  ratingMsgs[3] = "高";
+  ratingMsgs[4] = "良好";
+  ratingMsgs[5] = "不明"; 
+
+  ratingMsgColors[0] = "#676767";
+  ratingMsgColors[1] = "#aa0033";
+  ratingMsgColors[2] = "#f5ac00";
+  ratingMsgColors[3] = "#6699cc";
+  ratingMsgColors[4] = "#008000";
+  ratingMsgColors[5] = "#676767";
+
+  barColors[0] = "#dddddd";
+  barColors[1] = "#aa0033";
+  barColors[2] = "#ffcc33";
+  barColors[3] = "#6699cc";
+  barColors[4] = "#008000";
+  barColors[5] = "#676767";
+
+  function CreateRatePasswdReq(formKey) {
+    if (!isBrowserCompatible) {
+      return;
+    }
+
+    var passwd = document.forms[formKey].Passwd.value;
+
+    if (document.forms[formKey].Email) {
+      var email = getUserName(document.forms[formKey].Email.value);
+    } else {
+      
+      var email = getUserName("");
+    }
+
+    if (document.forms[formKey].LastName) {
+      
+      var lastname = escape(document.forms[formKey].LastName.value);
+    }
+
+    if (document.forms[formKey].FirstName) {
+      var firstname = escape(document.forms[formKey].FirstName.value);
+    }
+
+    var min_passwd_len = 8;
+    var passwdKey = "Passwd";
+    var emailKey = "Email";
+    var FirstNameKey = "FirstName";
+    var LastNameKey = "LastName";
+
+    if (passwd.length < min_passwd_len) {
+      if (passwd.length > 0) {
+  DrawBar(0);
+  } else {
+  resetBar();
+  }
+  } else {
+  passwd = escape(passwd);
+  var params = passwdKey + "=" + passwd + "&" +
+  emailKey + "=" + email + "&" +
+  FirstNameKey + "=" + firstname + "&" +
+  LastNameKey + "=" + lastname;
+  myxmlhttp = CreateXmlHttpReq(RatePasswdXmlHttpHandler);
+  XmlHttpPOST(myxmlhttp, "RatePassword", params);
+  }
+  }
+  function getElement(name) {
+  if (document.all) {
+  return document.all(name);
+  }
+  return document.getElementById(name);
+  }
+  function getUserName(s) {
+  var parts = s.split("@");
+  return parts[0];
+  }
+  function RatePasswdXmlHttpHandler() {
+  if (myxmlhttp.readyState != 4) {
+  return;
+  }
+  rating = parseInt(myxmlhttp.responseText);
+  DrawBar(rating);
+  }
+  function DrawBar(rating) {
+  var posbar = getElement('posBar');
+  var negbar = getElement('negBar');
+  var passwdRating = getElement('passwdRating');
+  var barLength = getElement('passwdBarDiv').width;
+  if (rating >= 0 && rating <= 4) {  
+      posbar.style.width = barLength / 4 * rating;
+      negbar.style.width = barLength / 4 * (4 - rating);
+    } else {
+      posbar.style.width = 0;
+      negbar.style.width = barLength;
+      rating = 5; 
+    }
+    posbar.style.background = barColors[rating];
+    passwdRating.innerHTML = "<font color='" + ratingMsgColors[rating] +
+                             "'>" + ratingMsgs[rating] + "</font>";
+  }
+  function resetBar() {
+  var posbar = getElement('posBar');
+  var negbar = getElement('negBar');
+  var passwdRating = getElement('passwdRating');
+  var barLength = getElement('passwdBar').width;
+  posbar.style.width = "0px";
+  negbar.style.width = barLength + "px";
+  passwdRating.innerHTML = "";
+  }
+  var agt = navigator.userAgent.toLowerCase();
+  var is_op = (agt.indexOf("opera") != -1);
+  var is_ie = (agt.indexOf("msie") != -1) && document.all && !is_op;
+  var is_mac = (agt.indexOf("mac") != -1);
+  var is_gk = (agt.indexOf("gecko") != -1);
+  var is_sf = (agt.indexOf("safari") != -1);
+  function gff(str, pfx) {
+  var i = str.indexOf(pfx);
+  if (i != -1) {
+  var v = parseFloat(str.substring(i + pfx.length));
+  if (!isNaN(v)) {
+  return v;
+  }
+  }
+  return null;
+  }
+  function Compatible() {
+  if (is_ie && !is_op && !is_mac) {
+  var v = gff(agt, "msie ");
+  if (v != null) {
+  return (v >= 6.0);
+  }
+  }
+  if (is_gk && !is_sf) {
+  var v = gff(agt, "rv:");
+  if (v != null) {
+  return (v >= 1.4);
+  } else {
+  v = gff(agt, "galeon/");
+  if (v != null) {
+  return (v >= 1.3);
+  }
+  }
+  }
+  if (is_sf) {
+  var v = gff(agt, "applewebkit/");
+  if (v != null) {
+  return (v >= 124);
+  }
+  }
+  return false;
+  }
+  myxmlhttp = CreateXmlHttpReq(RatePasswdXmlHttpHandler);
+  isBrowserCompatible = Compatible() && myxmlhttp;
+  -->
+</script>
+  <td width="10px"></td>
+  <td nowrap="nowrap" valign="top" id="passwdBarDiv" style="display:none" width="180">
+  <table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+  <td nowrap="nowrap" valign="top" width="0">
+  <font size="-1" face="Arial, sans-serif">
+  <a href="javascript:var popup=window.open('PasswordHelp', 'PasswordHelp',
+            'width=600, height=600, location=no, menubar=no,
+            status=no, toolbar=no, scrollbars=yes, resizable=yes');" tabindex="-1">
+  パスワードの安全度:</a>
+  </font>
+  </td>
+  <td nowrap="nowrap" valign="top">
+  <font size="-1" face="Arial, sans-serif" color="#808080"><b>
+  <div id="passwdRating"></div>
+  </b></font>
+  </td>
+  </tr>
+  <tr>
+  <td height="3"></td>
+  </tr>
+  <tr>
+  <td colspan="2">
+  <table id="passwdBar" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="180"><tr>
+  <td height="4" bgcolor="#e0e0e0" width="0%" id="posBar"></td>
+  <td height="4" bgcolor="#e0e0e0" width="100%" id="negBar"></td>
+  </tr></table>
+  </td>
+  </tr>
+  </table>
+  </td>
+<script type="text/javascript">
+<!--
+
+  var hidePasswordBar = 0;
+
+  if (isBrowserCompatible && !hidePasswordBar) {
+    document.getElementById("passwdBarDiv").style.display = "block";
+  } else {
+    var helpLink = document.getElementById("passwordHelpLink");
+    if (helpLink) {
+      helpLink.style.display = "inline";
+    }
+  } 
+
+//-->
+</script>
+  </tr>
+  </tbody>
+  </table>
+  </td>
+  </tr>
+  <tr>
+  <td valign="top">
+  <span class="gaia sub rpl">
+  パスワードを再入力してください:
+  </span>
+  </td>
+  <td>
+  <div>
+  <input type="password" name="PasswdAgain" id="PasswdAgain" size="30" class="gaia sub passwdtxtfield"/>
+  </div>
+  </td>
+  </tr>
+  <tr>
+  <td nowrap="nowrap">&nbsp;</td>
+  <td align="left">
+  <font size="-1">
+  <input type="checkbox" name="PersistentCookie" id="PersistentCookie" value="yes" checked="checked"/>
+&nbsp;<input type="hidden" name="rmShown" value="1"/>次回から入力を省略
+  </font>
+  </td>
+  </tr>
+<tr>
+  <td nowrap="nowrap">&nbsp;</td>
+  <td align="left">
+  <font size="-1" face="Arial, sans-serif">
+  Google アカウントを作成すると、ウェブ履歴が有効になります。ウェブ履歴では、ユーザーの嗜好に合わせて Google の機能をパーソナライズでき、より関連性の高い検索結果を得たり、検索キーワードの候補を表示することができます。
+  <a href="support/accounts/bin/answer.py?answer=54068&amp;hl=ja" target="_blank">詳細</a>
+  </font>
+  <br/>
+  <input type="checkbox" value="1" name="smhck" id="smhck" checked>
+  <input type="hidden" value="1" id="nshk" name="nshk">
+  <font size="-1" face="Arial, sans-serif">
+  ウェブ履歴を有効にする。
+  </font>
+  </td>
+</tr>
+  <tr>
+  <td colspan="2"><hr></td>
+  </tr>
+<tr>
+  <td nowrap="nowrap" valign="top">
+  <font size="-1" face="Arial, sans-serif">
+  <b>居住国:</b>
+  </font>
+  </td>
+  <td>
+<noscript>
+  <input type="hidden" name="hl" value="ja"/>
+</noscript>
+  <select id="loc" name="loc" onchange="javascript:reloadTos(reloadTimeZones)">
+  <option value="PS">
+  Palestinian Territories
+  </option>
+  <option value="IS">
+  アイスランド (?sland)
+  </option>
+  <option value="IE">
+  アイルランド (Ireland)
+  </option>
+  <option value="AZ">
+  アゼルバイジャン (Az?rbaycan)
+  </option>
+  <option value="AF">
+  アフガニスタン (?????????)
+  </option>
+  <option value="UM">
+  アメリカ合衆国外諸島 (United States minor outlying islands)
+  </option>
+  <option value="AS">
+  アメリカ領サモア (American Samoa)
+  </option>
+  <option value="AE">
+  アラブ首長国連邦 (???????? ???????? ????????)
+  </option>
+  <option value="DZ">
+  アルジェリア (???????)
+  </option>
+  <option value="AR">
+  アルゼンチン (Argentina)
+  </option>
+  <option value="AW">
+  アルバ (Aruba)
+  </option>
+  <option value="AL">
+  アルバニア (Shqip?ria)
+  </option>
+  <option value="AM">
+  アルメニア (????????)
+  </option>
+  <option value="AI">
+  アンギラ (Anguilla)
+  </option>
+  <option value="AO">
+  アンゴラ (Angola)
+  </option>
+  <option value="AG">
+  アンティグアバブーダ (Antigua and Barbuda)
+  </option>
+  <option value="AD">
+  アンドラ (Andorra)
+  </option>
+  <option value="YE">
+  イエメン (?????)
+  </option>
+  <option value="GB">
+  イギリス (United Kingdom)
+  </option>
+  <option value="IO">
+  イギリス領インド洋地域 (British Indian Ocean Territory)
+  </option>
+  <option value="IL">
+  イスラエル (?????)
+  </option>
+  <option value="IT">
+  イタリア (Italia)
+  </option>
+  <option value="IQ">
+  イラク (??????)
+  </option>
+  <option value="IR">
+  イラン (?????)
+  </option>
+  <option value="IN">
+  インド (India)
+  </option>
+  <option value="ID">
+  インドネシア (Indonesia)
+  </option>
+  <option value="UG">
+  ウガンダ (Uganda)
+  </option>
+  <option value="UA">
+  ウクライナ (Укра?на)
+  </option>
+  <option value="UZ">
+  ウズベキスタン (O&#39;zbekiston)
+  </option>
+  <option value="UY">
+  ウルグアイ (Uruguay)
+  </option>
+  <option value="EC">
+  エクアドル (Ecuador)
+  </option>
+  <option value="EG">
+  エジプト (???)
+  </option>
+  <option value="EE">
+  エストニア (Eesti)
+  </option>
+  <option value="ET">
+  エチオピア (Ityop&#39;iya)
+  </option>
+  <option value="ER">
+  エリトリア (Ertra)
+  </option>
+  <option value="SV">
+  エルサルバドル (El Salvador)
+  </option>
+  <option value="AU">
+  オーストラリア (Australia)
+  </option>
+  <option value="AT">
+  オーストリア (?sterreich)
+  </option>
+  <option value="AX">
+  オーランド諸島 (Aland Islands)
+  </option>
+  <option value="OM">
+  オマーン (????)
+  </option>
+  <option value="NL">
+  オランダ (Nederland)
+  </option>
+  <option value="AN">
+  オランダ領アンティル (Netherlands Antilles)
+  </option>
+  <option value="GY">
+  ガイアナ (Guyana)
+  </option>
+  <option value="KZ">
+  カザフスタン (?аза?стан)
+  </option>
+  <option value="QA">
+  カタール (???)
+  </option>
+  <option value="CA">
+  カナダ (Canada)
+  </option>
+  <option value="CV">
+  カボベルデ (Cabo Verde)
+  </option>
+  <option value="GA">
+  ガボン (Gabon)
+  </option>
+  <option value="CM">
+  カメルーン (Cameroun)
+  </option>
+  <option value="GM">
+  ガンビア (Gambia)
+  </option>
+  <option value="KH">
+  カンボジア (Kampuchea)
+  </option>
+  <option value="GH">
+  ガーナ (Ghana)
+  </option>
+  <option value="GG">
+  ガーンジー (Guernsey)
+  </option>
+  <option value="GN">
+  ギニア (Guin?e)
+  </option>
+  <option value="GW">
+  ギニアビサウ (Guin?-Bissau)
+  </option>
+  <option value="CY">
+  キプロス (Κυπρο?)
+  </option>
+  <option value="CU">
+  キューバ (Cuba)
+  </option>
+  <option value="GR">
+  ギリシャ (Ελλ??)
+  </option>
+  <option value="KI">
+  キリバス (Kiribati)
+  </option>
+  <option value="KG">
+  キルギス (Кыргызстан)
+  </option>
+  <option value="GP">
+  グアダループ (Guadeloupe)
+  </option>
+  <option value="GT">
+  グァテマラ (Guatemala)
+  </option>
+  <option value="GU">
+  グアム (Guam)
+  </option>
+  <option value="KW">
+  クウェート (??????)
+  </option>
+  <option value="CK">
+  クック諸島 (Cook Islands)
+  </option>
+  <option value="GL">
+  グリーンランド (Greenland)
+  </option>
+  <option value="CX">
+  クリスマス諸島 (Christmas Island)
+  </option>
+  <option value="GE">
+  グルジア (??????????)
+  </option>
+  <option value="GD">
+  グレナダ (Grenada)
+  </option>
+  <option value="HR">
+  クロアチア (Hrvatska)
+  </option>
+  <option value="KY">
+  ケイマン諸島 (Cayman Islands)
+  </option>
+  <option value="KE">
+  ケニア (Kenya)
+  </option>
+  <option value="CI">
+  コートジボワール (C?te d&#39;Ivoire)
+  </option>
+  <option value="CC">
+  ココス諸島 (Cocos Islands)
+  </option>
+  <option value="CR">
+  コスタリカ (Costa Rica)
+  </option>
+  <option value="KM">
+  コモロ (Comores)
+  </option>
+  <option value="CO">
+  コロンビア (Colombia)
+  </option>
+  <option value="CD">
+  コンゴ (Congo, Democratic Republic of the)
+  </option>
+  <option value="CG">
+  コンゴ (Congo)
+  </option>
+  <option value="SA">
+  サウジアラビア (??????? ??????? ????????)
+  </option>
+  <option value="WS">
+  サモア (Samoa)
+  </option>
+  <option value="ST">
+  サントメプリンシペ (S?o Tom? and Pr?ncipe)
+  </option>
+  <option value="ZM">
+  ザンビア (Zambia)
+  </option>
+  <option value="PM">
+  サンピエールミクロン (Saint Pierre and Miquelon)
+  </option>
+  <option value="SM">
+  サンマリノ (San Marino)
+  </option>
+  <option value="SL">
+  シェラレオネ (Sierra Leone)
+  </option>
+  <option value="DJ">
+  ジブチ (Djibouti)
+  </option>
+  <option value="GI">
+  ジブラルタル (Gibraltar)
+  </option>
+  <option value="JE">
+  ジャージー (Jersey)
+  </option>
+  <option value="JM">
+  ジャマイカ (Jamaica)
+  </option>
+  <option value="SY">
+  シリア (?????)
+  </option>
+  <option value="SG">
+  シンガポール (Singapura)
+  </option>
+  <option value="ZW">
+  ジンバブエ (Zimbabwe)
+  </option>
+  <option value="CH">
+  スイス連邦 (Schweiz)
+  </option>
+  <option value="SE">
+  スウェーデン (Sverige)
+  </option>
+  <option value="SD">
+  スーダン (???????)
+  </option>
+  <option value="SJ">
+  スバールバル諸島とヤンマイエン島 (Svalbard and Jan Mayen)
+  </option>
+  <option value="ES">
+  スペイン (Espa?a)
+  </option>
+  <option value="SR">
+  スリナム (Suriname)
+  </option>
+  <option value="LK">
+  スリランカ (Sri Lanka)
+  </option>
+  <option value="SK">
+  スロバキア (Slovensko)
+  </option>
+  <option value="SI">
+  スロベニア (Slovenija)
+  </option>
+  <option value="SZ">
+  スワジランド (Swaziland)
+  </option>
+  <option value="SC">
+  セイシェル (Seychelles)
+  </option>
+  <option value="SN">
+  セネガル (S?n?gal)
+  </option>
+  <option value="RS">
+  セルビア (Срби?а)
+  </option>
+  <option value="CS">
+  セルビアモンテネグロ (Срби?а и Црна Гора)
+  </option>
+  <option value="KN">
+  セントクリストファー・ネビス (Saint Kitts and Nevis)
+  </option>
+  <option value="VC">
+  セントビンセント・グレナディーン諸島 (Saint Vincent and the Grenadines)
+  </option>
+  <option value="SH">
+  セントヘレナ (Saint Helena)
+  </option>
+  <option value="LC">
+  セントルシア (Saint Lucia)
+  </option>
+  <option value="SO">
+  ソマリア (Soomaaliya)
+  </option>
+  <option value="SB">
+  ソロモン諸島 (Solomon Islands)
+  </option>
+  <option value="TC">
+  タークス諸島及びカイコス諸島 (Turks and Caicos Islands)
+  </option>
+  <option value="TH">
+  タイ (??????????????)
+  </option>
+  <option value="TJ">
+  タジキスタン (То?икистон)
+  </option>
+  <option value="TZ">
+  タンザニア (Tanzania)
+  </option>
+  <option value="CZ">
+  チェコ (?esko)
+  </option>
+  <option value="TD">
+  チャド (Tchad)
+  </option>
+  <option value="TN">
+  チュニジア (????)
+  </option>
+  <option value="CL">
+  チリ (Chile)
+  </option>
+  <option value="TV">
+  ツバル (Tuvalu)
+  </option>
+  <option value="DK">
+  デンマーク (Danmark)
+  </option>
+  <option value="DE">
+  ドイツ (Deutschland)
+  </option>
+  <option value="TG">
+  トーゴ (Togo)
+  </option>
+  <option value="TK">
+  トケラウ諸島 (Tokelau)
+  </option>
+  <option value="DM">
+  ドミニカ (Dominica)
+  </option>
+  <option value="DO">
+  ドミニカ (Dominican Republic)
+  </option>
+  <option value="TT">
+  トリニダードトバゴ (Trinidad and Tobago)
+  </option>
+  <option value="TM">
+  トルクメニスタン (T?rkmenistan)
+  </option>
+  <option value="TR">
+  トルコ (T?rkiye)
+  </option>
+  <option value="TO">
+  トンガ (Tonga)
+  </option>
+  <option value="NG">
+  ナイジェリア (Nigeria)
+  </option>
+  <option value="NR">
+  ナウル (Naoero)
+  </option>
+  <option value="NA">
+  ナミビア (Namibia)
+  </option>
+  <option value="NU">
+  ニウエ (Niue)
+  </option>
+  <option value="NI">
+  ニカラグア (Nicaragua)
+  </option>
+  <option value="NE">
+  ニジェール (Niger)
+  </option>
+  <option value="NC">
+  ニューカレドニア (New Caledonia)
+  </option>
+  <option value="NZ">
+  ニュージーランド (New Zealand)
+  </option>
+  <option value="NP">
+  ネパール (?????)
+  </option>
+  <option value="NF">
+  ノーフォーク島 (Norfolk Island)
+  </option>
+  <option value="NO">
+  ノルウェー (Norge)
+  </option>
+  <option value="HM">
+  ハード島とマクドナルド諸島 (Heard Island and McDonald Islands)
+  </option>
+  <option value="HT">
+  ハイチ (Ha?ti)
+  </option>
+  <option value="PK">
+  パキスタン (???????)
+  </option>
+  <option value="VA">
+  バチカン (Citt? del Vaticano)
+  </option>
+  <option value="PA">
+  パナマ (Panam?)
+  </option>
+  <option value="VU">
+  バヌアツ (Vanuatu)
+  </option>
+  <option value="BS">
+  バハマ (Bahamas)
+  </option>
+  <option value="PG">
+  パプア・ニューギニア (Papua New Guinea)
+  </option>
+  <option value="BM">
+  バミューダ (Bermuda)
+  </option>
+  <option value="PW">
+  パラオ (Belau)
+  </option>
+  <option value="PY">
+  パラグアイ (Paraguay)
+  </option>
+  <option value="BB">
+  バルバドス (Barbados)
+  </option>
+  <option value="HU">
+  ハンガリー (Magyarorsz?g)
+  </option>
+  <option value="BD">
+  バングラディッシュ (????????)
+  </option>
+  <option value="BH">
+  バーレーン (???????)
+  </option>
+  <option value="PN">
+  ピトケアン島 (Pitcairn)
+  </option>
+  <option value="FJ">
+  フィジー (Fiji)
+  </option>
+  <option value="PH">
+  フィリピン (Pilipinas)
+  </option>
+  <option value="FI">
+  フィンランド (Suomi)
+  </option>
+  <option value="PR">
+  プエルトリコ (Puerto Rico)
+  </option>
+  <option value="FO">
+  フェロー諸島 (Faroe Islands)
+  </option>
+  <option value="FK">
+  フォークランド諸島 (Falkland Islands)
+  </option>
+  <option value="BR">
+  ブラジル (Brasil)
+  </option>
+  <option value="FR">
+  フランス (France)
+  </option>
+  <option value="TF">
+  フランス南部領 (French Southern Territories)
+  </option>
+  <option value="GF">
+  フランス領ギニア (French Guiana)
+  </option>
+  <option value="PF">
+  フランス領ポリネシア (French Polynesia)
+  </option>
+  <option value="BG">
+  ブルガリア (България)
+  </option>
+  <option value="BF">
+  ブルキナファソ (Burkina Faso)
+  </option>
+  <option value="BN">
+  ブルネイ (Brunei Darussalam)
+  </option>
+  <option value="BI">
+  ブルンジ (Uburundi)
+  </option>
+  <option value="BT">
+  ブータン (?????????)
+  </option>
+  <option value="BV">
+  ブーベ島 (Bouvet Island)
+  </option>
+  <option value="VN">
+  ベトナム (Vi?t Nam)
+  </option>
+  <option value="BJ">
+  ベニン (B?nin)
+  </option>
+  <option value="VE">
+  ベネズエラ (Venezuela)
+  </option>
+  <option value="BY">
+  ベラルーシ (Белару?сь)
+  </option>
+  <option value="BZ">
+  ベリーズ (Belize)
+  </option>
+  <option value="PE">
+  ペルー (Per?)
+  </option>
+  <option value="BE">
+  ベルギー (Belgi?)
+  </option>
+  <option value="BA">
+  ボスニアヘルツェゴビナ (Bosna i Hercegovina)
+  </option>
+  <option value="BW">
+  ボツワナ (Botswana)
+  </option>
+  <option value="BO">
+  ボリビア (Bolivia)
+  </option>
+  <option value="PT">
+  ポルトガル (Portugal)
+  </option>
+  <option value="HN">
+  ホンジュラス (Honduras)
+  </option>
+  <option value="PL">
+  ポーランド (Polska)
+  </option>
+  <option value="MH">
+  マーシャル諸島 (Marshall Islands)
+  </option>
+  <option value="YT">
+  マイヨット島 (Mayotte)
+  </option>
+  <option value="MO">
+  マカオ (Macao)
+  </option>
+  <option value="MK">
+  マケドニア (Македони?а)
+  </option>
+  <option value="MG">
+  マダガスカル (Madagasikara)
+  </option>
+  <option value="MW">
+  マラウイ (Malawi)
+  </option>
+  <option value="ML">
+  マリ (Mali)
+  </option>
+  <option value="MT">
+  マルタ (Malta)
+  </option>
+  <option value="MQ">
+  マルチニーク (Martinique)
+  </option>
+  <option value="MY">
+  マレーシア (Malaysia)
+  </option>
+  <option value="IM">
+  マン島 (Isle of Man)
+  </option>
+  <option value="FM">
+  ミクロネシア連邦 (Micronesia)
+  </option>
+  <option value="MM">
+  ミャンマー (ビルマ) (Myanmar (Burma))
+  </option>
+  <option value="MX">
+  メキシコ (M?xico)
+  </option>
+  <option value="MU">
+  モーリシャス (Mauritius)
+  </option>
+  <option value="MR">
+  モーリタニア (?????????)
+  </option>
+  <option value="MZ">
+  モザンビーク (Mo?ambique)
+  </option>
+  <option value="MC">
+  モナコ (Monaco)
+  </option>
+  <option value="MV">
+  モルディブ (???????? ???????????)
+  </option>
+  <option value="MD">
+  モルドバ (Moldova)
+  </option>
+  <option value="MA">
+  モロッコ (??????)
+  </option>
+  <option value="MN">
+  モンゴル (Монгол Улс)
+  </option>
+  <option value="ME">
+  モンテネグロ (Црна Гора)
+  </option>
+  <option value="MS">
+  モントセラト島 (Montserrat)
+  </option>
+  <option value="JO">
+  ヨルダン (??????)
+  </option>
+  <option value="LA">
+  ラオス (????)
+  </option>
+  <option value="LV">
+  ラトビア (Latvija)
+  </option>
+  <option value="LT">
+  リトアニア (Lietuva)
+  </option>
+  <option value="LY">
+  リビア (?????)
+  </option>
+  <option value="LI">
+  リヒテンシュタイン (Liechtenstein)
+  </option>
+  <option value="LR">
+  リベリア (Liberia)
+  </option>
+  <option value="RO">
+  ルーマニア (Rom?nia)
+  </option>
+  <option value="LU">
+  ルクセンブルグ (L?tzebuerg)
+  </option>
+  <option value="RW">
+  ルワンダ (Rwanda)
+  </option>
+  <option value="LS">
+  レソト (Lesotho)
+  </option>
+  <option value="LB">
+  レバノン (?????)
+  </option>
+  <option value="RE">
+  レユニオン (Reunion)
+  </option>
+  <option value="RU">
+  ロシア (Россия)
+  </option>
+  <option value="WF">
+  ワリーエフトゥーナ諸島 (Wallis and Futuna)
+  </option>
+  <option value="VG">
+  英領バージン諸島 (Virgin Islands, British)
+  </option>
+  <option value="KR">
+  韓国 (??)
+  </option>
+  <option value="HK">
+  香港 (Hong Kong)
+  </option>
+  <option value="EH">
+  西サハラ (??????? ???????)
+  </option>
+  <option value="GQ">
+  赤道ギニア (Guinea Ecuatorial)
+  </option>
+  <option value="TW">
+  台湾 (台灣)
+  </option>
+  <option value="CF">
+  中央アフリカ (R?publique Centrafricaine)
+  </option>
+  <option value="CN">
+  中国
+  </option>
+  <option value="TL">
+  東チモール (Timor-Leste)
+  </option>
+  <option value="ZA">
+  南アフリカ (South Africa)
+  </option>
+  <option value="GS">
+  南ジョージア島と南サンドイッチ諸島 (South Georgia and the South Sandwich Islands)
+  </option>
+  <option value="AQ">
+  南極大陸 (Antarctica)
+  </option>
+  <option value="JP">
+  日本
+  </option>
+  <option value="US" selected>
+  米国 (United States)
+  </option>
+  <option value="VI">
+  米領バージン諸島 (Virgin Islands, U.S.)
+  </option>
+  <option value="MP">
+  北マリアナ諸島 (Northern Mariana Islands)
+  </option>
+  <option value="KP">
+  北朝鮮 (??)
+  </option>
+  </select>
+  <noscript>
+  <input type="submit" name="default_submit" id="default_submit" style="display:none"/>
+  <input type="submit" name="change_location" id="change_location" style="display:inline" value="変更"/>
+  </noscript>
+  </td>
+</tr>
+<tr>
+  <td valign="top">
+  <span class="gaia cud cl">
+  文字の確認:
+  </span>
+  </td>
+  <td>
+  <table>
+  <input type="hidden" name="newaccounttoken" id="newaccounttoken" value="bpIkNAZ5CB56JiKTOgC3tc740YI9_p6WEvuUp_IPyLt8ccjDWA6lgXGxNu_2H9Pud9g4kFAvFJC1gtNiBWIk1A:eUfqNyLvTD3lKxUuOp97_A"/>
+  <input type="hidden" name="newaccounturl" id="newaccounturl" value="/accounts/Captcha?ctoken=bpIkNAZ5CB56JiKTOgC3tc740YI9_p6WEvuUp_IPyLt8ccjDWA6lgXGxNu_2H9Pud9g4kFAvFJC1gtNiBWIk1A%3AeUfqNyLvTD3lKxUuOp97_A"/>
+<tr>
+  <td valign="top">
+  </td>
+  <td valign="top">
+  <span class="gaia captchahtml desc">
+  画像に表示されている文字を入力してください。
+  </span>
+  <div>
+  <img src="/accounts/Captcha?ctoken=bpIkNAZ5CB56JiKTOgC3tc740YI9_p6WEvuUp_IPyLt8ccjDWA6lgXGxNu_2H9Pud9g4kFAvFJC1gtNiBWIk1A%3AeUfqNyLvTD3lKxUuOp97_A" width="200" height="70" alt="Visual verification"/>
+  </div>
+  <input type="hidden" name="newaccounttoken_audio" id="newaccounttoken_audio" value="z6td-kpu8aHeuQiJTSl50R5MLvVK5MlQZVAPL0uSyATBNLTw8TnKGApGzlJMseje08rhWA6EIQD0y-8kz7akqQ:Tuc_8kUpaFg3Jh0HBSWQOA"/>
+  <input type="hidden" name="newaccounturl_audio" id="newaccounturl_audio" value="/accounts/Captcha?ctoken=z6td-kpu8aHeuQiJTSl50R5MLvVK5MlQZVAPL0uSyATBNLTw8TnKGApGzlJMseje08rhWA6EIQD0y-8kz7akqQ%3ATuc_8kUpaFg3Jh0HBSWQOA"/>
+  <div id="snd1"></div>
+  <div id="noEm"></div>
+  <div id="playAudio"></div>
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+  <div>
+  <input type="text" size="22" id="newaccountcaptcha" name="newaccountcaptcha" value="" title="Type the characters you see or numbers you hear"></input>
+  <script><!--
+          document.write('<a href="javascript:playCaptcha()">');
+  document.write('<img src="http:\x2F\x2Fwww.google.com\x2Faccounts\x2Faccessibility.gif" border="0" style="width: 1em; height: 1.2em;" alt="Listen and type the numbers you hear"></a>');
+  --></script>
+  <noscript>
+  <a href="/accounts/Captcha?ctoken=z6td-kpu8aHeuQiJTSl50R5MLvVK5MlQZVAPL0uSyATBNLTw8TnKGApGzlJMseje08rhWA6EIQD0y-8kz7akqQ%3ATuc_8kUpaFg3Jh0HBSWQOA" target="_blank">
+  <img src="/accounts/accessibility.gif" border="0" style="width: 1em; height: 1.2em;" align="absmiddle" alt="聞こえた番号を入力します"/>
+  </a>
+  </noscript>
+  <a href="support/accounts/bin/answer.py?answer=33974" target="_top">
+  <img border="0" height="1" width="1" alt="スクリーン リーダーの詳細については、ここをクリックしてください。"/>
+  </a>
+  </div>
+  <span class="gaia captchahtml cmt">
+  大文字と小文字は区別されません
+  </span>
+ </td>
+</tr>
+<script><!--
+
+// cross platform equiv. to document.getElementById
+function gGetElementById(s) {
+ var o = (document.getElementById ? document.getElementById(s)
+                                  : document.all[s]);
+ return ((o == null) ? false : o);
+}
+
+
+function playCaptcha() {
+  var wavURL    = "http:\x2F\x2Fwww.google.com\x2Faccounts\x2FCaptcha?ctoken=z6td-kpu8aHeuQiJTSl50R5MLvVK5MlQZVAPL0uSyATBNLTw8TnKGApGzlJMseje08rhWA6EIQD0y-8kz7akqQ%3ATuc_8kUpaFg3Jh0HBSWQOA";
+  var embedCode = '<EMBED SRC=' + wavURL + ' HIDDEN="true" AUTOSTART="true" >';
+  gGetElementById("playAudio").innerHTML = "";
+  gGetElementById("playAudio").innerHTML = embedCode;
+  gGetElementById("newaccountcaptcha").value="";
+  gGetElementById("newaccountcaptcha").focus();
+}
+--></script>
+  </table>
+  </td>
+</tr>
+  <!-- Tos.naui=default -->
+  <tr>
+  <td valign="top" nowrap="nowrap">
+  <font size="-1" face="Arial, sans-serif">
+  <b>利用規約:</b>
+  </font>
+  </td>
+  <td valign="top">
+  <font size="-1" face="Arial, sans-serif">
+  入力した Google アカウントの情報を確認して、必要に応じて変更し、次の利用規約をお読みください。
+  </font>
+  </td>
+  </tr>
+  <tr>
+  <td>&nbsp;</td>
+  <td valign="top">
+  <div>
+  <div style="display:inline" id="tos_div">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td align="right" valign="top">
+  <font size="-1">
+  <a href="TOS?loc=US&amp;hl=ja" target="_blank">印刷用</a>
+  </font>
+</td></tr>
+<tr><td>
+  <textarea rows="5" cols="80" style="width:100%;text-align:" readonly="readonly" onfocus="this.rows=10">?サービス利用規約
+
+
+
+1. ユーザーと Googleの関係 
+
+1.1 ユーザーがGoogle のプロダクト、サービス、ソフトウェアおよびウェブサイト（別個の書面による合意に基づきGoogle がユーザーに提供するサービスを除きます。以下、本文書で総称して「本サービス」といいます。）をご利用になる場合、Google とユーザー間での法的な契約の条件が適用されます。Google とは次を所在地とする Google, Inc. を指します。
+
+Google, Inc.
+1600 Amphitheatre Parkway 
+Mountain View, CA 94043
+
+本文書は Google とユーザー間において、どのようにこの契約が成立するかを説明するとともに、この契約のいくつかの条件を定めるものです。
+
+1.2 別途 Google と書面で合意した場合を除き、Googleとユーザーの間の契約には、常に、少なくとも本文書に定める条件（以下「共通条項」といいます。）が含まれます。
+
+1.3 ユーザーと Google の契約には、共通条項に加えて、本サービスに適用される全ての法的な通知の条件が含まれます。かかる法的な通知に含まれる条件を以下「追加条項」といいます。本サービスに追加条項が適用される場合には、ユーザーは、本サービス内や本サービスの利用を通じて適用される追加条項を確認することができます。
+
+1.4 共通条項と追加条項が、ユーザーによる本サービスの利用に関する、ユーザーとGoogle 間における法的拘束力を有する契約を構成します。これらを注意深くお読みください。共通条項と追加条項により構成される契約を総称して、以下「本規約」といいます。
+
+1.5 追加条項と共通条項の間に矛盾がある場合、対象となる本サービスに関して適用される追加条項が優先するものとします。
+
+2. 本規約への同意
+
+2.1 本サービスを利用する場合、本規約に同意するものとします。同意いただけない場合、本サービスを利用することはできません。
+
+2.2 以下の方法により本規約に同意することができます。
+
+(A) 本規約を「承諾する」または「同意する」のボタンをクリックする（対象となる本サービスのユーザー インタフェースでこのオプションを提供している場合）。
+
+(B) 実際に本サービスを利用する。この場合、ユーザーは、本サービスのご利用を開始した時点からご自身が本規約を承諾したものとGoogleがみなすことを理解し、これに同意するものとします。
+
+2.3 (a)ユーザーが Google と拘束力のある契約を締結する法定年齢に達していない場合、 (b)アメリカ合衆国又はユーザーが居住もしくは本サービスを利用する国を含むその他の国の法律に基づき、ユーザーが本サービスを受けることを禁止されている場合は、本サービスを利用することはできず、本規約を承諾することはできません。
+
+2.4 ご利用を開始する前に、記録として共通条項を印刷するかコピーを保存することをお勧めいたします。
+
+3. 本規約の使用言語
+
+3.1 Google が本規約の翻訳を提供している場合、かかる翻訳はユーザーの便宜を図ることのみを目的としたものであり、ユーザーと Google の関係に関しては、本規約の英語版が適用されることに同意するものとします。
+
+3.2 本規約の英語版と翻訳版で相違や矛盾が発生する場合、英語版が優先するものとします。
+
+4. Google による本サービスの提供
+
+4.1 Googleには、世界中に子会社および関係会社があります。これらの子会社または関係会社がGoogleのために本サービスを提供する場合があります。ユーザーは、子会社および関係会社が本サービスを提供する権利があることを了承し、これに同意するものとします。
+
+4.2 Googleは、ユーザに最良のサービスを提供するため、継続してサービスの革新を行っています。ユーザーは、Googleが提供する本サービスの形式および性質が事前の通知なく随時変更される場合があることを了承し、これに同意するものとします。
+
+4.3 かかる継続的なサービスの革新の一環として、ユーザーは、Googleが、事前の通知なく、その単独の裁量により（永久にまたは一時的に）本サービス（または本サービス内の何らかの機能）の提供を中止する場合があることを了承し、これに同意するものとします。ユーザーは、いつでも、本サービスの利用を中止することができます。本サービスの利用を中止する場合、特に Google に連絡する必要はありません。
+
+4.4 ユーザーは、Googleがユーザーに対してアカウントへのアクセスを無効にした場合、本サービス、ご自身のアカウントの詳細、またはご自身のアカウントに含まれる如何なるファイルもしくはその他のコンテンツへのアクセスができないことがあることを了承し、これに同意するものとします。
+
+4.5 ユーザーは、Googleが現時点でユーザーが本サービスを通じて送信もしくは受信できる通信の数、または本サービスの提供のために使用できる保存スペースの量について一定の上限を設定していない場合であっても、Googleの裁量によりこれらについて一定の上限を設定できることを了承し、これに同意するものとします。
+
+5. ユーザーによる本サービスのご利用
+
+5.1 一部の本サービスにアクセスする際に、登録の手続や本サービスの利用に際して、ユーザーご自身に関する情報（ユーザーを特定するための情報または連絡先の詳細等）を提供いただく場合があります。ユーザーは、Googleに提供するこれらの情報が常に正確で最新のものであることに同意するものとします。
+
+5.2 ユーザーは、(a)本規約および(b)関連する法域において適用される法律、規制、一般に認められる慣行およびガイドライン等（合衆国またはその他の関係国へのまたはそれらに対する、データまたはソフトウェアの輸出に関する法律を含みます。）により許可される目的にのみ、本サービスを利用することに同意するものとします。
+
+5.3 Googleが提供するインタフェース以外の手段で、本サービスのいずれにもアクセスしないこと（またはアクセスを試みないこと）に同意するものとします。ただし、Google との別個の契約において明確な許可を受けた場合は除きます。特に、ユーザーは、いかなる本サービスについても、いかなる自動化された方法（スクリプトやウェブ クローラーの利用によるものを含みます。）によりアクセスせず、アクセスを試みないことに同意し、また、本サービスに関して提示されるいかなる robots.txt ファイルにおける指示に従うものとします。
+
+
+5.4 ユーザーは、本サービス（または本サービスに接続されているサーバおよびネットワーク）を妨害、中断させるいかなる行為も行わないことに同意するものとします。
+
+5.5 ユーザーは、Googleとの別個の契約において明確な許可を受けた場合を除き、どのような目的であれ、本サービスの複製、複写、コピー、販売、トレードおよび再販売を行わないことに同意するものとします。
+
+5.6 ユーザーは、ユーザーが本規約に基づく義務に違反した場合、および上記違反の結果で発生する損失や損害（Googleが被る可能性がある損失、損害を含みます。）について、ユーザーが単独で責任を負うこと、およびGoogleがユーザーおよび如何なる第三者に対しても何らの責任を負わないことに同意するものとします。
+
+6. ユーザーのパスワードおよびアカウントのセキュリティ
+
+6.1 ユーザーは、ご自身が本サービスにアクセスするために使用するすべてのアカウントに関係するパスワードの秘密を保持する責任を負うことを理解し、これに同意します。
+
+6.2ユーザーは、前項を踏まえて、ご自身のアカウントにおいて生じるすべての活動や行為について、Google に対して単独で責任を負うことに同意するものとします。
+
+6.3 パスワードやアカウントの不正な使用に気付いた場合は、次の URL をご参照になり必要な対応を行うことに同意するものとします。
+support/accounts/bin/answer.py?answer=48601&amp;hl=jp
+
+7. プライバシーと個人情報
+
+7.1 Google の情報保護に対する取り組みについては、次の URLに記載されているGoogleのプライバシーポリシー をご参照ください。
+http://www.google.co.jp/privacy.html
+このポリシーは、ユーザーが本サービスを利用する際に、Googleがどのようにユーザーの個人情報を取り扱い、プライバシーを保護するかについて説明しています。
+
+7.2 ユーザーは、ご提供いただいた個人情報がGoogleのプライバシーに関する方針に従って利用されることに同意するものとします。
+
+8. 本サービスのコンテンツ
+
+8.1 ユーザーは、本サービスの一環として、または本サービスの利用を通じてアクセスできるすべての情報（データ ファイル、テキスト、ソフトウェア、音楽、音声ファイルまたはその他のサウンド、写真、映像またはその他の画像等）についての責任は、そのコンテンツを制作した者に単独で帰属することを理解するものとします。上記のすべての情報を以下「本コンテンツ」といいます。
+
+8.2 ユーザーは、本サービスの一環として提供される広告やリンクなどを含む本コンテンツが、本コンテンツをGoogleに提供したスポンサーや広告主（または上記の者を代理するその他の者もしくは会社によって）などの第三者が保有する知的財産権によって保護される場合があることを理解するものとします。ユーザーは、本コンテンツを修正、賃貸、リース、貸出、販売、配布し、または本コンテンツ（全部もしくは一部のいずれか）に基づく二次的著作物を作成することはできません。ただし、Googleまたは本コンテンツの所有者から別個の契約において明確な許可を受けた場合は除きます。
+
+8.3 Googleは、すべての本サービスから全部または一部の本コンテンツを事前に選別、チェック、フラグ、フィルター、修正、拒絶または削除する権利を留保します（ただし、義務は負わない）。一部の本サービスについて、Google は、露骨な性的コンテンツを除去するツールを提供する場合があります。これらのツールには、セーフサーチの任意設定が含まれます（ http://www.google.co.jp/help/customize.html#safeを参照してください）。また、好ましくないと思われるマテリアルへのアクセスを制限する市販のサービスおよびソフトウェアがあります。
+
+8.4 ユーザーは、本サービスを利用することにより、不快、猥褻、または好ましくないと思われる本コンテンツにさらされる可能性があること、およびこの点につき、ユーザーが自己の危険負担により本サービスを利用することを理解するものとします。
+
+8.5 ユーザーは、本サービスを利用する過程でユーザーが作成、送信または表示する本コンテンツやユーザーの行動の結果で発生する損失や損害（Google が被る可能性がある損失または損害を含む）について、ユーザーが単独で責任を負うこと（および　Google がユーザーや第三者に対して責任を負わないこと）に同意するものとします。
+
+9. 財産的権利
+
+9.1 ユーザーは、本サービスに関連するすべての知的財産権を含め（その権利が登録されているか否か、または世界のどこにその権利が存在するかにかかわらず）、本サービスにおけるすべての法的権利、権原および利益を Google（またはGoogleのライセンサー）が所有することを了承し、これに同意するものとします。さらに、ユーザーは、本サービスが、Googleが秘密と指定した情報を含む場合があること、および、事前にGoogleの書面による同意を得ることなく、かかる情報を開示してはならないことに同意するものとします。
+
+9.2 ユーザーが別途Googleと書面で合意した場合を除き、本規約のいかなる規定も、Googleの商号、商標、サービス マーク、ロゴ、ドメイン名、およびその他の識別性を有するブランドの特徴（以下、総称して「Googleブランド」といいます）のいずれかを使用する権利をユーザーに付与するものではありません。
+
+9.3 ユーザーは、 Google との別個の書面による契約においてGoogleブランドのいずれかを使用する明示的な権利を付与されている場合、ユーザーによるGoogleブランドの使用が当該契約、本規約の適用される規定、および随時更新されるGoogleのブランド使用のガイドラインに従うことに同意するものとします。かかるガイドラインは、http://www.google.co.jp/permissions/guidelines.html（または Google がそのために随時提供するその他のURL）にて閲覧することができます。
+
+9.4 Googleは、本規約に基づき、ユーザーが本サービスを通じて、または本サービス上に提出、掲示、送信または表示する、本コンテンツに対する権利、権原または利益を、本コンテンツに内在する知的財産権を含め（その権利が登録されているか否か、または世界のどこにその権利が存在するかにかかわらず）、Google がユーザー（またはユーザーのライセンサー）から取得しないことを了承し、これに同意するものとします。ただし、第11条に定める限定的なライセンスを除きます。別途 Google と書面で合意した場合を除き、ユーザーは、ご自身がかかる権利を保護および強制する責任を負うことならびに Google がユーザーに代わりこれを行う義務を負わないことに同意するものとします。
+
+9.5 ユーザーは、本サービスに関する、もしくは本サービス内に含まれる財産権についての告知（著作権および商標の告知を含む）を削除、改変したり、見えないようにしないことに同意するものとします。
+
+9.6 ユーザーは、Google が書面で明示的に権限を付与した場合を除き、本サービスを利用する際に、会社や組織の商標、サービスマーク、商号、ロゴを使用するにあたり、それらの所有者について混乱が生じるような方法で使用しないことに同意するものとします。
+
+10. Google からのライセンス
+
+10.1 Google は、本サービスの一環としてユーザーに提供するソフトウェア（以下「本ソフトウェア」といいます）を使用するための、個人利用を目的とし、全世界で適用され譲渡不可かつ非独占的なライセンスをロイヤリティ無料で提供します。このライセンスは、Google が提供する本サービスを本規約により許容される方法でユーザーが使用し、かつその便益を享受できるようにすることを唯一の目的としています。
+
+10.2 ユーザーは、本ソフトウェアまたはその一部のコピー、修正、その二次的著作物の作成、リバース エンジニア、もしくはデコンパイルを行い、またはその他の方法によりそのソースコードの抽出を試みてはならず、第三者にもかかる行為を認めてはならないものとします。ただし、それが法律により明示的に許可もしくは要求されている場合、または Google から書面により明確な許可を受けた場合は除きます。
+
+10.3 Google が書面により明確に許可した場合を除き、ユーザーは、本ソフトウェアを使用する権利を譲渡したり、サブライセンスを供与したり、本ソフトウェアを使用する権利に担保を設定したり、その他の方法により本ソフトウェアを使用する権利の一部を移転しないことに同意するものとします。
+
+11.本コンテンツのライセンス
+
+11.1 ユーザーは、本サービス上や本サービスを通じて提出、掲示または表示する本コンテンツについて既に保有する著作権およびその他の権利を保持します。本コンテンツを提出、掲示または表示することにより、ユーザーが本サービス上や本サービスを通じて提出、掲示または表示する本コンテンツを、再生、翻案、修正、翻訳、出版、公衆実演、公衆展示、および配布するための無期限、取消不可、全世界で適用され、ロイヤルティ無料の、かつ非独占的なライセンスを Google に提供していただきます。このライセンスは、Google が本サービスを表示、配布およびプロモーションすることをできるようにすることを唯一の目的としており、本サービスの追加条項に定義する一部の本サービスについては撤回される場合があります。
+
+11.2 ユーザーは、このライセンスには、本コンテンツをシンジケート サービスの提供のために Google と関係があるその他の会社、組織または個人が利用できるようにし、サービスの提供に関連して本コンテンツを使用するための Google の権利を付与することを含むことに同意するものとします。
+
+11.3ユーザーは、Google が、ユーザに対して本サービスを提供するために要求される技術的措置を履行する際、(a)各種公共のネットワーク上でおよび各種媒体においてユーザーの本コンテンツを送信または配布すること、ならびに(b)ユーザーの本コンテンツに対して、ネットワーク、機器、サービスまたは媒体を接続するための技術的要件に本コンテンツを適合および適応させるために必要とされる変更を加えることができることに同意するものとします。また、ユーザーは、このライセンスが Google に上記措置を講じることを許可するものであることに同意するものとします。
+
+11.4 ユーザーは、ご自身が上記ライセンスを供与するために必要とされるすべての権利、能力および権限を有していることを Google に対して確認および保証するものとします。
+
+12. ソフトウェアの更新
+
+12.1 ユーザーが使用する本ソフトウェアは、随時Google から自動的に更新をダウンロード、インストールすることがあります。これらの更新は、本サービスを改善し、拡張し、かつさらに発展させるように設計されており、バグの修正、拡張機能、新規ソフトウェア モデュールおよび完全に新しいバージョンの形式をとる場合があります。ユーザーは、ご自身による本サービスの利用の一環として上記更新を受け取ること（およびGoogle が上記をユーザーに提供することを許可すること）に同意するものとします。
+
+13. Google との関係の終了
+
+13.1 本規約は、ユーザーまたは Google のいずれかが以下に定める方法によりその関係を終了させるまで、適用されます。
+
+13.2 Google との法的な契約を終了させたい場合、ユーザーは、(a)いつでも Googleに通知し、かつ(b)Google がオプションを提供している場合にはユーザーが利用するすべての本サービスのアカウントを閉鎖することにより、終了させることができます。ユーザーからの通知は、書面により、本規約の冒頭に定めるGoogle の住所に送付するものとします。
+
+13.3 Google は、以下のいずれかの事由が生じた場合、いつでもユーザーとの法的な契約を終了する権利を有するものとします。
+
+(A) ユーザーが本規約のいずれかの規定に違反した場合（または本規約の規定に従う意思がないまたは従うことができないことを明確に示す方法で行動した場合）。
+
+(B) Google が法律により終了させる義務を負う場合（例えば、ユーザーに対する本サービスの提供が違法であり、または違法となる場合）。
+
+(C) Google と共にユーザーに本サービスを提供していた提携先が　Google との関係を終了させた場合、もしくは、ユーザーに対する本サービスの提供を中止した場合。
+
+(D) Google が、ユーザーが居住、もしくはサービスを利用している国のユーザに対する本サービスの提供の中止へ移行している場合。
+
+(E) Google が本サービスを提供することが、商業的に可能でないと判断した場合。
+
+13.4 本条のいかなる規定も、本規約第4条に基づく本サービスの提供に関する Google の権利に影響を及ぼさないものとします。
+
+13.5 本規約が終了した場合、ユーザーおよび Google が享受し、適用を受けた（もしくは本規約が有効であった間に時間と共に発生した）または無期限に継続すると明示されたすべての法的権利、義務および債務は、上記中止により影響を受けないものとし、かつ第20.7項の規定は、引き続き上記権利、義務および債務に無期限に適用されるものとします。
+
+14. 保証の排除
+
+14.1 第14条および第15条を含め、本規約のいかなる規定も、適用される法律によって適法に排除または制限することができない、損失に関する Google の保証または責任を排除または制限しないものとします。法域によっては、過失、契約違反もしくは黙示の条件違反によって生じた損失もしくは損害、または付随的もしくは結果的損害に関する何らかの保証もしくは条件の排除または責任の制限もしくは排除が認められていません。従って、ユーザーの法域において適法な制限のみが適用され、Google の責任は、法律により認められる最大限に制限されます。
+
+14.2 本サービスの利用はユーザー単独の危険負担によるものであり、かつ本サービスが「現状のまま」および「入手できる状態のままで」提供されることを明示的に理解し、これに同意するものとします。
+
+14.3 特に、Google、その子会社および関係会社、ならびにそのライセンサーは、以下の事項を表明または保証しません。
+
+(A) 本サービスのご利用がユーザーに必要な事項を満たすこと。
+
+(B) 本サービスのご利用に中断が生じず、タイムリーであり、安全であり、またはエラーが生じないこと。
+
+(C) 本サービスを利用した結果、取得した情報が正確であり、または信頼できること。
+
+(D) 本サービスの一環としてユーザーに提供されたソフトウェアの動作または機能における不具合が修正されること。
+
+14.4 本サービスのご利用を通じて行なったダウンロード、またはその他の方法による取得は、ユーザー自身の裁量および危険負担で行っているのであり、ダウンロードの結果生じたユーザーのコンピュータ システムもしくはその他の機器に対する損害またはデータの喪失は、ユーザーが単独で責任を負います。
+
+14.5 口頭、書面によるかを問わず、ユーザーが Google から、もしくは本サービスを通じて取得した助言または情報は、本規約に明示の定めのない保証を生じさせるものではありません。
+
+14.6 Google は、明示または黙示を問わず、あらゆる種類のすべての保証および条件（商品性、特定目的適合性および侵害が存在しないことに関する黙示の保証および条件を含みますがこれらに限りません）を明示的に否認するものとします。
+
+15. 責任制限
+
+15.1 ユーザーは、本規約の第14.1項の規定全般を条件として、Google、Google の子会社および関係会社、ならびに　Google のライセンサーが、ユーザーに対し以下の各号について責任を負わないことについて、明示的に理解し同意するものとします。
+
+(A)ユーザーが被る直接損害、間接損害、付随的損害、特別損害、結果的損害または懲罰的損害賠償（どのように生じるかを問わず、かつ根拠となる責任理論を問いません）。これらの損害には、逸失利益（直接的、間接的を問わず）、のれんやビジネス上の評判に対する損失、データ消失の被害、代替商品またはサービスの調達価格、またはその他無形の損失等を含むものとします。
+
+(B) 以下の各項目に起因する損失または損害等を含む、ユーザーが被る損失または損害。
+
+(I) ユーザーが、いずれかの広告の完全性、正確性または存在を信頼したことに起因し、または、ユーザーと、本サービス上に掲載される広告の広告主またはスポンサーとの間の関係または取引に起因する損失または損害。
+
+(II) Google が本サービスに施す変更に起因し、または、本サービス（または本サービスの範囲内のいずれかの機能）の提供を永続的または一時的に停止したことに起因する損失または損害。
+
+(III) ユーザーが本サービスを利用したことによりまたは利用したことを通じ、保存、送信された本コンテンツおよびその他通信データの削除、破損、または保存の不備に起因する損失または損害。
+
+(III) ユーザーが、Google に対し、正確なアカウント情報を提出しなかったことに起因する損失または損害。
+
+(IV) ユーザーが、ご自身のパスワードまたはアカウントの明細の保護および秘密保持を怠ったことに起因する損失または損害。
+
+15.2 前項におけるユーザーに対する Google の責任の制限は、Google が、上記の損失の発生の可能性を通知されていたか、またはかかる可能性を認識すべきであったかを問わず、適用されるものとします。
+
+16. 著作権および商標に関する方針
+
+16.1 Google の方針として、適用のある国際的な知的財産権法（米国においてはデジタル ミレニアム著作権法を含みます）に従い、申し立てられた著作権侵害の通知に対処し、また、著作権侵害の常習者のアカウントを終了させます。Google の方針の詳細は、http://www.google.co.jp/dmca.htmlにてご覧いただけます。
+
+16.2 Google では広告関連サービスで発生する商標侵害に関する手続き方法を運用しています。詳細は次の URL をご確認ください。http://www.google.co.jp/tm_complaint.html
+
+17. 広 告
+
+17.1 本サービスの一部は、広告収入により支えられており、本サービスの一部に広告および宣伝を掲載することがあります。これらの広告は、本サービス上に保存される情報の内容、または本サービスを介して行われたクエリ、またはその他の情報を対象とすることがあります。
+
+17.2 本サービス上の Google による広告の様式、形態および範囲は、ユーザーに対し特定の通知を行うことなく変更されることがあります。
+
+17.3 ユーザーは、本サービスのアクセス権および利用権をユーザーに許諾することの対価として、Google が、本サービス上で上記のような広告を行えることについて同意するものとします。
+
+18. その他のコンテンツ
+
+18.1 本サービスは、他のウェブサイトまたはコンテンツまたは情報源へのハイパーリンクを含むことがあります。Google は、Google 以外の企業または個人により提供されるウェブサイトまたは情報源に対し、一切のコントロールを持たないことがあります。
+
+18.2 Google が、上記のような外部のサイトまたは情報源の利用可能性について責任を負わないこと、および、Google が、上記のようなウェブサイトまたは情報源における、またはここから入手できる広告、製品またはその他マテリアルを保証しないことについて了承し同意ものとします。
+
+18.3 上記のような外部のサイトまたは情報源の利用可能性に起因し、または、ユーザーが、上記のようなウェブサイトや情報源における、またはそれらから入手できる広告、サービスやプロダクト、またはその他のマテリアルの完全性、正確性または存在を信頼したことに起因して被るいかなる損失または損害についても、Google が責任を負わないことについて了承しかつ同意するものとします。
+
+19. 本規約の変更
+
+19.1 Google は、適宜、共通条項または追加条項を変更できるものとします。共通条項または追加条項を変更する場合、Google は、共通条項については、新しいバージョンを作成し、accounts/TOS?loc=JPにて入手できるようにし、また、新しい追加条項は、影響を受ける本サービスの中からまたは影響を受ける本サービスを通じて入手できるようにします。
+
+19.2 ユーザーは、共通条項または追加条項が変更された日以降に本サービスを利用する場合、それにより、ユーザーが最新の共通条項または追加条項を承認されたとGoogleがみなすことについて理解し同意するものとします。
+
+20. 一般的な法的条項
+
+20.1 ユーザーは、本サービスの利用において、（本サービスを利用した結果、または本サービスの利用を介して）第三者である個人や企業により提供されるサービスの利用、ソフトウェアのダウンロード、商品の購入を行なう場合があります。このような他のサービス、ソフトウェアまたは商品を利用する場合、ユーザーと、他の当該企業または個人の間に、別個の契約条件が適用されることがあります。この場合、本規約は、ユーザーと他の当該企業または者との間の法律上の関係に影響を及ぼしません。
+
+20.2 本規約は、ユーザーと Google との間の完全なる法的な合意を構成し、かつ、ユーザーによる本サービス（ただし、Google が、ユーザーに対し別個の書面による合意に基づき提供するサービスを除く）の利用について定め、かつ、本サービスに関してユーザーと Googleとの間における従前の合意に完全に取って代わります。
+
+20.3 ユーザーは、Google が、本サービスに関し、電子メール、郵便、または本サービス上への掲示により、ユーザーに対する通知（本規約の変更に関する通知を含みます）を送付できることについて同意します。
+
+20.4 ユーザーは、Googleが、本規約に記載される（または適用法に基づき自らが利益を有する）法律上の権利または救済措置を行使せずまたは執行しなかった場合についても、自らの権利を正式に放棄したとみなされないこと、および、かかる権利または救済措置は、Google により引続き利用可能であることについて同意します。
+
+20.5 本件に関し判決を下す管轄権を有するいずれかの裁判所が、本規約のいずれかの規定が無効であるとの判決を下した場合には、当該規定は、本規約の残りの規定に影響を及ぼすことなく、本規約から除外されます。本規約の残りの規定は、引続き有効かつ執行可能とします。
+
+20.6 ユーザーは、Google を親会社とするグループを構成する企業のそれぞれが、本規約の第三受益者であること、およびかかる他の企業が、それらに対して利益（またはかかる他の企業のための権利）を付与することを定めた本規約の全ての規定を、直接、執行し、また、これらの規定に依拠できることについて了承し同意するものとします。上記の場合を除き、他のいかなる者または企業も、本規約の第三者受益者ではないものとします。
+
+20.7 本規約、および本規約に基づくユーザーと Google の関係は、抵触法の規定にかかわらず、カリフォルニア州法に準拠するものとします。ユーザーと Googleは、本規約に起因して生じる法的問題の解決のため、カリフォルニア州、サンタクララ郡内に所在する裁判所の専属管轄権に服することについて合意します。上記の規定にもかかわらず、Google が、いずれの法域においても、仮処分や差止めによる救済（またはこれに準ずる緊急の法的救済措置）を申請できることについて同意するものとします。
+
+
+</textarea>
+</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>
+  <font size="-1">
+  次の [同意する] をクリックすることで、上記の<a href="TOS?loc=US&amp;hl=ja" target="_blank">利用規約</a>と<a href="intl/ja/privacy.html" target="_blank">プライバシー ポリシー</a>に同意したことになります。
+  </font>
+</td></tr>
+</table>
+<input type="hidden" id="privacy_policy_url" name="privacy_policy_url" value="intl/ja/privacy.html"/>
+  <input type="hidden" id="requested_tos_language" name="requested_tos_language" value="ja"/>
+  <input type="hidden" id="served_tos_location" name="served_tos_location" value="US"/>
+  <input type="hidden" id="served_tos_language" name="served_tos_language" value="ja"/>
+  </div>
+  </div>
+  </td>
+  </tr>
+<script src="/accounts/XmlHttp.js" type="text/javascript"></script>
+<script type="text/javascript" src="/accounts/TimeZones.js"></script>
+<script type="text/javascript"><!--
+
+
+  
+    reloadTos(reloadTimeZones);
+  
+
+function reloadTos(nextAction) {
+
+  var xmlhttp = initXmlHttp();
+
+   
+  if (xmlhttp != null) {
+    var buttonKey = "change_location";
+    var button = getFieldFromForm("createaccount", buttonKey);
+    if (button != null) {
+      button.style.display = "none";
+    }
+  } else {
+    return;
+  }
+
+  var ccKey = "loc";
+  var ccField = getFieldFromForm("createaccount", ccKey);
+
+  
+  if ((ccField != null) &&
+      (document.forms["gaia_langform"] != null) &&
+      (document.forms["gaia_langform"].elements[ccKey] != null)) {
+      document.forms["gaia_langform"].elements[ccKey].value = ccField.value;
+  }
+
+  var hlKey = "hl";
+  var hlField = getFieldFromForm("gaia_langform", hlKey);
+
+  var p1Key = "program_policy_url";
+  var p1Field = getFieldFromForm("createaccount", p1Key);
+
+  var p2Key = "privacy_policy_url";
+  var p2Field = getFieldFromForm("createaccount", p2Key);
+
+  var url = "SelectTos?";
+  if (ccField != null) {
+    url += "&" + ccKey + "=" + ccField.value;
+  }
+  if (hlField != null) {
+    url += "&" + hlKey + "=" + hlField.value;
+  }  
+  if (p1Field != null) {
+    url += "&" + p1Key + "=" + p1Field.value;
+  }
+  if (p2Field != null) {
+    url += "&" + p2Key + "=" + p2Field.value;
+  }  
+
+  
+  var tosDivKey = "tos_div";
+  var tosDiv = document.getElementById(tosDivKey);
+
+  xmlhttp.open("GET", url, true);
+  
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4) {
+      if (tosDiv != null) {
+        tosDiv.innerHTML = xmlhttp.responseText;
+      }
+      var agt = navigator.userAgent.toLowerCase();
+      var is_op = (agt.indexOf("opera") != -1);
+      if (is_op && (nextAction != undefined) &&
+        (nextAction != null)) {
+        
+        nextAction();
+      }
+    } else if (xmlhttp.readyState == 2) {
+      
+      if ((nextAction != undefined) && (nextAction != null)) {
+        nextAction();
+      }
+    }
+  }
+  
+  xmlhttp.send(null);
+
+
+  
+  
+}
+//--></script>
+  <tr>
+  <td colspan="1">
+  &nbsp;
+  </td>
+  <td>
+  <input style="width:29em" id="submitbutton" name="submitbutton" type="SUBMIT" value="同意して、アカウントを作成します"/>
+  </td>
+  </tr>
+  </table>
+  </td></tr>
+  </table>
+  </td>
+  </tr>
+  </table>
+  </td></tr>
+  </table>
+  </form>
+  </div>
+<style type="text/css"><!--
+.footer { padding-right: 5px;
+          padding-left: 5px;
+          padding-bottom: 5px;
+          padding-top: 5px;
+          font-size: 83%;
+          border-top: #ffffff 1px solid;
+          border-bottom: #ffffff 1px solid;
+          background: #e5ecf9;
+          text-align: center;
+          font-family: arial,sans-serif;
+}
+--></style>
+<div class="footer" align="center">
+  <font color="#666666">
+  &copy;2009 Google
+  </font>
+  -
+  <a href="">Google ホーム</a>
+  -
+  <a href="/accounts/TOS?hl=ja">利用規約</a>
+  -
+  <a href="intl/ja/privacy.html">プライバシー ポリシー</a>
+  -
+  <a href="support/accounts?hl=ja">ヘルプ</a>
+</div>
+  </body>
+</html>
