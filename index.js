@@ -1,4 +1,4 @@
-import fs, { existsSync, lchown, readFileSync } from "fs"
+import fs from "fs"
 import iconv from 'iconv-lite'
 import path from "path"
 import express from "express"
@@ -8,7 +8,6 @@ import qs from 'qs';
 import googleapis from 'googleapis';
 import Encoding from 'encoding-japanese';
 import autocomplete from './backend/pull_autocomplete.js'
-import * as readline from 'readline-sync'
 import searxngfetch from './backend/searx-api-hit.js'
 import cfg from "./backend/cfg.js";
 import { log } from "./backend/things.js"
@@ -16,9 +15,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import user from "./backend/user.js";
 import toml from "toml"
-import { url } from "inspector";
-import { runInNewContext } from "vm";
 import { dump } from "js-toml";
+import { exec } from "child_process";
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -29,8 +27,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 var config = toml.parse(cfg.template)
-
 var searxng_ishttps = false;
+
+log.i("starting gs2009 instance, version " + gs2009_version, "init")
+
+async function branchWarning() {
+    const tag = "branch"
+    // Source - https://stackoverflow.com/a/62228183
+    // Posted by Aayush Mall, modified by community. See post 'Timeline' for change history
+    // Retrieved 2026-09-23, License - CC BY-SA 4.0
+
+    await exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
+        if (err) {
+            log.e("Failed to retrive current branch from this directory", tag)
+            return false
+        }
+
+        if (typeof stdout === 'string' && (stdout.trim() !== 'main')) {
+            log.w("You're now in '" + stdout.trim() + "' which looks not main branch. If you are in the development branch you might see some issues or crashes!", tag)
+        }
+    });
+}
+
+await branchWarning()
 
 function getLanguage(settings) {
     if (!settings || config.frontend.forceDefaults) return config.frontend.defaults.language
@@ -171,11 +190,11 @@ async function reloadconfig(){
         }
         if (!fs.existsSync(path.join(config.users.location.secretdb))) {
             fs.writeFileSync(config.users.location.secretdb, JSON.stringify([]))
-            log("Created new database: " + path.join(config.users.location.secretdb), tag)
+            log.i("Created new database: " + path.join(config.users.location.secretdb), tag)
         }
         if (!fs.existsSync(path.join(config.users.location.userdb))) {
             fs.writeFileSync(config.users.location.userdb, JSON.stringify([]))
-            log("Created new database: " + path.join(config.users.location.userdb), tag)
+            log.i("Created new database: " + path.join(config.users.location.userdb), tag)
         }
     }
 }
@@ -354,16 +373,7 @@ app.listen(config.server.port, () => {
 });
 
 app.get('/setprefs', (req, res) => {
-    if (req.query.yt2009addr == "yt2009addr-replace-this") {
-        return
-    }
-
-    if (config.server.enableServerSettingsPage == false) {
-        res.send("This feature is disabled due to settings page is disabled.<br>Please contact your administrator to change the settings.")
-        return
-    }
-
-    res.send("this code is so FUCKED LOL")
+    // this code is so FUCKED LOL
     return
     /*
     let redir_temp
@@ -862,28 +872,30 @@ app.get('/clearcookies', (req, res) => {
 })
 
 app.get('/search', async (req, res) => {
+    const tag = "search"
+
     const language = getLanguage(req.cookies.GS2009_SETTINGS)
-    console.log("[INFO] search: got an /search GET")
+    log.i("got an /search GET", tag)
     const startTime = Date.now();
     let nowTime = 0;
     var sqparam = qs.parse(parseurl(req).query);
     if (sqparam.q == "" || sqparam.q == undefined) {
-        console.log("[INFO] search: query was empty, redirecting to /")
+        log.w("query was empty, redirecting to /", tag)
         res.redirect('/');
         return
     }
     if (sqparam.q.includes('%')) {
-        console.log("[INFO] search: maybe Shift-JIS? trying to decode to Unicode")
+        log.i("maybe Shift-JIS? trying to decode to Unicode", tag)
         let sjisArray = Encoding.urlDecode(sqparam.q);
         let unicodeArray = Encoding.convert(sjisArray, { to: 'UNICODE', from: 'SJIS' });
         query = Encoding.codeToString(unicodeArray);
     } else {
         query = sqparam.q;
     }
-    console.log("[INFO] search: extracted query: " + query)
+    log.i("extracted query: " + query, tag)
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
-        log("before date was not 0000-00-00, adding before: param to query")
+        log.i("before date was not 0000-00-00, adding before: param to query", tag)
         actualq = query
         query = query + " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before;
     }
@@ -905,7 +917,7 @@ app.get('/search', async (req, res) => {
         start = 0;
     }
 
-    console.log("[INFO] search: waiting for result")
+    log.i("waiting for result", tag)
 
     let result;
     try {
@@ -945,7 +957,7 @@ app.get('/search', async (req, res) => {
         return
     }
 
-    console.log("[INFO] search: got an result")
+    log.i("got an result", tag)
     
     // console.log("result: ", result);
     // console.log(JSON.stringify(result.data.items, null, 2))
@@ -956,7 +968,7 @@ app.get('/search', async (req, res) => {
     try {
         let test_result_length = result.data.items.length
     } catch {
-        console.log("[INFO] search: nvm thats error")
+        log.e("nvm thats error", tag)
         const filePath = path.join(__dirname, "/html/error.html");
         fs.readFile(filePath, (err, data) => {
             let repl = data.toString();
@@ -975,7 +987,7 @@ app.get('/search', async (req, res) => {
     })
 
     if (req.query.btnI == "I'm Feeling Lucky") {
-        console.log("[INFO] search: feeling lucky, redirecting to first link")
+        log.i("feeling lucky, redirecting to first link", tag)
         res.redirect(result.data.items[0].link)
         return
     }
@@ -983,7 +995,7 @@ app.get('/search', async (req, res) => {
     const linklist = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     const alphlist = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 
-    console.log("[INFO] search: Sorting item")
+    log.i("Sorting item", tag)
     link.forEach((item, i) => {
         
         // console.log("link:" + link[i])
@@ -1018,10 +1030,8 @@ app.get('/search', async (req, res) => {
         }
     })
 
-    console.log("[INFO] search: Sorted Alphabet list:")
-    console.log(linkalplist);
-    console.log("[INFO] search: Sorted Number list:")
-    console.log(linknumlist);
+    log.i("Sorted Alphabet list: " + linkalplist.toString(), tag)
+    log.i("Sorted Number list: " + linknumlist.toString(), tag)
 
     filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html");
     
@@ -1048,7 +1058,7 @@ app.get('/search', async (req, res) => {
         }
 
         if (result.data.items.length < 1) {
-            console.log("[INFO] search: no result found for the query: ", query)
+            log.i("no result found for the query: " + query, tag)
             repl = repl.replace(/didyoumean/g, "");
             repl = repl.replace(/item/g, "");
 
@@ -1321,7 +1331,7 @@ app.get('/search', async (req, res) => {
 
         repl = repl.replace(/gbar_username/g, SimLogin)
         repl = repl.replace(/topItem/g, "")
-        console.log("[INFO] search: Sending replaced result")
+        log.i("Sending replaced result", tag)
         if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -1368,6 +1378,6 @@ app.post('/__gs2009_wallma_/LoginAuth', (req, res) => {
 })
 
 process.on('SIGINT', function() {
-    console.log("[INFO] Server stopped by interrupt signal");
+    log.i("Server stopped by interrupt signal", tag);
     process.exit();
 });
