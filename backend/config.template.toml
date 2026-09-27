@@ -71,7 +71,7 @@ roll_eras=true
 roll_stucknine=true
 # before: Limits search results to before specific date. Only tested with Custom Search JSON API (Google).
 # Should be same format with Google's one, for example: 2009-12-31
-# Leave it 0000-00-00 if you don't use them.
+# Leave it false if you don't use them.
 before=2009-12-31
 # redirects.enabled: Enables editing URL for redirecting. Available options: "wayback", "yt2009", "http"
 #         "wayback": Replace URL with Wayback Machine in specific date.

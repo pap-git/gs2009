@@ -895,8 +895,8 @@ app.get('/search', async (req, res) => {
     }
     log.i("extracted query: " + query, tag)
 
-    if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
-        log.i("before date was not 0000-00-00, adding before: param to query", tag)
+    if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
+        log.i("before date was not false, adding before: param to query", tag)
         actualq = query
         query = query + " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before;
     }
@@ -1067,7 +1067,7 @@ app.get('/search', async (req, res) => {
 
             repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
-            if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
+            if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
                 repl = repl.replace(/query/g, actualq)
             } else {
                 repl = repl.replace(/query/g, query)
@@ -1082,7 +1082,7 @@ app.get('/search', async (req, res) => {
             return
         }
         
-        if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
+        if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
             repl = repl.replace(/query/g, actualq)
         } else {
             repl = repl.replace(/query/g, query)
@@ -1265,7 +1265,7 @@ app.get('/search', async (req, res) => {
                 repl = repl.replace(/didyoumean/g, ext_t_dym)
                 let suggested = result.data.spelling.correctedQuery;
                 let date;
-                if (grabSettings(req.cookies.GS2009_SETTINGS).before !== "0000-00-00") {
+                if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
                     date = " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before
                     suggested = suggested.replace(date, "")
                 }
