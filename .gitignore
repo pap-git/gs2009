@@ -4,3 +4,10 @@ config.json
 create.js
 output.html
 .gitignore
+
+.env
+config.toml
+secretdb.json
+userdb.json
+
+/assets/captcha

@@ -1158,6 +1158,19 @@ app.get('/search', async (req, res) => {
 
             repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
+            repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?\n?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
+
+            const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing(\n? ?)*<p>(\n? ?)*<a href="\/">Google.*<\/p>/s)[0]
+                            .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+                            .replace(/<p>/g, "").replace(/<\/p>/g, "")
+                            
+            repl = repl.replace(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing(\n? ?)*<p>(\n? ?)*<a href="\/">Google.*<\/p>/s, "!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+            repl = repl.replace("OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing",
+                '<style>.z { display: none; } .t {background: #d5ddf3; color: #000; padding: 5px 1px 4px} div,td,.n a,.n a:visited {color: #000} .bt {border-top: 1px solid #36c }</style><p><hr class="z"><div style="padding:2px" class="t n bt"><font size="-1"></font>' + links + "</div><br>")
+
+            repl = repl.replace(/<table id="nav".*<\/table>/s, "")
+            repl = repl.replace(/<p>.*<\/div>.*<div id="res" class="med">/s, '<p>&nbsp;<nobr></div><div id="res" class="med">')
+
             if (only_old == true) {
                 repl = repl.replace(/query/g, actualq)
             } else {
