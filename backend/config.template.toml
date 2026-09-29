@@ -62,6 +62,9 @@ forceDefaults=false
 [frontend.defaults]
 # language: Languages of the page. If Language doesn't exist, it will use English as fallback.
 language="en"
+# lang_dependsOnDomainAndParams: Change language depends on domain and "hl" parameters.
+# This only works if you have setted up your instance with hosts file.
+lang_dependsOnDomainAndParams=false
 # eras: Keeping for future use.
 eras=""
 # roll_eras: Force to change eras depends on the date.

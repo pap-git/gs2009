@@ -51,13 +51,32 @@ async function branchWarning() {
 
 await branchWarning()
 
-function getLanguage(settings) {
-    if (!settings || config.frontend.forceDefaults) return config.frontend.defaults.language
+function getLanguage(host, settings) {
+    function checkHostLanguage(host) {
+        const h = host.replace("www.", "")
+        switch (h) {
+            case "google.co.th":
+                return "th"
+            case "google.co.jp":
+                return "ja"
+            default:
+                return "en"
+        }
+    }
+
+    if (!settings || config.frontend.forceDefaults) {
+        if (config.frontend.defaults.lang_dependsOnDomainAndParams) return checkHostLanguage(host)
+        else return config.frontend.defaults.language
+    }
     const j = JSON.parse(settings)
 
-    if (!j) return config.frontend.defaults.language
+    if (!j) {
+        if (config.frontend.defaults.lang_dependsOnDomainAndParams) return checkHostLanguage(host)
+        else return config.frontend.defaults.language
+    }
     else try {
-        return j.language
+        if (j.lang_dependsOnDomainAndParams) return checkHostLanguage(host)
+        else return j.language
     } catch {
         return config.frontend.defaults.language
     }
@@ -457,7 +476,7 @@ app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
 })
 
 app.get('/logos/olympics10.png', (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
 
     let now = new Date
     let nowmonth = now.getMonth() + 1
@@ -504,7 +523,7 @@ app.get('/logos/olympics10.png', (req, res) => {
 })
 
 app.get('/extern_js/f/autocomplete.js', async (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     let jsFilePath
     switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
         case "early2009":
@@ -548,7 +567,7 @@ app.get('/extern_js/f/autocomplete.js', async (req, res) => {
 })
 
 app.get('/complete/search', async (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
 
     let result = "";
     let hl = "";
@@ -589,7 +608,7 @@ app.get('/notepad', (req, res) => {
 });
 
 app.get('/search_csstest', (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = undefined;
     try {
@@ -625,7 +644,7 @@ app.get('/search_csstest', (req, res) => {
 });
 
 app.get('/imghp', (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     let SimLogin = undefined;
     try {
         SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
@@ -656,7 +675,7 @@ app.get('/csi', async (req, res) => {
 })
 
 app.get('/', async (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     const template = retriveTemplate(language)
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = undefined;
@@ -737,7 +756,7 @@ app.get('/gs2009settings', (req, res) => {
 })
 
 app.get('/accounts/Login', async (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     const template = retriveTemplate(language)
     const file = await grabEraPath("/signin.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
     let repl = fs.readFileSync(file)
@@ -826,7 +845,7 @@ app.post('/accounts/LoginAuth', async (req, res) => {
 })
 
 app.get('/accounts/NewAccount', async (req, res) => {
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     const filePath = await grabEraPath("/signup.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
     fs.readFile(filePath, (err, data) => {
         let repl = "";
@@ -875,7 +894,7 @@ app.get('/clearcookies', (req, res) => {
 app.get('/search', async (req, res) => {
     const tag = "search"
 
-    const language = getLanguage(req.cookies.GS2009_SETTINGS)
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     log.i("got an /search GET", tag)
     const startTime = Date.now();
     let nowTime = 0;
