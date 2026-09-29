@@ -4,6 +4,13 @@
 [server]
 # port: The port number to host this instance.
 port=3000
+# https.enabled: Enable https. You need to generate/or get your private key and cert by yourself.
+https.enabled=false
+# https.port: The port number to host the HTTPS server.
+https.port=443
+# https.x_path: Path of certificates and private keys.
+https.cert_path=""
+https.privatekey_path=""
 
 [server.settingsPage]
 # enabled: Enabling this will allows users to edit server settings from client-side.

@@ -17,6 +17,7 @@ import user from "./backend/user.js";
 import toml from "toml"
 import { dump } from "js-toml";
 import { exec } from "child_process";
+import { createServer } from "https";
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -88,6 +89,28 @@ function grabSettings(settings) {
         return JSON.parse(settings)
     } catch {
         return config.frontend.defaults
+    }
+}
+
+function getEraYears(settings) {
+    const s = grabSettings(settings)
+    return Number(s.eras.replace(/[a-z]/g, ""))
+}
+
+function grabEras(settings) {
+    const s = (!settings || config.frontend.forceDefaults) ? settings : config.frontend.defaults;
+    if (s.roll_eras) {
+        const d = new Date
+        const month = d.getUTCMonth() + 1;
+        if (month < 4) {
+            return (s.roll_stucknine && month < 3) ? "early2009" : "early2010"
+        } else if (month >= 4 && month <= 9) {
+            return "mid2009"
+        } else if (month > 9) {
+            return "late2009"
+        }
+    } else {
+        return s.eras
     }
 }
 
@@ -387,9 +410,24 @@ app.use(async (req, res, next) => {
     next()
 })
 
+if (config.server.https.enabled) {
+    if (!fs.existsSync(path.join(config.server.https.cert_path)) || !fs.existsSync(path.join(config.server.https.privatekey_path))) {
+        log.e("HTTPS enabled but either private key or certs file does not exist! Exiting", "cfg")
+        process.exit(1)
+    }
+    log.w("HTTPS enabled with creds in directory", "cfg")
+    const server = createServer({
+        cert: fs.readFileSync(path.join(__dirname, config.server.https.cert_path), "utf8"),
+        key: fs.readFileSync(path.join(__dirname, config.server.https.privatekey_path), "utf8"),
+    }, app)
+    server.listen(config.server.https.port, () => {
+        const tag = "init"
+        log.i(`HTTPS Server started at port ${config.server.https.port} in ` + Date(), tag);
+    });
+}
 app.listen(config.server.port, () => {
     const tag = "init"
-    log.i(`Server started at port ${config.server.port} in ` + Date(), tag);
+    log.i(`HTTP Server started at port ${config.server.port} in ` + Date(), tag);
 });
 
 app.get('/setprefs', (req, res) => {
@@ -460,7 +498,7 @@ app.get('/setprefs', (req, res) => {
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
     let now = new Date
-    let nowdate = (now.getMonth() + 1) + (now.getDay() < 10 ? 0 + now.getDay().toString() : now.getDay())
+    let nowdate = (now.getUTCMonth() + 1) + (now.getUTCDay() < 10 ? 0 + now.getUTCDay().toString() : now.getUTCDay())
     
     let logo_path;
 
@@ -479,7 +517,7 @@ app.get('/logos/olympics10.png', (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
 
     let now = new Date
-    let nowmonth = now.getMonth() + 1
+    let nowmonth = now.getUTCMonth() + 1
     let tmp = now.getDay()
     let nowday
     nowday = tmp < 10 ? 0 + tmp.toString() : tmp
@@ -525,7 +563,7 @@ app.get('/logos/olympics10.png', (req, res) => {
 app.get('/extern_js/f/autocomplete.js', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     let jsFilePath
-    switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+    switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
         case "early2009":
             jsFilePath = './assets/extern_js/autocomplete_early2009.js'
             break;
@@ -539,7 +577,7 @@ app.get('/extern_js/f/autocomplete.js', async (req, res) => {
     fs.readFile(jsFilePath, async (err, data) => {
         let repl = data.toString();
 
-        const filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
+        const filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
         fs.readFile(filePath, (err, data) => {
             let conv;
 
@@ -684,25 +722,25 @@ app.get('/', async (req, res) => {
     } catch {}
 
     let now = new Date
-    let nowmonth = now.getMonth() + 1
+    let nowmonth = now.getUTCMonth() + 1
     let tmp = now.getDay()
 
     let filePath
 
-    switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+    switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
         case "early2010":
             if (nowmonth == 2){
                 if (tmp >= 12 && tmp <= 23) {
-                    filePath = await grabEraPath("/index-olympics10.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+                    filePath = await grabEraPath("/index-olympics10.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
                 } else {
-                    filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+                    filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
                 }
             } else {
-                filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+                filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
             }
             break;
         default:
-            filePath = await grabEraPath("/index.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
+            filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
             break;
     }
         
@@ -715,23 +753,47 @@ app.get('/', async (req, res) => {
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
 
-        let messagelist = JSON.parse(fs.readFileSync('languages/' + language + "/defaults/" + 'messages.json', 'utf8'))
+        let messages = JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8'))
 
-        let now = new Date
-        let nowmonth = now.getMonth() + 1
-        let tmp = now.getDay()
-        let nowday 
-        if (tmp < 10) {
-            nowday = 0 + tmp.toString()
-        } else {
-            nowday = tmp
-        }
-        let nowdate = nowmonth.toString() + nowday.toString()
-        let message;
+        const now = new Date()
+        const nowmonth = (now.getUTCMonth() + 1) < 10 ? "0" + (now.getUTCMonth() + 1) : now.getUTCMonth() + 1
+        const nowday = now.getUTCDay() < 10 ? "0" + now.getUTCDay() : now.getUTCDay()
+        const nowdate = getEraYears(req.cookies.GS2009_SETTINGS) + nowmonth.toString() + nowday.toString()
+        let message = "";
 
-        messagelist.messages.forEach(item => {
-            if (nowdate.toString() == item.date) {
-                message = item.message
+        messages.forEach(item => {
+            /*
+            item[0].forEach(date => {
+                if (date == nowdate) message = item[1] + "<br><br>"
+            })
+            */
+            if (item[0].length == 2) {
+                const d = {
+                    from: {
+                        year: Number(item[0][0].substring(0, 4)),
+                        month: Number(item[0][0].substring(4, 6)),
+                        day: Number(item[0][0].substring(6, 8)),
+                    },
+                    to: {
+                        year: Number(item[0][1].substring(0, 4)),
+                        month: Number(item[0][1].substring(4, 6)),
+                        day: Number(item[0][1].substring(6, 8)),
+                    }
+                }
+                const dates = []
+                for (let year = d.from.year; year <= d.to.year; year++) {
+                    for (let month = d.from.month; month <= d.to.month; month++) {
+                        for (let day = d.from.day; day <= d.to.day; day++) {
+                            dates.push(String(year) + (month < 10 ? "0" + String(month) : String(month)) + (day < 10 ? "0" + String(day) : String(day)))
+                        }
+                    }
+                }
+                for (let i = 0; i < dates.length; i++) {
+                    if (dates[i] == nowdate) {
+                        message = item[1] + "<br><br>"
+                        break;
+                    }
+                }
             }
         })
         repl = repl.replace(/message/g, message)
@@ -758,7 +820,7 @@ app.get('/gs2009settings', (req, res) => {
 app.get('/accounts/Login', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     const template = retriveTemplate(language)
-    const file = await grabEraPath("/signin.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras)
+    const file = await grabEraPath("/signin.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     let repl = fs.readFileSync(file)
     
     if (language == "ja") {
@@ -769,7 +831,7 @@ app.get('/accounts/Login', async (req, res) => {
     }
 
     if (req.cookies.GS2009_AUTH_MISMATCH) {
-        switch (grabSettings(req.cookies.GS2009_SETTINGS).eras) {
+        switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
             case "early2009":
                 repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr>[^{a-z}]*td align="right" va/, '<td align="left">' + template.data.auth_mismatch + '</td></tr><tr><td align="right" va')
             default:
@@ -846,7 +908,7 @@ app.post('/accounts/LoginAuth', async (req, res) => {
 
 app.get('/accounts/NewAccount', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
-    const filePath = await grabEraPath("/signup.html", language, grabSettings(req.cookies.GS2009_SETTINGS).eras);
+    const filePath = await grabEraPath("/signup.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         

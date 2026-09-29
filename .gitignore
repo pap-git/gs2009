@@ -21,3 +21,7 @@ secretdb.json
 userdb.json
 
 /assets/captcha
+
+# to avoid including certs to git
+*.pem
+*.crt
