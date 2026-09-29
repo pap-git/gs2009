@@ -79,25 +79,36 @@ export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnab
             return results
         }
 
-        const results = { data: { searchInformation: { formattedTotalResults: 0 }, items: [] } }
+        const results = { 
+            data: { 
+                searchInformation: { 
+                    formattedTotalResults: 0
+                }, 
+                items: [] 
+            } 
+        }
 
         json.results.forEach(result => {
             if (result.template != "default.html") return;
 
-            let htmlTitle = result.title;
-            let displayLink = result.parsed_url[1];
+            let title = result.title;
+            let htmlTitle = result.title.replace(new RegExp(RegExp.escape(query), "ig"), "<b>$&</b>");
+            let displayLink = result.parsed_url[1].replace(new RegExp(RegExp.escape(query), "ig"), "<b>$&</b>");
             let link = result.url;
-            let htmlSnippet = result.content;
-            let htmlFormattedUrl = result.url;
+            let snippet = result.content;
+            let htmlSnippet = result.content.replace(new RegExp(RegExp.escape(query), "ig"), "<b>$&</b>");
+            let htmlFormattedUrl = result.url.replace(new RegExp(RegExp.escape(query), "ig"), "<b>$&</b>");
 
             if (displayLink.match(/www\./)) {
                 displayLink = result.parsed_url[1].replace(/www\./, "")
             }
 
             const returns = {
+                title: title,
                 htmlTitle: htmlTitle,
                 displayLink: displayLink,
                 link: link,
+                snippet: snippet,
                 htmlSnippet: htmlSnippet,
                 htmlFormattedUrl: htmlFormattedUrl
             }

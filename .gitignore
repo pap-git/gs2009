@@ -25,3 +25,5 @@ userdb.json
 # to avoid including certs to git
 *.pem
 *.crt
+
+placeholder-dev/

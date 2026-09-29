@@ -257,6 +257,7 @@ function retriveTemplate(lang) {
         gbar_user: GiveMeTheResult(lang, "/gbar_user.txt"), // ext_t_g_u
         gbar_user_index: GiveMeTheResult(lang, "/gbar_user_index.txt"), // ext_t_g_u
         gbar_user_logged: GiveMeTheResult(lang, "/gbar_user_logged.txt"), // ext_t_g_u_l
+        gbar_user_logged_index: GiveMeTheResult(lang, "/gbar_user_logged_index.txt"),
 
         auth_mismatch: GiveMeTheResult(lang, "/auth_mismatch.txt"),
 
@@ -753,7 +754,7 @@ app.get('/', async (req, res) => {
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
 
-        let messages = JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8'))
+        const messages = fs.existsSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8')) : undefined
 
         const now = new Date()
         const nowmonth = (now.getUTCMonth() + 1) < 10 ? "0" + (now.getUTCMonth() + 1) : now.getUTCMonth() + 1
@@ -761,41 +762,43 @@ app.get('/', async (req, res) => {
         const nowdate = getEraYears(req.cookies.GS2009_SETTINGS) + nowmonth.toString() + nowday.toString()
         let message = "";
 
-        messages.forEach(item => {
-            /*
-            item[0].forEach(date => {
-                if (date == nowdate) message = item[1] + "<br><br>"
-            })
-            */
-            if (item[0].length == 2) {
-                const d = {
-                    from: {
-                        year: Number(item[0][0].substring(0, 4)),
-                        month: Number(item[0][0].substring(4, 6)),
-                        day: Number(item[0][0].substring(6, 8)),
-                    },
-                    to: {
-                        year: Number(item[0][1].substring(0, 4)),
-                        month: Number(item[0][1].substring(4, 6)),
-                        day: Number(item[0][1].substring(6, 8)),
+        if (messages) {
+            messages.forEach(item => {
+                /*
+                item[0].forEach(date => {
+                    if (date == nowdate) message = item[1] + "<br><br>"
+                })
+                */
+                if (item[0].length == 2) {
+                    const d = {
+                        from: {
+                            year: Number(item[0][0].substring(0, 4)),
+                            month: Number(item[0][0].substring(4, 6)),
+                            day: Number(item[0][0].substring(6, 8)),
+                        },
+                        to: {
+                            year: Number(item[0][1].substring(0, 4)),
+                            month: Number(item[0][1].substring(4, 6)),
+                            day: Number(item[0][1].substring(6, 8)),
+                        }
                     }
-                }
-                const dates = []
-                for (let year = d.from.year; year <= d.to.year; year++) {
-                    for (let month = d.from.month; month <= d.to.month; month++) {
-                        for (let day = d.from.day; day <= d.to.day; day++) {
-                            dates.push(String(year) + (month < 10 ? "0" + String(month) : String(month)) + (day < 10 ? "0" + String(day) : String(day)))
+                    const dates = []
+                    for (let year = d.from.year; year <= d.to.year; year++) {
+                        for (let month = d.from.month; month <= d.to.month; month++) {
+                            for (let day = d.from.day; day <= d.to.day; day++) {
+                                dates.push(String(year) + (month < 10 ? "0" + String(month) : String(month)) + (day < 10 ? "0" + String(day) : String(day)))
+                            }
+                        }
+                    }
+                    for (let i = 0; i < dates.length; i++) {
+                        if (dates[i] == nowdate) {
+                            message = item[1] + "<br><br>"
+                            break;
                         }
                     }
                 }
-                for (let i = 0; i < dates.length; i++) {
-                    if (dates[i] == nowdate) {
-                        message = item[1] + "<br><br>"
-                        break;
-                    }
-                }
-            }
-        })
+            })
+        }
         repl = repl.replace(/message/g, message)
         repl = repl.replace(/message/g, "")
         
@@ -1136,7 +1139,7 @@ app.get('/search', async (req, res) => {
         if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
             repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user)
         } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_index)
         }
 
         if (result.data.items.length < 1) {

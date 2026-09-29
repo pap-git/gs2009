@@ -1,1 +1,1 @@
-<b>gbar_username</b> | <a href="/url?sa=p&pref=ig&pval=3&q=http://www.google.co.jp/ig%3Fhl%3Dja%26source%3Diglk&usg=AFQjCNEmQuNg1ivauCid9lXp5yYSx6AHXw" class=gb4>iGoogle</a> | <a href="/preferences?hl=ja" class=gb4>検索設定</a> | <a href="/clearcookies" class=gb4>ログアウト</a>
+<b>gbar_username</b> | <a href="#" class=gb4>マイ ノートブック</a> | <a href="/preferences?hl=ja" class=gb4>検索設定</a> | <a href="/clearcookies" class=gb4>ログアウト</a>
