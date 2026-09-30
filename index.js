@@ -265,6 +265,7 @@ function retriveTemplate(lang) {
         search_more: GiveMeTheResult(lang, "/search/more.txt"), // ext_t_s_m
         search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
         search_notfound: GiveMeTheResult(lang, "/search/not_found.txt"), // ext_t_s_nf
+        search_related: GiveMeTheResult(lang, "/search/related_search.txt"),
 
         did_you_mean: GiveMeTheResult(lang, "/search/did_you_mean.txt"), // ext_t_dym
     }
@@ -273,6 +274,7 @@ function retriveTemplate(lang) {
         gbar_user: fs.readFileSync(paths.gbar_user, "utf8"),
         gbar_user_index: fs.readFileSync(paths.gbar_user_index, "utf8"),
         gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
+        gbar_user_logged_index: fs.readFileSync(paths.gbar_user_logged_index, "utf8"),
 
         auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
 
@@ -280,6 +282,8 @@ function retriveTemplate(lang) {
         search_more: fs.readFileSync(paths.search_more, "utf8"),
         search_EOM: fs.readFileSync(paths.search_EOM, "utf8"),
         search_notfound: fs.readFileSync(paths.search_notfound, "utf8"),
+
+        search_related: fs.readFileSync(paths.search_related, "utf8"),
 
         did_you_mean: fs.readFileSync(paths.did_you_mean, "utf8")
     }
@@ -385,18 +389,20 @@ app.use(async (req, res, next) => {
         if (JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe) {
             age = { maxAge: 31 * 24 * 60 * 60 * 1000 }
         }
-        let userdata;
 
         try {
             if (clear) throw new Error("e")
-            userdata = await user.get(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, JSON.parse(req.cookies.GS2009_ACCOUNTS).auth, serviceID)
+            const userdata = await user.get(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, JSON.parse(req.cookies.GS2009_ACCOUNTS).auth, serviceID)
+            let s = userdata
             res.cookie('GS2009_ACCOUNTS', JSON.stringify({
                 email: JSON.parse(req.cookies.GS2009_ACCOUNTS).email,
                 auth: JSON.parse(req.cookies.GS2009_ACCOUNTS).auth,
                 stayWithMe: JSON.parse(req.cookies.GS2009_ACCOUNTS).stayWithMe
             }), age)
-            res.cookie('GS2009_SETTINGS', config.frontend.forceDefaults ? JSON.stringify(config.frontend.defaults) : JSON.stringify(userdata.settings), age);
-        } catch {
+            s = s ? s : await user.modifyData(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, serviceID, config.frontend.defaults, true)
+            res.cookie('GS2009_SETTINGS', config.frontend.forceDefaults ? JSON.stringify(config.frontend.defaults) : JSON.stringify(s.settings), age);
+        } catch(e) {
+            console.log(e)
             res.clearCookie('GS2009_ACCOUNTS');
             res.clearCookie('GS2009_SETTINGS');
         }
@@ -752,7 +758,7 @@ app.get('/', async (req, res) => {
 
         repl = (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") ? 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
-                repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
+                repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_index)
 
         const messages = fs.existsSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8')) : undefined
 
@@ -1139,7 +1145,7 @@ app.get('/search', async (req, res) => {
         if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
             repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user)
         } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_index)
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
         }
 
         if (result.data.items.length < 1) {
@@ -1179,13 +1185,30 @@ app.get('/search', async (req, res) => {
             return
         }
         
+        if (result.data._SearXNG_exclusive && result.data._SearXNG_exclusive.relatedSuggestions) {
+            repl = repl.replace(/item(\r?\n?) *[^(item(\r?\n?) *)]/gms, "item\nrelatedSearchTemplates<")
+            repl = repl.replace("relatedSearchTemplates", template.data.search_related)
+            const suggests = result.data._SearXNG_exclusive.relatedSuggestions
+            repl = suggests.length <= 5 ? repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE</tr>") : repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE1</tr><tr>QUERIESQUEUEDHERE2</tr>");
+            let tr1 = ""
+            let tr2 = ""
+            suggests.forEach((words, i) => {
+                const q = grabSettings(req.cookies.GS2009_SETTINGS).before !== false ? actualq : query
+                const pq = ("<b>" + words.replace(new RegExp(RegExp.escape(q), "ig"), "QUERY!!") + "</b>").replace("QUERY!!", "</b>" + q + "<b>")
+                if ((suggests.length == 8 && i > 3) || (suggests.length >= 8 && i > 4)) {
+                    tr2 = tr2 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
+                } else {
+                    tr1 = tr1 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
+                }
+            })
+            repl = repl.replace("QUERIESQUEUEDHERE1", tr1).replace("QUERIESQUEUEDHERE2", tr2)
+        }
+
         if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
             repl = repl.replace(/query/g, actualq)
         } else {
             repl = repl.replace(/query/g, query)
         }
-        
-        let lastIdx = linkalplist.findLastIndex(item => /[a-z]/i.test(item))
         
         let items = repl.split("item")
 

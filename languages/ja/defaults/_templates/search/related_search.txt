@@ -1,0 +1,8 @@
+<div class="e">
+    <table class="ts std" id="brs" style="padding:0 0 1em">
+        <caption class="med nobr" style="padding-bottom:6px;text-align:left"><b>query</b> に関連する検索キーワード</caption>
+        <tbody>
+            PRESERVEDFORRELATEDTEMPLATE
+        </tbody>
+    </table>
+</div>

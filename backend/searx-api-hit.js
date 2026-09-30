@@ -80,7 +80,10 @@ export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnab
         }
 
         const results = { 
-            data: { 
+            data: {
+                _SearXNG_exclusive: {
+                    relatedSuggestions: json.suggestions
+                },
                 searchInformation: { 
                     formattedTotalResults: 0
                 }, 
