@@ -160,6 +160,7 @@ async function followPath(urlPath) {
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
         ['/images/newspaper.gif', './assets/images/newspaper.gif'],
+        ["/images/malware_logo.gif", "./assets/images/malware_logo.gif"],
         ['/logos/olympics10-bg.jpg', './assets/logos/olympics10-bg.jpg'],
         ['/images/firefox/firefox35_v1.png', './assets/images/firefox/firefox35_v1.png'],
         ['/images/firefox/sprite2.png', './assets/images/firefox/sprite2.png'],
@@ -1399,7 +1400,23 @@ app.get('/search', async (req, res) => {
             search.htmlSnippet = item.htmlSnippet;
             search.displayLink = item.displayLink;
         }
-        
+
+        let add;
+        if (grabSettings(req.cookies.GS2009_SETTINGS).mayharm.enabled && fs.existsSync(path.join(config.frontend.mayharm.path))) {
+            const definition = toml.parse(fs.readFileSync(path.join(config.frontend.mayharm.path)))
+            definition.domains.exact_match.forEach((domain) => {
+                if (search.link.replace(/http.:\/\//, "").split("/")[0] == domain && !add) add = true;
+            })
+            definition.domains.regex.forEach((regex) => {
+                if (search.link.replace(/http.:\/\//, "").split("/")[0].match(new RegExp(regex[0], regex[1])) && !add) add = true;
+            })
+            definition.url.exact_match.forEach((url) => {
+                if (search.link == url && !add) add = true;
+            })
+            definition.url.regex.forEach((regex) => {
+                if (search.link.match(new RegExp(regex[0], regex[1])) && !add) add = true;
+            })
+        }
         repl = repl.replace(/htmlTitle/, search.htmlTitle)
         if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
             search.link = search.link.replace("https://", "http://")
@@ -1463,8 +1480,8 @@ app.get('/search', async (req, res) => {
             }
         }
         repl = repl.replace(/relatedUrlLink/, search.link)
-        repl = repl.replace(/UrlLink/, search.link)
-        repl = repl.replace(/htmlSnippet/, search.htmlSnippet)
+        repl = repl.replace(/UrlLink/, add ? ("/interstitial?url=" + escape(search.link)) : search.link)
+        repl = repl.replace(/htmlSnippet/, add ? ('<a href="#">' + strings.search.mayharm + '</a><br>' + search.htmlSnippet) : search.htmlSnippet)
         repl = repl.replace(/htmlFormattedUrl/, search.htmlFormattedUrl)
         //repl = repl.replace(/displayLink/, search.displayLink)
     })
@@ -1583,6 +1600,20 @@ app.post('/__gs2009_wallma_/LoginAuth', (req, res) => {
         res.cookie("GS2009_AUTH_MISMATCH", JSON.stringify(true))
         res.redirect("/__gs2009_wallma_/Login")
     }
+})
+
+app.get('/interstitial', async (req, res) => {
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+    const data = fs.readFileSync(await grabEraPath("interstitial.html", language, "defaults"))
+
+    let repl = "";
+    
+    if (language == "ja") {
+        repl = iconv.decode(data, 'shift_jis')
+    } else {
+        repl = data.toString();
+    }
+    res.send(repl.replace(/GS2009__URL/, req.query.url))
 })
 
 process.on('SIGINT', function() {

@@ -1,0 +1,12 @@
+# This is the template file for mayharm.toml. Please copy it to anywhere you want to use them.
+
+# This config file determines which sites to show "Virus warning" below of the site and make unable to access from the instance.
+# regex will be parsed like from ["test", "g"] to `new RegExp("test", "g")`, which will be parsed as /test/g.
+
+[domains]
+exact_match=["gemini.google.com"]
+regex=[["claude[a-z]*", "g"]]
+
+[url]
+exact_match=[]
+regex=[]

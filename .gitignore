@@ -27,3 +27,4 @@ userdb.json
 *.crt
 
 placeholder-dev/
+mayharm.toml
