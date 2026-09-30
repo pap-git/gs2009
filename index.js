@@ -159,6 +159,7 @@ async function followPath(urlPath) {
         ['/favicon.ico', './assets/favicon.ico'],
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
+        ['/images/newspaper.gif', './assets/images/newspaper.gif'],
         ['/logos/olympics10-bg.jpg', './assets/logos/olympics10-bg.jpg'],
         ['/images/firefox/firefox35_v1.png', './assets/images/firefox/firefox35_v1.png'],
         ['/images/firefox/sprite2.png', './assets/images/firefox/sprite2.png'],
@@ -246,6 +247,31 @@ await reloadconfig()
 
 const app = express();
 
+async function retriveLanguageStrings(lang) {
+    const string_en = await toml.parse(await fs.readFileSync(path.join(__dirname, "/languages/", "en", "/defaults/strings.toml")))
+    const string_lang = fs.existsSync(path.join(__dirname, "/languages/", lang, "/defaults/strings.toml")) ? await toml.parse(await fs.readFileSync(path.join(__dirname, "/languages/", lang, "/defaults/strings.toml"))) : undefined;
+
+    function GiveMeTheResult(langFile, category, vname) {
+        try {
+            return langFile[category][vname]
+        } catch(e) {
+            return string_en[category][vname]
+        }
+    }
+
+    return {
+        categoryName: {
+            maps: GiveMeTheResult(string_lang, "categoryName", "maps"),
+            books: GiveMeTheResult(string_lang, "categoryName", "books"),
+            news: GiveMeTheResult(string_lang, "categoryName", "news"),
+        },
+        search: {
+            related: GiveMeTheResult(string_lang, "search", "related"),
+            mayharm: GiveMeTheResult(string_lang, "search", "mayharm"),
+        }
+    }
+}
+
 function retriveTemplate(lang) {
     function GiveMeTheResult(lang, next_path) {
         const langTemplatePath = path.join(__dirname, "/languages/", lang, "/defaults/_templates")
@@ -266,6 +292,7 @@ function retriveTemplate(lang) {
         search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
         search_notfound: GiveMeTheResult(lang, "/search/not_found.txt"), // ext_t_s_nf
         search_related: GiveMeTheResult(lang, "/search/related_search.txt"),
+        search_news_section: GiveMeTheResult(lang, "/search/news.txt"),
 
         did_you_mean: GiveMeTheResult(lang, "/search/did_you_mean.txt"), // ext_t_dym
     }
@@ -282,6 +309,7 @@ function retriveTemplate(lang) {
         search_more: fs.readFileSync(paths.search_more, "utf8"),
         search_EOM: fs.readFileSync(paths.search_EOM, "utf8"),
         search_notfound: fs.readFileSync(paths.search_notfound, "utf8"),
+        search_news_section: fs.readFileSync(paths.search_news_section, "utf8"),
 
         search_related: fs.readFileSync(paths.search_related, "utf8"),
 
@@ -302,8 +330,7 @@ var start;
 // https://qiita.com/ganyariya/items/23d51b05bacdcb27fce6
 // im using the google search example from here v (thx for og author)
 
-async function search(event) {
-
+async function fetchResults(askOtherCategories) {
     if (isNaN(start) == true) {
         start = 0;
     }
@@ -318,6 +345,7 @@ async function search(event) {
                 if (!config.engine.csjapi.api_key || !config.engine.csjapi.cse_id) throw new Error("Either API key or CSE ID is missing on Custom Search JSON API settings")
 
                 try {
+                    if (askOtherCategories) { throw new Error("e")}
                     const {google} = googleapis;
                     const customSearch = google.customsearch("v1");
                     result = await customSearch.cse.list({
@@ -331,7 +359,6 @@ async function search(event) {
                     i = config.engine.order.length
                 } catch(e) {
                     log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
-                    log.e(e.trace)
                     errorCounts++
                 }
                 break;
@@ -342,13 +369,15 @@ async function search(event) {
                         temp_searxng_ishttps = searxng_ishttps
                         searxng_ishttps = undefined
                     }
-                    result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr)
+                    // result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr, true)
+                    result = await searxngfetch(config.engine.searxng.url, query, { ishttps: true, start: start, categories: askOtherCategories ? "news" : "" })
                     searxng_ishttps = temp_searxng_ishttps
 
                     if (result.data.error) throw new Error("bye bro")
                     i = config.engine.order.length
                 } catch(e) {
                     log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
+                    log.e(e)
                     errorCounts++
                 }
                 break;
@@ -402,7 +431,6 @@ app.use(async (req, res, next) => {
             s = s ? s : await user.modifyData(JSON.parse(req.cookies.GS2009_ACCOUNTS).email, serviceID, config.frontend.defaults, true)
             res.cookie('GS2009_SETTINGS', config.frontend.forceDefaults ? JSON.stringify(config.frontend.defaults) : JSON.stringify(s.settings), age);
         } catch(e) {
-            console.log(e)
             res.clearCookie('GS2009_ACCOUNTS');
             res.clearCookie('GS2009_SETTINGS');
         }
@@ -966,10 +994,11 @@ app.get('/search', async (req, res) => {
     const tag = "search"
 
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+    const strings = await retriveLanguageStrings(language)
     log.i("got an /search GET", tag)
     const startTime = Date.now();
     let nowTime = 0;
-    var sqparam = qs.parse(parseurl(req).query);
+    const sqparam = qs.parse(parseurl(req).query);
     if (sqparam.q == "" || sqparam.q == undefined) {
         log.w("query was empty, redirecting to /", tag)
         res.redirect('/');
@@ -1012,7 +1041,7 @@ app.get('/search', async (req, res) => {
 
     let result;
     try {
-        result = await search();
+        result = await fetchResults(false);
     } catch(e) {
         /*
         if (config.backend.engine.type == "cse") {
@@ -1122,337 +1151,58 @@ app.get('/search', async (req, res) => {
     })
 
     log.i("Sorted Alphabet list: " + linkalplist.toString(), tag)
-    log.i("Sorted Number list: " + linknumlist.toString(), tag)
 
-    filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html");
+    const data = fs.readFileSync(path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html"));
+    const template = retriveTemplate(language)
+
+    let repl = "";
     
-    fs.readFile(filePath, (err, data) => {
-        const template = retriveTemplate(language)
+    if (language == "ja") {
+        repl = iconv.decode(data, 'shift_jis')
+    } else {
+        repl = data.toString();
+    }
 
-        let repl = "";
-        
-        if (language == "ja") {
-            repl = iconv.decode(data, 'shift_jis')
-        } else {
-            repl = data.toString();
-        }
+    let SimLogin = undefined;
+    try {
+        SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+    } catch {}
 
-        let SimLogin = undefined;
-        try {
-            SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
-        } catch {}
+    if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
+        repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user)
+    } else {
+        repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
+    }
+    
+    repl = repl.replace(/gbar_username/g, SimLogin)
 
-        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
-            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user)
-        } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged)
-        }
+    if (result.data.items.length < 1) {
+        log.i("no result found for the query: " + query, tag)
+        repl = repl.replace(/didyoumean/g, "");
+        repl = repl.replace(/item/g, "");
 
-        if (result.data.items.length < 1) {
-            log.i("no result found for the query: " + query, tag)
-            repl = repl.replace(/didyoumean/g, "");
-            repl = repl.replace(/item/g, "");
+        repl = repl.replace(/topItem/g, template.data.search_notfound);
 
-            repl = repl.replace(/topItem/g, template.data.search_notfound);
+        repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
 
-            repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
+        repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
 
-            repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
+        const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s)[0]
+                        .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+                        .replace(/<p>/g, "").replace(/<\/p>/g, "")
+                        
+        repl = repl.replace(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s, "!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+        repl = repl.replace("OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing",
+            '<style>.z { display: none; } .t {background: #d5ddf3; color: #000; padding: 5px 1px 4px} div,td,.n a,.n a:visited {color: #000} .bt {border-top: 1px solid #36c }</style><p><hr class="z"><div style="padding:2px" class="t n bt"><font size="-1"></font>' + links + "</div><br>")
 
-            const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s)[0]
-                            .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
-                            .replace(/<p>/g, "").replace(/<\/p>/g, "")
-                            
-            repl = repl.replace(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s, "!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
-            repl = repl.replace("OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing",
-                '<style>.z { display: none; } .t {background: #d5ddf3; color: #000; padding: 5px 1px 4px} div,td,.n a,.n a:visited {color: #000} .bt {border-top: 1px solid #36c }</style><p><hr class="z"><div style="padding:2px" class="t n bt"><font size="-1"></font>' + links + "</div><br>")
-
-            repl = repl.replace(/<table id="nav".*<\/table>/s, "")
-            repl = repl.replace(/<p>.*<\/div>.*<div id="res" class="med">/s, '<p>&nbsp;<nobr></div><div id="res" class="med">')
-
-            if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
-                repl = repl.replace(/query/g, actualq)
-            } else {
-                repl = repl.replace(/query/g, query)
-            }
-            if (language == "ja"){
-                let encoded = iconv.encode(repl, 'shift_jis')
-                res.set("Content-Type", "text/html;charset=Shift_JIS")
-                res.send(encoded)
-                return
-            }
-            res.send(repl)
-            return
-        }
-        
-        if (result.data._SearXNG_exclusive && result.data._SearXNG_exclusive.relatedSuggestions) {
-            repl = repl.replace(/item(\r?\n?) *[^(item(\r?\n?) *)]/gms, "item\nrelatedSearchTemplates<")
-            repl = repl.replace("relatedSearchTemplates", template.data.search_related)
-            const suggests = result.data._SearXNG_exclusive.relatedSuggestions
-            repl = suggests.length <= 5 ? repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE</tr>") : repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE1</tr><tr>QUERIESQUEUEDHERE2</tr>");
-            let tr1 = ""
-            let tr2 = ""
-            suggests.forEach((words, i) => {
-                const q = grabSettings(req.cookies.GS2009_SETTINGS).before !== false ? actualq : query
-                const pq = ("<b>" + words.replace(new RegExp(RegExp.escape(q), "ig"), "QUERY!!") + "</b>").replace("QUERY!!", "</b>" + q + "<b>")
-                if ((suggests.length == 8 && i > 3) || (suggests.length >= 8 && i > 4)) {
-                    tr2 = tr2 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
-                } else {
-                    tr1 = tr1 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
-                }
-            })
-            repl = repl.replace("QUERIESQUEUEDHERE1", tr1).replace("QUERIESQUEUEDHERE2", tr2)
-        }
+        repl = repl.replace(/<table id="nav".*<\/table>/s, "")
+        repl = repl.replace(/<p>.*<\/div>.*<div id="res" class="med">/s, '<p>&nbsp;<nobr></div><div id="res" class="med">')
 
         if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
             repl = repl.replace(/query/g, actualq)
         } else {
             repl = repl.replace(/query/g, query)
         }
-        
-        let items = repl.split("item")
-
-        let count = linkalplist.filter(v => /[a-z]/i.test(String(v))).length
-        if (count == 0) {
-            void(0);
-        } else {
-            result.data.items.forEach((item, i) => {
-                if (typeof linkalplist[i] !== 'number') {
-                    if (typeof linkalplist[i+1] == 'number') {
-                        items.splice(i + 1, 0, "lastone\n")
-                    }
-                }
-            })
-        }
-
-        repl = items.join("item")
-
-        result.data.items.forEach((item, i) => {
-            if (typeof linkalplist[i] !== 'number') {
-                repl = repl.replace(/item/, template.data.search_more)
-                return
-            }
-            repl = repl.replace(/item/, template.data.search_normal)
-            repl = repl.replace(/lastone/, template.data.search_EOM)
-        })
-
-        const search = [];
-        search.htmlTitle = "";
-        search.link = "";
-        search.htmlSnippet = "";
-        search.htmlFormattedUrl = "";
-        search.displayLink = "";
-
-        result.data.items.forEach((item, i) => {
-            const search = [];
-            search.htmlTitle = "";
-            search.link = "";
-            search.htmlSnippet = "";
-            search.htmlFormattedUrl = "";
-            search.displayLink = "";
-
-            try {
-                if (i != linknumlist[i]){
-                    search.htmlTitle = result.data.items[linknumlist[i]].htmlTitle;
-                    search.link = result.data.items[linknumlist[i]].link;
-                    search.htmlFormattedUrl = result.data.items[linknumlist[i]].htmlFormattedUrl;
-                    search.htmlSnippet = result.data.items[linknumlist[i]].htmlSnippet;
-                    search.displayLink = result.data.items[linknumlist[i]].displayLink;
-                } else {
-                    search.htmlTitle = item.htmlTitle;
-                    search.link = item.link;
-                    search.htmlFormattedUrl = item.htmlFormattedUrl;
-                    search.htmlSnippet = item.htmlSnippet;
-                    search.displayLink = item.displayLink;
-                }
-            } catch {
-                search.htmlTitle = item.htmlTitle;
-                search.link = item.link;
-                search.htmlFormattedUrl = item.htmlFormattedUrl;
-                search.htmlSnippet = item.htmlSnippet;
-                search.displayLink = item.displayLink;
-            }
-            
-            repl = repl.replace(/htmlTitle/, search.htmlTitle)
-            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
-                search.link = search.link.replace("https://", "http://")
-            }
-            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
-                grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
-                    let waybacklink
-                    switch (target) {
-                        case "wayback":
-                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
-                                    waybacklink = "http://web.archive.org/web/20100324182056/"
-                                } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
-                                }
-                                search.link = search.link.replace("http://", waybacklink)
-                                search.link = search.link.replace("https://", waybacklink)
-                                break;
-                            }
-                        case "yt2009":
-                            if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
-                                    return
-                                }
-                                search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
-                                search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
-                            } else {
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
-                                    return
-                                }
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
-                                    waybacklink = "http://web.archive.org/web/20100324182056/"
-                                } else {
-                                    waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
-                                }
-                                search.link = search.link.replace("http://", waybacklink)
-                                search.link = search.link.replace("https://", waybacklink)
-
-                                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
-                                } else {
-                                    let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
-                                    let ytlink0 = waybacklink + "https://www.youtube.com"
-                                    let ytlink1 = waybacklink + "http://www.youtube.com"
-                                    let ytlink2 = waybacklink + "www.youtube.com"
-                                    search.link = search.link.replace(ytlink0, yt2009link)
-                                    search.link = search.link.replace(ytlink1, yt2009link)
-                                    search.link = search.link.replace(ytlink2, yt2009link)
-                                }
-                            }
-                            break;
-                        case "http":
-                            break;
-                    } 
-                });
-                /*
-                
-                if (redirector_only == "yt2009") {
-                    if (config.frontend.default.redirects.properties.yt2009_url == undefined) {
-                        return
-                    }
-                    search.link = search.link.replace("www.youtube.com", config.frontend.default.redirects.properties.yt2009_url)
-                    search.link = search.link.replace("youtube.com", config.frontend.default.redirects.properties.yt2009_url)
-                } else if (redirector_only == "wayback") {
-                    if (config.frontend.default.redirects.properties.wayback_date == undefined) {
-                        waybacklink = "http://web.archive.org/web/20100324182056/"
-                    } else {
-                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirects.properties.wayback_date + "/"
-                    }
-                    search.link = search.link.replace("http://", waybacklink)
-                    search.link = search.link.replace("https://", waybacklink)
-                } else if (redirector_only == "none") {
-                } else if (redirector_only == "both") {
-                    if (config.frontend.default.redirects.properties.wayback_date == undefined) {
-                        waybacklink = "http://web.archive.org/web/20100324182056/"
-                    } else {
-                        waybacklink = "http://web.archive.org/web/" + config.frontend.default.redirects.properties.wayback_date + "/"
-                    }
-                    search.link = search.link.replace("http://", waybacklink)
-                    search.link = search.link.replace("https://", waybacklink)
-
-                    if (config.frontend.default.redirects.properties.yt2009_url == undefined) {
-                    } else {
-                        let yt2009link = "http://" + config.frontend.default.redirects.properties.yt2009_url;
-                        let ytlink0 = waybacklink + "https://www.youtube.com"
-                        let ytlink1 = waybacklink + "http://www.youtube.com"
-                        let ytlink2 = waybacklink + "www.youtube.com"
-                        search.link = search.link.replace(ytlink0, yt2009link)
-                        search.link = search.link.replace(ytlink1, yt2009link)
-                        search.link = search.link.replace(ytlink2, yt2009link)
-                    }
-                }
-                */
-            }
-
-            if (typeof linkalplist[i] !== 'number') {
-                if (typeof linkalplist[i+1] == 'number') {
-                    repl = repl.replace(/moreRelatedLink/, search.displayLink)
-                    repl = repl.replace(/moreRelatedLink/, search.displayLink)
-                }
-            }
-            repl = repl.replace(/relatedUrlLink/, search.link)
-            repl = repl.replace(/UrlLink/, search.link)
-            repl = repl.replace(/htmlSnippet/, search.htmlSnippet)
-            repl = repl.replace(/htmlFormattedUrl/, search.htmlFormattedUrl)
-            //repl = repl.replace(/displayLink/, search.displayLink)
-        })
-
-        try {
-            if (result.data.spelling.correctedQuery != undefined) {
-                repl = repl.replace(/didyoumean/g, ext_t_dym)
-                let suggested = result.data.spelling.correctedQuery;
-                let date;
-                if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
-                    date = " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before
-                    suggested = suggested.replace(date, "")
-                }
-                repl = repl.replace(/suggestedQuery/g, suggested);
-            }
-        } catch {
-            repl = repl.replace(/didyoumean/g, "")
-        }
-
-        repl = repl.replace(/item/g, "")
-
-        nowTime = (Date.now() - startTime) / 1000;
-        const searchFinish = nowTime.toString();
-
-        repl = repl.replace(/searchFinish/g, searchFinish.slice(0,4))
-
-        if (req.query.start <= 9 || isNaN(req.query.start) == true) {
-            repl = repl.replace(/<td class="b">[\s\S]*?<\/a>/, '')
-            repl = repl.replace(/<td>\s*<a[^>]*href="\/search\?[^"]*">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-        } else {
-            if (start <= 20) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=10&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 30) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=20&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 40) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=30&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 50) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=40&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 60) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=50&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 70) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=60&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 80) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=70&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else if (start <= 90) {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=80&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-            } else {
-                repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=90&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
-                repl = repl.replace(/<td class="b">\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=nextstart&amp;sa=N">[\s\S]*?<\/a>/g, '<td><span class="csb" style="background-position:-76px 0;width:40px"></span>')
-            }
-        }
-
-        if (req.query.start <= 9 || isNaN(req.query.start) == true) {
-        } else if (start <= 11) {
-            repl = repl.replace(/&amp;start=prevstart/, "");
-        } else {
-            repl = repl.replace(/prevstart/, parseInt(req.query.start) - 10 )
-        }
-
-        if (req.query.start <= 9 || isNaN(req.query.start) == true) {
-            repl = repl.replace(/nextstart/, 10)
-        } else {
-            repl = repl.replace(/nextstart/, parseInt(req.query.start) + 10 )
-        }
-
-        repl = repl.replace(/formattedTotalResults/, result.data.searchInformation.formattedTotalResults)
-        if (start != 0) {
-            repl = repl.replace(/currentItems/, start)
-            repl = repl.replace(/currentItems2/, start + 9)
-        } else {
-            repl = repl.replace(/currentItems/, 1)
-            repl = repl.replace(/currentItems2/, start + 10)
-        }
-
-        repl = repl.replace(/gbar_username/g, SimLogin)
-        repl = repl.replace(/topItem/g, "")
-        log.i("Sending replaced result", tag)
         if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -1460,7 +1210,343 @@ app.get('/search', async (req, res) => {
             return
         }
         res.send(repl)
-    } )
+        return
+    }
+    
+    if (result.data._SearXNG_exclusive && result.data._SearXNG_exclusive.relatedSuggestions) {
+        const suggests = result.data._SearXNG_exclusive.relatedSuggestions
+        if (suggests.length > 0) {
+            repl = repl.replace(/item(\r?\n?) *[^(item(\r?\n?) *)]/gms, "item\nrelatedSearchTemplates<")
+            repl = repl.replace("relatedSearchTemplates", ('<div class="e"><table class="ts std" id="brs" style="padding:0 0 1em"><caption class="med nobr" style="padding-bottom:6px;text-align:left">___GS2009__RELATED</caption><tbody>PRESERVEDFORRELATEDTEMPLATE</tbody></table></div>'.replace(/___GS2009__RELATED/, strings.search.related)))
+            repl = suggests.length <= 5 ? repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE1</tr>") : repl.replace("PRESERVEDFORRELATEDTEMPLATE", "<tr>QUERIESQUEUEDHERE1</tr><tr>QUERIESQUEUEDHERE2</tr>");
+            let tr1 = ""
+            let tr2 = ""
+            suggests.forEach((words, i) => {
+                const q = grabSettings(req.cookies.GS2009_SETTINGS).before !== false ? actualq : query
+                const pq = ("<b>" + words.replace(new RegExp(RegExp.escape(q), "ig"), "QUERY!!") + "</b>").replace("QUERY!!", "</b>" + q + "<b>")
+                if (!(suggests.length <= 5)){
+                    if ((suggests.length == 8 && i > 3) || (suggests.length >= 8 && i > 4)) {
+                        tr2 = tr2 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
+                    } else {
+                        tr1 = tr1 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
+                    }
+                } else {
+                    tr1 = tr1 + ("<td style=\"padding:0 0 7px;padding-right:34px;vertical-align:top\"><a href=\"/search?hl=en&amp;q=" + words + "\">poweredQuery</a></td>".replace("poweredQuery", pq))
+                }
+            })
+            repl = repl.replace("QUERIESQUEUEDHERE1", tr1).replace("QUERIESQUEUEDHERE2", tr2)
+        } else {
+            repl = repl.replace(/item(\r?\n?) *[^(item(\r?\n?) *)]/gms, "")
+        }
+    }
+
+    if (result.data._SearXNG_exclusive) {
+        const newsresults = await fetchResults(true)
+        if (!(newsresults.data.items.length < 1)){
+            const newsloc = []
+            linkalplist.forEach((item, i) => {
+                if (!isNaN(Number(item)) && !isNaN(Number(linkalplist[i+1]))) newsloc.push(true)
+                else newsloc.push(false) 
+            })
+            let actualnewsloc
+            for (let i = 0; i < newsloc.length; i++) {
+                if (newsloc[i]) { actualnewsloc = i; break; }
+            }
+
+            for (let i = 0; i <= 10; i++) {
+                repl = repl.replace(/item[^0-9]/, "item" + i)
+            }
+
+            repl = repl.replace("item" + actualnewsloc, "item\n" + template.data.search_news_section)
+            for (let i = 0; i <= 10; i++) {
+                repl = repl.replace("item" + i, "item")
+            }
+            for (let i = 0; i < 3; i++) {
+                const search = [];
+                search.htmlTitle = newsresults.data.items[i].htmlTitle;
+                search.link = newsresults.data.items[i].link;
+                search.htmlSnippet = newsresults.data.items[i].htmlSnippet;
+                search.displayLink = newsresults.data.items[i].displayLink;
+                
+                repl = repl.replace(/htmlTitle/, search.htmlTitle)
+                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
+                    search.link = search.link.replace("https://", "http://")
+                }
+                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
+                    grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
+                        let waybacklink
+                        switch (target) {
+                            case "wayback":
+                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                        waybacklink = "http://web.archive.org/web/20100324182056/"
+                                    } else {
+                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                    }
+                                    search.link = search.link.replace("http://", waybacklink)
+                                    search.link = search.link.replace("https://", waybacklink)
+                                    break;
+                                }
+                            case "yt2009":
+                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                        return
+                                    }
+                                    search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                                    search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                                } else {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                        return
+                                    }
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                        waybacklink = "http://web.archive.org/web/20100324182056/"
+                                    } else {
+                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                    }
+                                    search.link = search.link.replace("http://", waybacklink)
+                                    search.link = search.link.replace("https://", waybacklink)
+
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                    } else {
+                                        let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
+                                        let ytlink0 = waybacklink + "https://www.youtube.com"
+                                        let ytlink1 = waybacklink + "http://www.youtube.com"
+                                        let ytlink2 = waybacklink + "www.youtube.com"
+                                        search.link = search.link.replace(ytlink0, yt2009link)
+                                        search.link = search.link.replace(ytlink1, yt2009link)
+                                        search.link = search.link.replace(ytlink2, yt2009link)
+                                    }
+                                }
+                                break;
+                            case "http":
+                                break;
+                        } 
+                    });
+                }
+                repl = repl.replace(/htmlTitle/, search.htmlTitle)
+                repl = repl.replace(/UrlLink/, search.link)
+                repl = repl.replace(/htmlSnippet/, search.htmlSnippet)
+                repl = repl.replace(/displayLink/, search.displayLink)
+            }
+        }
+    }
+
+    if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
+        repl = repl.replace(/query/g, actualq)
+    } else {
+        repl = repl.replace(/query/g, query)
+    }
+    
+    let items = repl.split("item")
+
+    let count = linkalplist.filter(v => /[a-z]/i.test(String(v))).length
+    if (count == 0) {
+    } else {
+        result.data.items.forEach((item, i) => {
+            if (typeof linkalplist[i] !== 'number') {
+                if (typeof linkalplist[i+1] == 'number') {
+                    items.splice(i + 1, 0, "lastone\n")
+                }
+            }
+        })
+    }
+
+    repl = items.join("item")
+
+    result.data.items.forEach((item, i) => {
+        if (typeof linkalplist[i] !== 'number') {
+            repl = repl.replace(/item/, template.data.search_more)
+            return
+        }
+        repl = repl.replace(/item/, template.data.search_normal)
+        repl = repl.replace(/lastone/, template.data.search_EOM)
+    })
+
+    const search = [];
+    search.htmlTitle = "";
+    search.link = "";
+    search.htmlSnippet = "";
+    search.htmlFormattedUrl = "";
+    search.displayLink = "";
+
+    result.data.items.forEach((item, i) => {
+        const search = [];
+        search.htmlTitle = "";
+        search.link = "";
+        search.htmlSnippet = "";
+        search.htmlFormattedUrl = "";
+        search.displayLink = "";
+
+        try {
+            if (i != linknumlist[i]){
+                search.htmlTitle = result.data.items[linknumlist[i]].htmlTitle;
+                search.link = result.data.items[linknumlist[i]].link;
+                search.htmlFormattedUrl = result.data.items[linknumlist[i]].htmlFormattedUrl;
+                search.htmlSnippet = result.data.items[linknumlist[i]].htmlSnippet;
+                search.displayLink = result.data.items[linknumlist[i]].displayLink;
+            } else {
+                search.htmlTitle = item.htmlTitle;
+                search.link = item.link;
+                search.htmlFormattedUrl = item.htmlFormattedUrl;
+                search.htmlSnippet = item.htmlSnippet;
+                search.displayLink = item.displayLink;
+            }
+        } catch {
+            search.htmlTitle = item.htmlTitle;
+            search.link = item.link;
+            search.htmlFormattedUrl = item.htmlFormattedUrl;
+            search.htmlSnippet = item.htmlSnippet;
+            search.displayLink = item.displayLink;
+        }
+        
+        repl = repl.replace(/htmlTitle/, search.htmlTitle)
+        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
+            search.link = search.link.replace("https://", "http://")
+        }
+        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
+            grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
+                let waybacklink
+                switch (target) {
+                    case "wayback":
+                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                waybacklink = "http://web.archive.org/web/20100324182056/"
+                            } else {
+                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                            }
+                            search.link = search.link.replace("http://", waybacklink)
+                            search.link = search.link.replace("https://", waybacklink)
+                            break;
+                        }
+                    case "yt2009":
+                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                return
+                            }
+                            search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                            search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                        } else {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                return
+                            }
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                waybacklink = "http://web.archive.org/web/20100324182056/"
+                            } else {
+                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                            }
+                            search.link = search.link.replace("http://", waybacklink)
+                            search.link = search.link.replace("https://", waybacklink)
+
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                            } else {
+                                let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
+                                let ytlink0 = waybacklink + "https://www.youtube.com"
+                                let ytlink1 = waybacklink + "http://www.youtube.com"
+                                let ytlink2 = waybacklink + "www.youtube.com"
+                                search.link = search.link.replace(ytlink0, yt2009link)
+                                search.link = search.link.replace(ytlink1, yt2009link)
+                                search.link = search.link.replace(ytlink2, yt2009link)
+                            }
+                        }
+                        break;
+                    case "http":
+                        break;
+                } 
+            });
+        }
+
+        if (typeof linkalplist[i] !== 'number') {
+            if (typeof linkalplist[i+1] == 'number') {
+                repl = repl.replace(/moreRelatedLink/, search.displayLink)
+                repl = repl.replace(/moreRelatedLink/, search.displayLink)
+            }
+        }
+        repl = repl.replace(/relatedUrlLink/, search.link)
+        repl = repl.replace(/UrlLink/, search.link)
+        repl = repl.replace(/htmlSnippet/, search.htmlSnippet)
+        repl = repl.replace(/htmlFormattedUrl/, search.htmlFormattedUrl)
+        //repl = repl.replace(/displayLink/, search.displayLink)
+    })
+
+    try {
+        if (result.data.spelling.correctedQuery != undefined) {
+            repl = repl.replace(/didyoumean/g, ext_t_dym)
+            let suggested = result.data.spelling.correctedQuery;
+            let date;
+            if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
+                date = " before:" + grabSettings(req.cookies.GS2009_SETTINGS).before
+                suggested = suggested.replace(date, "")
+            }
+            repl = repl.replace(/suggestedQuery/g, suggested);
+        }
+    } catch {
+        repl = repl.replace(/didyoumean/g, "")
+    }
+
+    repl = repl.replace(/item/g, "")
+
+    nowTime = (Date.now() - startTime) / 1000;
+    const searchFinish = nowTime.toString();
+
+    repl = repl.replace(/searchFinish/g, searchFinish.slice(0,4))
+
+    if (req.query.start <= 9 || isNaN(req.query.start) == true) {
+        repl = repl.replace(/<td class="b">[\s\S]*?<\/a>/, '')
+        repl = repl.replace(/<td>\s*<a[^>]*href="\/search\?[^"]*">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+    } else {
+        if (start <= 20) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=10&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 30) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=20&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 40) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=30&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 50) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=40&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 60) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=50&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 70) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=60&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 80) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=70&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else if (start <= 90) {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=80&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+        } else {
+            repl = repl.replace(/<td>\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=90&amp;sa=N">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
+            repl = repl.replace(/<td class="b">\s*<a href="\/search\?hl=[^&]*&amp;q=[^&]*&amp;start=nextstart&amp;sa=N">[\s\S]*?<\/a>/g, '<td><span class="csb" style="background-position:-76px 0;width:40px"></span>')
+        }
+    }
+
+    if (req.query.start <= 9 || isNaN(req.query.start) == true) {
+    } else if (start <= 11) {
+        repl = repl.replace(/&amp;start=prevstart/, "");
+    } else {
+        repl = repl.replace(/prevstart/, parseInt(req.query.start) - 10 )
+    }
+
+    if (req.query.start <= 9 || isNaN(req.query.start) == true) {
+        repl = repl.replace(/nextstart/, 10)
+    } else {
+        repl = repl.replace(/nextstart/, parseInt(req.query.start) + 10 )
+    }
+
+    repl = repl.replace(/formattedTotalResults/, result.data.searchInformation.formattedTotalResults)
+    if (start != 0) {
+        repl = repl.replace(/currentItems/, start)
+        repl = repl.replace(/currentItems2/, start + 9)
+    } else {
+        repl = repl.replace(/currentItems/, 1)
+        repl = repl.replace(/currentItems2/, start + 10)
+    }
+
+    repl = repl.replace(/topItem/g, "")
+    log.i("Sending replaced result", tag)
+    if (language == "ja"){
+        let encoded = iconv.encode(repl, 'shift_jis')
+        res.set("Content-Type", "text/html;charset=Shift_JIS")
+        res.send(encoded)
+        return
+    }
+    res.send(repl)
 })
 
 app.get('/gs2009', async (req, res) => {

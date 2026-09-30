@@ -1,28 +1,34 @@
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
-
-export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnabled, query, start, lr) {
+export default async function searxngfetch(searchip, query, 
+    { ishttps, 
+    engines, 
+    start, 
+    lr, 
+    categories
+    }) {
+// export default async function searxngfetch(searchip, ishttps, IsOtherEnginesEnabled, query, start, lr, category) {
     let page;
     let url;
     let url1;
-    if (searchIP == undefined) {
-        throw new Error("searchIP is empty, cannot proceed")
+    if (searchip == undefined) {
+        throw new Error("searchip is empty, cannot proceed")
     } else {
-        if (searchIP.match(/http:\/\//) == false && searchIP.match(/https:\/\//) == false) {
-            if (typeof isHTTPS == "boolean") {
-                if (isHTTPS) {
-                    url1 = "https://" + searchIP
+        if (searchip.match(/http:\/\//) == false && searchip.match(/https:\/\//) == false) {
+            if (typeof ishttps == "boolean") {
+                if (ishttps) {
+                    url1 = "https://" + searchip
                 } else {
-                    url1 = "http://" + searchIP
+                    url1 = "http://" + searchip
                 }
-            } else if (typeof isHTTPS == "undefined"){
+            } else if (typeof ishttps == "undefined"){
                 throw new Error("cannot determine https or not")
             } else {
-                throw new Error("isHTTPS should be boolean")
+                throw new Error("ishttps should be boolean")
             }
         } else {
-            url1 = searchIP;
+            url1 = searchip;
         }
         if (url1.charAt(url1.length - 1) == "/") {
             url1 = url1.slice(0, url1.length - 1)
@@ -39,11 +45,15 @@ export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnab
         page = 1
     }
 
-    url = url1 + "/search?q=" + query + "&format=json" + "&pageno=" + page
-
-    if (!IsOtherEnginesEnabled) {
-        url = url + "&engines=google"
+    let category = ""
+    if (Array.isArray(categories)) {
+        categories.forEach((c) => {
+            if (category == "") category = category + c
+            else category = category + "," + c
+        })
     }
+    url = url1 + "/search?q=" + query + "&format=json" + "&pageno=" + page + (category == "" ? "&categories=" + category : "")
+
     /*
     if (lr != undefined) {
         url = url + "&language=" + lr
@@ -82,7 +92,8 @@ export default async function searxngfetch(searchIP, isHTTPS, IsOtherEnginesEnab
         const results = { 
             data: {
                 _SearXNG_exclusive: {
-                    relatedSuggestions: json.suggestions
+                    relatedSuggestions: json.suggestions,
+                    categories: categories ? categories : "general"
                 },
                 searchInformation: { 
                     formattedTotalResults: 0

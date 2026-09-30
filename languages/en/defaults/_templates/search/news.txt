@@ -1,0 +1,23 @@
+<li class="g">
+    <h3 class="r"><a
+            href="http://news.google.com/news?q=query&amp;um=1&amp;ie=UTF-8&amp;hl=en&amp;ei=gJ7jSbSgC5mCtgPVn9mnCQ&amp;sa=X&amp;oi=news_group&amp;resnum=4&amp;ct=title">News
+            results for <em>query</em></a></h3>
+    <table class="ts">
+        <tbody>
+            <tr>
+                <td valign="top" style="padding-top:5px;padding-right:10px;font-size:78%;line-height:normal;width:40px;text-align:center"><img src="/images/newspaper.gif" width="40" height="30" alt=""></td>
+                <td valign="top" style="padding-top:3px"><a href="UrlLink" class="l">htmlTitle</a> - <nobr><span class="f">1 hour ago</span></nobr><br>
+                    <div class="s">htmlSnippet</div>
+                    <span class="gl"><cite>displayLink</cite> - <a href="http://news.google.com/news/story?q=query&amp;um=1&amp;ie=UTF-8&amp;ncl=d7sWnbslTXnjegM&amp;hl=en&amp;ei=gJ7jSbSgC5mCtgPVn9mnCQ&amp;sa=X&amp;oi=news_result&amp;resnum=4&amp;ct=more-results&amp;cd=1">367 related articles&nbsp;»</a></span><br>
+                    <div class="s">
+                        <a href="UrlLink" class="l">htmlTitle</a> - <span class="gl"><cite>displayLink</cite> - <a
+                                href="http://news.google.com/news/story?q=query&amp;um=1&amp;ie=UTF-8&amp;ncl=dLEf9ghUB5jki_M&amp;hl=en&amp;ei=gJ7jSbSgC5mCtgPVn9mnCQ&amp;sa=X&amp;oi=news_result&amp;resnum=5&amp;ct=more-results&amp;cd=1">425
+                                related articles&nbsp;»</a></span></div>
+                    <div class="s"><a href="UrlLink" class="l">htmlTitle</a> - <span class="gl"><cite>displayLink</cite> - <a
+                                href="http://news.google.com/news/story?q=query&amp;um=1&amp;ie=UTF-8&amp;ncl=dlca79P_5eJepXM&amp;hl=en&amp;ei=gJ7jSbSgC5mCtgPVn9mnCQ&amp;sa=X&amp;oi=news_result&amp;resnum=6&amp;ct=more-results&amp;cd=1">177
+                                related articles&nbsp;»</a></span></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</li>
