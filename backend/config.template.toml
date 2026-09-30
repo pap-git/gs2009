@@ -37,6 +37,9 @@ order=["cse", "searxng"]
 url=""
 # enginesToUse: idk will i implement this??
 enginesToUse=[]
+# newsFetch: Enable fetching news results.
+# You might want to disable this option if you have problem with getting CAPTCHA soon after searching a lot.
+newsFetch=false
 
 [engine.csjapi]
 # api_key: API key to use "Custom Search JSON API".

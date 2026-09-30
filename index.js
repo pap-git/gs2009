@@ -1240,7 +1240,8 @@ app.get('/search', async (req, res) => {
         }
     }
 
-    if (result.data._SearXNG_exclusive) {
+    if (result.data._SearXNG_exclusive && config.engine.searxng.newsFetch) {
+        log.i("fetching news result, query: " + query)
         const newsresults = await fetchResults(true)
         if (!(newsresults.data.items.length < 1)){
             const newsloc = []
