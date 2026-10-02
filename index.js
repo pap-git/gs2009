@@ -98,7 +98,7 @@ function getEraYears(settings) {
 }
 
 function grabEras(settings) {
-    const s = (!settings || config.frontend.forceDefaults) ? settings : config.frontend.defaults;
+    const s = (settings && !config.frontend.forceDefaults) ? settings : config.frontend.defaults;
     if (s.roll_eras) {
         const d = new Date
         const month = d.getUTCMonth() + 1;
@@ -357,6 +357,7 @@ async function fetchResults(askOtherCategories) {
                         lr: lr,
                         start: start
                     });
+                    if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
                     i = config.engine.order.length
                 } catch(e) {
                     log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
@@ -375,10 +376,10 @@ async function fetchResults(askOtherCategories) {
                     searxng_ishttps = temp_searxng_ishttps
 
                     if (result.data.error) throw new Error("bye bro")
+                    if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
                     i = config.engine.order.length
                 } catch(e) {
                     log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
-                    log.e(e)
                     errorCounts++
                 }
                 break;

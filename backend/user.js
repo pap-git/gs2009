@@ -79,6 +79,7 @@ const user = {
     modifyData: async function(email, serviceID, object, returnObject) {
         if (!await user.exists(email, "boolean")) throw new Error("User does not exist in database.")
         let db = await getDB(user.userdataDB)
+        if (!((await user.exists(email, "array")).includes("userdata"))) db.push({ email: email, data: [] })
 
         db.forEach((user) => {
             if (!(user.email == email)) return
