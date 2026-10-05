@@ -331,7 +331,7 @@ var start;
 // https://qiita.com/ganyariya/items/23d51b05bacdcb27fce6
 // im using the google search example from here v (thx for og author)
 
-async function fetchResults(askOtherCategories) {
+async function fetchResults({ askOtherCategories, existingfilePath }) {
     if (isNaN(start) == true) {
         start = 0;
     }
@@ -339,56 +339,60 @@ async function fetchResults(askOtherCategories) {
     let result;
     let errorCounts = 0;
 
-    for (let i = 0; i < config.engine.order.length; i++) {
-        log.i("trying engine: " + config.engine.order[i], "search")
-        switch (config.engine.order[i]) {
-            case "cse":
-                if (!config.engine.csjapi.api_key || !config.engine.csjapi.cse_id) throw new Error("Either API key or CSE ID is missing on Custom Search JSON API settings")
+    if (!existingfilePath) {
+        for (let i = 0; i < config.engine.order.length; i++) {
+            log.i("trying engine: " + config.engine.order[i], "search")
+            switch (config.engine.order[i]) {
+                case "cse":
+                    if (!config.engine.csjapi.api_key || !config.engine.csjapi.cse_id) throw new Error("Either API key or CSE ID is missing on Custom Search JSON API settings")
 
-                try {
-                    if (askOtherCategories) { throw new Error("e")}
-                    const {google} = googleapis;
-                    const customSearch = google.customsearch("v1");
-                    result = await customSearch.cse.list({
-                        auth: config.engine.csjapi.api_key,
-                        cx: config.engine.csjapi.cse_id,
-                        q: query,
-                        hl: hl,
-                        lr: lr,
-                        start: start
-                    });
-                    if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
-                    i = config.engine.order.length
-                } catch(e) {
-                    log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
-                    errorCounts++
-                }
-                break;
-            case "searxng":
-                try {
-                    let temp_searxng_ishttps
-                    if (config.engine.searxng.url.match(/https:\/\//) || config.engine.searxng.url.match(/http:\/\//)) {
-                        temp_searxng_ishttps = searxng_ishttps
-                        searxng_ishttps = undefined
+                    try {
+                        if (askOtherCategories) { throw new Error("e")}
+                        const {google} = googleapis;
+                        const customSearch = google.customsearch("v1");
+                        result = await customSearch.cse.list({
+                            auth: config.engine.csjapi.api_key,
+                            cx: config.engine.csjapi.cse_id,
+                            q: query,
+                            hl: hl,
+                            lr: lr,
+                            start: start
+                        });
+                        if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
+                        i = config.engine.order.length
+                    } catch(e) {
+                        log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
+                        errorCounts++
                     }
-                    // result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr, true)
-                    result = await searxngfetch(config.engine.searxng.url, query, { ishttps: true, start: start, categories: askOtherCategories ? "news" : "" })
-                    searxng_ishttps = temp_searxng_ishttps
+                    break;
+                case "searxng":
+                    try {
+                        let temp_searxng_ishttps
+                        if (config.engine.searxng.url.match(/https:\/\//) || config.engine.searxng.url.match(/http:\/\//)) {
+                            temp_searxng_ishttps = searxng_ishttps
+                            searxng_ishttps = undefined
+                        }
+                        // result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr, true)
+                        result = await searxngfetch(config.engine.searxng.url, query, { ishttps: true, start: start, categories: askOtherCategories ? "news" : "" })
+                        searxng_ishttps = temp_searxng_ishttps
 
-                    if (result.data.error) throw new Error("bye bro")
-                    if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
-                    i = config.engine.order.length
-                } catch(e) {
-                    log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
-                    errorCounts++
-                }
-                break;
-            default:
-                throw new Error("??? got new engine called " + config.engine.order[i])
+                        if (result.data.error) throw new Error("bye bro")
+                        if (result.data.items.length < 0 && config.engine.order[i+1] !== undefined) throw new Error("let me try others")
+                        i = config.engine.order.length
+                    } catch(e) {
+                        log.e("got an error on engine '" + config.engine.order[i] + "', skipping")
+                        errorCounts++
+                    }
+                    break;
+                default:
+                    throw new Error("??? got new engine called " + config.engine.order[i])
+            }
         }
-    }
 
-    if (errorCounts == config.engine.order.length) log.e("Failed to retrive results on every engine", "search")
+        if (errorCounts == config.engine.order.length) log.e("Failed to retrive results on every engine", "search")
+    } else {
+        result = JSON.parse(fs.readFileSync(path.join(existingfilePath)))
+    }
     return(result);
 }
 
@@ -1043,7 +1047,7 @@ app.get('/search', async (req, res) => {
 
     let result;
     try {
-        result = await fetchResults(false);
+        result = await fetchResults({ existingfilePath: "placeholder-dev/search_output.json" });
     } catch(e) {
         /*
         if (config.backend.engine.type == "cse") {
@@ -1075,7 +1079,6 @@ app.get('/search', async (req, res) => {
             })
         }
         */
-        
         return
     }
 
@@ -1272,46 +1275,46 @@ app.get('/search', async (req, res) => {
                 search.displayLink = newsresults.data.items[i].displayLink;
                 
                 repl = repl.replace(/htmlTitle/, search.htmlTitle)
-                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
+                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("http") == true) {
                     search.link = search.link.replace("https://", "http://")
                 }
-                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
-                    grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
+                if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.length < 1) {
+                    grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.forEach(target => {
                         let waybacklink
                         switch (target) {
                             case "wayback":
-                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
-                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("yt2009")) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date == undefined) {
                                         waybacklink = "http://web.archive.org/web/20100324182056/"
                                     } else {
-                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date + "/"
                                     }
                                     search.link = search.link.replace("http://", waybacklink)
                                     search.link = search.link.replace("https://", waybacklink)
                                     break;
                                 }
                             case "yt2009":
-                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
-                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("wayback")) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                                         return
                                     }
-                                    search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
-                                    search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                                    search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address)
+                                    search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address)
                                 } else {
-                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                                         return
                                     }
-                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date == undefined) {
                                         waybacklink = "http://web.archive.org/web/20100324182056/"
                                     } else {
-                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                        waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date + "/"
                                     }
                                     search.link = search.link.replace("http://", waybacklink)
                                     search.link = search.link.replace("https://", waybacklink)
 
-                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                                    if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                                     } else {
-                                        let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
+                                        let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address;
                                         let ytlink0 = waybacklink + "https://www.youtube.com"
                                         let ytlink1 = waybacklink + "http://www.youtube.com"
                                         let ytlink2 = waybacklink + "www.youtube.com"
@@ -1333,6 +1336,19 @@ app.get('/search', async (req, res) => {
             }
         }
     }
+
+    /*
+    if (true) { // sponsored
+        const aj = {sponsored: []}
+        let adTables = '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">Sponsored Links</h2><ol onmouseover="return true" class="nobr"><li><h3><a id="an1" href="/web/20090413202015/http://www.google.com/aclk?sa=l&amp;ai=CqDQvgJ7jSf_-DKOyoQSBwZCmB4emi6EBxajp1gvio6oHEAEoA1CojKLl______8BYMnOqIvApNgPoAGvkebwA8gBAaoEHU_QZkEYXCHX6BIhvskm6rHxKTtGmE9WdQK-DZHa&amp;num=2&amp;sig=AGiWqtzii0XeMRXHeawTia3MHuY4OEM0cw&amp;q=https://www.checkingfinder.com/%3Fasd%3Dsds%26s_kwcid%3Dbank%7C3023675777">Free Online Banking</a></h3>Local Online Banking with High<br>Rates. Open a Free Account Today!<br><cite>www.CheckingFinder.com</cite></li><li><h3><a id="an2" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=ChdpngJ7jSf_-DKOyoQSBwZCmB5arh4cB2KbMzAvio6oHEAIoA1Dcx9rl-P____8BYMnOqIvApNgPyAEBqgQZT9BmMelFOu3Q2qMeRmvh7VfL3NzSSp2wfA&amp;num=3&amp;sig=AGiWqtyMT5dJgVfRyAkJPs0yieY_WPGZiw&amp;q=http://clk.atdmt.com/NYC/go/141372372/direct%3Bat.DBSEM_BroadBankingBank_100013_Incentive20409%3Bct.1/01/">Savings with Capital One</a></h3>Earn 2.01% APY on $10,000 balances.<br>$50 bonus.* No fees. FDIC Insured.<br><cite>www.CapitalOne.com/Direct<b>Bank</b>ing</cite></li><li><h3><a id="an3" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=CQ_wlgJ7jSf_-DKOyoQSBwZCmB66IzZYB3NiPiQm4nJ4FEAMoA1DPp_jjBWDJzqiLwKTYD8gBAaoEGk_QRmNWWSHR6BJpvhZdQj2NyjJz2AS9Ec2O&amp;num=4&amp;sig=AGiWqtzVEy-k7HbTpEYTT8O3IOlDXb6Bgw&amp;q=http://search.ace.advertising.com/click/site%3D617056/mnum%3D572640/term%3D20426/spid%3D28327579/xsstr2%3D2334136828">Money &amp; Finance</a></h3>Find Local Financial Services -<br>Addresses, Phone Numbers &amp; More<br><cite>MapQuest.com</cite></li></ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+
+        repl = repl.replace('<div id="res" class="med">', adTables + '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">Sponsored Link</h2><ol onmouseover="return true" style="padding:3px 0"><li class="tas"><h3><a id="pa1" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=CHE12gJ7jSf_-DKOyoQSBwZCmB5O-44QBsdLn_w6y-7AMCAAQAVDIovaB_v____8BYMnOqIvApNgPyAEBqgQfT9BWVTpcIdTgE5m9AOwxk6bA6ZyZofl_TJ6sIA1d_A&amp;sig=AGiWqtz1V6jp5rTt3EExYvLDoXyUuzqZdg&amp;q=http://clickserve.dartsearch.net/link/click%3Flid%3D43000000184131184%26ds_s_kwgid%3D58000000004174542%26ds_e_adid%3D3928849535%26ds_e_matchtype%3Dsearch%26ds_url_v%3D2"><b>Bank</b> of America ®</a></h3><cite>www.<b>Bank</b>ofAmerica.com</cite>&nbsp; &nbsp; &nbsp; Get Free Checking, Online Banking, And More. Open Today. Official Site</li></ol></div><div id="res" class="med">')
+    }
+
+    if (true) { // linklist
+
+    }
+    */
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
         repl = repl.replace(/query/g, actualq)
@@ -1403,8 +1419,8 @@ app.get('/search', async (req, res) => {
         }
 
         let add;
-        if (grabSettings(req.cookies.GS2009_SETTINGS).mayharm.enabled && fs.existsSync(path.join(config.frontend.mayharm.path))) {
-            const definition = toml.parse(fs.readFileSync(path.join(config.frontend.mayharm.path)))
+        if (grabSettings(req.cookies.GS2009_SETTINGS).mayharm?.enabled && fs.existsSync(path.join(config.frontend.mayharm?.path))) {
+            const definition = toml.parse(fs.readFileSync(path.join(config.frontend.mayharm?.path)))
             definition.domains.exact_match.forEach((domain) => {
                 if (search.link.replace(/http.:\/\//, "").split("/")[0] == domain && !add) add = true;
             })
@@ -1419,46 +1435,46 @@ app.get('/search', async (req, res) => {
             })
         }
         repl = repl.replace(/htmlTitle/, search.htmlTitle)
-        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("http") == true) {
+        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("http") == true) {
             search.link = search.link.replace("https://", "http://")
         }
-        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.length < 1) {
-            grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.forEach(target => {
+        if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.length < 1) {
+            grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.forEach(target => {
                 let waybacklink
                 switch (target) {
                     case "wayback":
-                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("yt2009")) {
-                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("yt2009")) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date == undefined) {
                                 waybacklink = "http://web.archive.org/web/20100324182056/"
                             } else {
-                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date + "/"
                             }
                             search.link = search.link.replace("http://", waybacklink)
                             search.link = search.link.replace("https://", waybacklink)
                             break;
                         }
                     case "yt2009":
-                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects.enabled.includes("wayback")) {
-                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                        if (!grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("wayback")) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                                 return
                             }
-                            search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
-                            search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address)
+                            search.link = search.link.replace("www.youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address)
+                            search.link = search.link.replace("youtube.com", grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address)
                         } else {
-                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                                 return
                             }
-                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date == undefined) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date == undefined) {
                                 waybacklink = "http://web.archive.org/web/20100324182056/"
                             } else {
-                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.wayback_date + "/"
+                                waybacklink = "http://web.archive.org/web/" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.wayback_date + "/"
                             }
                             search.link = search.link.replace("http://", waybacklink)
                             search.link = search.link.replace("https://", waybacklink)
 
-                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address == undefined) {
+                            if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address == undefined) {
                             } else {
-                                let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects.yt2009_address;
+                                let yt2009link = "http://" + grabSettings(req.cookies.GS2009_SETTINGS).redirects?.yt2009_address;
                                 let ytlink0 = waybacklink + "https://www.youtube.com"
                                 let ytlink1 = waybacklink + "http://www.youtube.com"
                                 let ytlink2 = waybacklink + "www.youtube.com"
