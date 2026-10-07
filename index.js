@@ -1047,8 +1047,11 @@ app.get('/search', async (req, res) => {
 
     let result;
     try {
-        result = await fetchResults({ existingfilePath: "placeholder-dev/search_output.json" });
+        result = await fetchResults({});
     } catch(e) {
+        log.e("Some errors occured during fetching results", tag)
+        log.e(e.toString(), tag)
+        res.send("error occured during doing engine thing:<br>(this is the temporary page for showing this error to front)<br><code>" + e.toString() + "</code>")
         /*
         if (config.backend.engine.type == "cse") {
             console.error("[ERROR] GaxiosError:", e.cause.status);
