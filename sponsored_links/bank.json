@@ -1,0 +1,64 @@
+{
+    "listinfo": {
+        "name": "bank",
+        "author": "gs2009",
+        "last_updated": 0,
+        "update_link": ""
+    },
+    "categories": [
+        {
+            "name": "bank",
+            "on_query": {
+                "regexes": [["bank", "g"]],
+                "exact_match": ["bank"]
+            },
+            "on_title_snippets": {
+                "regexes": [],
+                "exact_match": []
+            },
+            "on_urls": {
+                "regexes": [],
+                "exact_match": []
+            }
+        }
+    ],
+    "sponsored": [
+        {
+            "title": "Bank of America ®", 
+            "snippets": "Get Free Checking, Online Banking, And More. Open Today. Official Site", 
+            "domain": "www.BankofAmerica.com",
+            "href": "http://www.bankofamerica.com", 
+
+            "on_top_of_search": true,
+            "exclude_language": ["ja"],
+            "category": "bank"
+        },
+        {
+            "title": "Free Online Banking", 
+            "snippets": "Local Online Banking with High Rates. Open a Free Account Today!", 
+            "domain": "www.CheckingFinder.com",
+            "href": "https://www.checkingfinder.com/", 
+
+            "exclude_language": ["ja"],
+            "category": "bank"
+        },
+        {
+            "title": "Savings with Capital One", 
+            "snippets": "Earn 2.01% APY on $10,000 balances. $50 bonus.* No fees. FDIC Insured.", 
+            "domain": "www.CapitalOne.com/DirectBanking",
+            "href": "http://www.capitalone/directbanking", 
+
+            "exclude_language": ["ja"],
+            "category": "bank"
+        },
+        {
+            "title": "Money & Finance", 
+            "snippets": "Find Local Financial Services - Addresses, Phone Numbers & More", 
+            "domain": "MapQuest.com",
+            "href": "https://www.mapquest.com", 
+
+            "exclude_language": ["ja"],
+            "category": "bank"
+        }
+    ]
+}

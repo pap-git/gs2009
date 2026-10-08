@@ -69,6 +69,11 @@ location.userdb="userdb.json"
 # forceDefaults: Force the default settings instead of using user-side settings.
 # Not recommended to enable this for public instances.
 forceDefaults=false
+# mayharm.path: Path of mayharm.toml. Used on "mayharm" feature.
+mayharm.path="mayharm.toml"
+# sponsored_links.path: Array of path for sponsored links. Needs to be file path or URL.
+# By default, gs2009 will load sponsored links from the JSON file found in "sponsored_links/" folder.
+sponsored_links.path=[""]
 [frontend.defaults]
 # language: Languages of the page. If Language doesn't exist, it will use English as fallback.
 language="en"
@@ -82,6 +87,9 @@ eras=""
 roll_eras=true
 # roll_stucknine: Use early2009 instead of early2010 in Jan to Feb, on roll_eras.
 roll_stucknine=true
+# sponsored_links.enabled: Show Sponsored Links according to the list defined on JSON file.
+# Please see frontend.sponsored_links.path for the list of the JSON files defined for sponsored links.
+sponsored_links.enabled=true
 # before: Limits search results to before specific date. Only tested with Custom Search JSON API (Google).
 # Should be same format with Google's one, for example: 2009-12-31
 # Leave it false if you don't use them.

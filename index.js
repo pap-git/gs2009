@@ -269,6 +269,8 @@ async function retriveLanguageStrings(lang) {
         search: {
             related: GiveMeTheResult(string_lang, "search", "related"),
             mayharm: GiveMeTheResult(string_lang, "search", "mayharm"),
+            sponsored_link: GiveMeTheResult(string_lang, "search", "sponsored_link"),
+            sponsored_links: GiveMeTheResult(string_lang, "search", "sponsored_links")
         }
     }
 }
@@ -1340,18 +1342,124 @@ app.get('/search', async (req, res) => {
         }
     }
 
-    /*
-    if (true) { // sponsored
-        const aj = {sponsored: []}
-        let adTables = '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">Sponsored Links</h2><ol onmouseover="return true" class="nobr"><li><h3><a id="an1" href="/web/20090413202015/http://www.google.com/aclk?sa=l&amp;ai=CqDQvgJ7jSf_-DKOyoQSBwZCmB4emi6EBxajp1gvio6oHEAEoA1CojKLl______8BYMnOqIvApNgPoAGvkebwA8gBAaoEHU_QZkEYXCHX6BIhvskm6rHxKTtGmE9WdQK-DZHa&amp;num=2&amp;sig=AGiWqtzii0XeMRXHeawTia3MHuY4OEM0cw&amp;q=https://www.checkingfinder.com/%3Fasd%3Dsds%26s_kwcid%3Dbank%7C3023675777">Free Online Banking</a></h3>Local Online Banking with High<br>Rates. Open a Free Account Today!<br><cite>www.CheckingFinder.com</cite></li><li><h3><a id="an2" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=ChdpngJ7jSf_-DKOyoQSBwZCmB5arh4cB2KbMzAvio6oHEAIoA1Dcx9rl-P____8BYMnOqIvApNgPyAEBqgQZT9BmMelFOu3Q2qMeRmvh7VfL3NzSSp2wfA&amp;num=3&amp;sig=AGiWqtyMT5dJgVfRyAkJPs0yieY_WPGZiw&amp;q=http://clk.atdmt.com/NYC/go/141372372/direct%3Bat.DBSEM_BroadBankingBank_100013_Incentive20409%3Bct.1/01/">Savings with Capital One</a></h3>Earn 2.01% APY on $10,000 balances.<br>$50 bonus.* No fees. FDIC Insured.<br><cite>www.CapitalOne.com/Direct<b>Bank</b>ing</cite></li><li><h3><a id="an3" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=CQ_wlgJ7jSf_-DKOyoQSBwZCmB66IzZYB3NiPiQm4nJ4FEAMoA1DPp_jjBWDJzqiLwKTYD8gBAaoEGk_QRmNWWSHR6BJpvhZdQj2NyjJz2AS9Ec2O&amp;num=4&amp;sig=AGiWqtzVEy-k7HbTpEYTT8O3IOlDXb6Bgw&amp;q=http://search.ace.advertising.com/click/site%3D617056/mnum%3D572640/term%3D20426/spid%3D28327579/xsstr2%3D2334136828">Money &amp; Finance</a></h3>Find Local Financial Services -<br>Addresses, Phone Numbers &amp; More<br><cite>MapQuest.com</cite></li></ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+    if (grabSettings(req.cookies.GS2009_SETTINGS).sponsored_links?.enabled) { // sponsored
+        function isMatchingToPatterns(object, patterns) {
+            let result = false;
+            if (typeof patterns?.exact_match === "undefined" && typeof patterns?.regexes === "undefined") throw new Error("Both regex and exact_match is empty or does not exist")
+            if (Array.isArray(patterns?.exact_match)) patterns.exact_match.forEach((words) => {
+                if (object && object.match(words)) result = true;
+            })
+            if (Array.isArray(patterns?.regexes)) patterns.regexes.forEach((regex, i) => {
+                if (!Array.isArray(regex)) throw new Error("Not Array: regex[" + i + "]: " + regex.toString())
+                if (Array.length > 2 || Array.length < 1) throw new Error("Array is " + (Array.length > 2 ? "too long" : "too short") + "");
+                const regexp = new RegExp(regex[0], regex[1])
+                if (object && object.match(regexp)) result = true;
+            })
 
-        repl = repl.replace('<div id="res" class="med">', adTables + '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">Sponsored Link</h2><ol onmouseover="return true" style="padding:3px 0"><li class="tas"><h3><a id="pa1" href="/web/20090413202015/http://www.google.com/aclk?sa=L&amp;ai=CHE12gJ7jSf_-DKOyoQSBwZCmB5O-44QBsdLn_w6y-7AMCAAQAVDIovaB_v____8BYMnOqIvApNgPyAEBqgQfT9BWVTpcIdTgE5m9AOwxk6bA6ZyZofl_TJ6sIA1d_A&amp;sig=AGiWqtz1V6jp5rTt3EExYvLDoXyUuzqZdg&amp;q=http://clickserve.dartsearch.net/link/click%3Flid%3D43000000184131184%26ds_s_kwgid%3D58000000004174542%26ds_e_adid%3D3928849535%26ds_e_matchtype%3Dsearch%26ds_url_v%3D2"><b>Bank</b> of America ®</a></h3><cite>www.<b>Bank</b>ofAmerica.com</cite>&nbsp; &nbsp; &nbsp; Get Free Checking, Online Banking, And More. Open Today. Official Site</li></ol></div><div id="res" class="med">')
+            return result;
+        }
+
+        const topadsHTML = []
+        const adsHTML = []
+        const filePath = []
+        if (Array.isArray(config.frontend.sponsored_links.path)) {
+            config.frontend.sponsored_links.path.forEach(item => {
+                filePath.push(item)
+            })
+        }
+        if (fs.existsSync(path.join(__dirname, "sponsored_links/")) && fs.statSync(path.join(__dirname, "sponsored_links/")).isDirectory()) {
+            fs.readdirSync(path.join(__dirname, "sponsored_links/")).forEach(item => {
+                filePath.push(path.join(__dirname, "sponsored_links/", item))
+            })
+        }
+        filePath.forEach((ogfile) => {
+            if (ogfile.length <= 0) return
+            const q = grabSettings(req.cookies.GS2009_SETTINGS).before !== false ? actualq : query
+            const json = JSON.parse(fs.readFileSync(ogfile))
+
+            json.sponsored.forEach((ad) => {
+                let r = false
+                json.categories.forEach((category) => {
+                    if (ad.category == category.name) {
+                        if (!r && category.on_query && isMatchingToPatterns(q, category.on_query)) r = true
+                        if (!r && category.on_title_snippets) {
+                            result.data.items.forEach((item) => {
+                                if (isMatchingToPatterns(item.title, category.on_title_snippets)) r = true
+                                if (isMatchingToPatterns(item.snippets, category.on_title_snippets)) r = true
+                            })
+                        }
+                        if (!r && category.on_urls) {
+                            result.data.items.forEach((item) => {
+                                if (isMatchingToPatterns(item.link, category.on_urls)) r = true
+                            })
+                        }
+                    }
+                })
+                if (ad.exclude_language) {
+                    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+                    if (Array.isArray(ad.exclude_language)) ad.exclude_language.forEach((l) => {
+                        if (l == language) r = false;
+                    })
+                    else if (ad.exclude_language == language) r = false;
+                }
+
+                if (r) {
+                    if (ad.on_top_of_search) {
+                        topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
+                    } else {
+                        let actualsnippets = ""
+                        let already_br = false
+                        const snippetsSeparated = ad.snippets.split(" ")
+                        snippetsSeparated.forEach((words) => {
+                            actualsnippets = actualsnippets + words + " "
+                            console.log(actualsnippets)
+                            if (!already_br && actualsnippets.length > 35) {
+                                actualsnippets = actualsnippets + "<br>"
+                                already_br = true;
+                            }
+                        })
+                        adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
+                    }
+                }
+            })
+        })
+
+        function shuffle(array) {
+            let currentIndex = array.length;
+
+            // While there remain elements to shuffle...
+            while (currentIndex != 0) {
+
+                // Pick a remaining element...
+                let randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+            }
+        }
+
+        shuffle(adsHTML)
+        shuffle(topadsHTML)
+
+        let links1 = ""
+        let links2 = ""
+        for (let i = 0; i < (adsHTML.length > 12 ? 12 : adsHTML.length); i++) {
+            links1 = links1 + adsHTML[i]
+        }
+        for (let i = 0; i < (topadsHTML.length > 3 ? 3 : topadsHTML.length); i++) {
+            links2 = links2 + topadsHTML[i]
+        }
+
+        let adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+
+        repl = repl.replace('<div id="res" class="med">', adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
     }
 
     if (true) { // linklist
 
     }
-    */
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
         repl = repl.replace(/query/g, actualq)
