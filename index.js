@@ -862,8 +862,7 @@ app.get('/', async (req, res) => {
 
         const doodlePath = fs.existsSync(path.join(__dirname, "languages", language, "doodles.json")) ? path.join(__dirname, "languages", language, "doodles.json") : path.join(__dirname, "languages", "en", "doodles.json")
         const nowDate = new Date(Date.now())
-        // const date = Number(grabEras(grabSettings(req.cookies.GS2009_SETTINGS)).replace(/[a-z]/g, "")).toString() + (nowDate.getUTCDate() + 1 < 10 ? "0" + (nowDate.getUTCDate() + 1) : (nowDate.getUTCDate() + 1)) + (nowDate.getUTCDay() < 10 ? "0" + nowDate.getUTCDay() : nowDate.getUTCDay())
-        const date = "20091031"
+        const date = Number(grabEras(grabSettings(req.cookies.GS2009_SETTINGS)).replace(/[a-z]/g, "")).toString() + (nowDate.getUTCDate() + 1 < 10 ? "0" + (nowDate.getUTCDate() + 1) : (nowDate.getUTCDate() + 1)) + (nowDate.getUTCDay() < 10 ? "0" + nowDate.getUTCDay() : nowDate.getUTCDay())
         const doodleList = JSON.parse(fs.readFileSync(doodlePath))
         let doodle = ""
         for (let i = 0; i < doodleList.length; i++) {
