@@ -10,7 +10,7 @@ import Encoding from 'encoding-japanese';
 import autocomplete from './backend/pull_autocomplete.js'
 import searxngfetch from './backend/searx-api-hit.js'
 import cfg from "./backend/cfg.js";
-import { log } from "./backend/things.js"
+import { getRandomInt, log } from "./backend/things.js"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import user from "./backend/user.js";
@@ -18,6 +18,9 @@ import toml from "toml"
 import { dump } from "js-toml";
 import { exec } from "child_process";
 import { createServer } from "https";
+import { imageSizeFromFile } from "image-size/fromFile";
+import { Readable } from "stream";
+import { finished } from "stream/promises";
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -129,7 +132,7 @@ async function grabEraPath(afterPath, language, era){
     }
 }
 
-async function followPath(urlPath) {
+async function followPath(urlPath, era) {
     let result = undefined;
     const pathes = [
         // i would move these thing to another json file or js
@@ -156,7 +159,7 @@ async function followPath(urlPath) {
         ['/intl/ja/images/logos/accounts_logo.gif', './assets/images/ja/accounts_logo.gif'],
         ['/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
         ['/accounts/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
-        ['/favicon.ico', './assets/favicon.ico'],
+        ['/favicon.ico', (era == "early2009" || Number(era.replace(/[a-z]/g, "")) < 2009 ? './assets/favicon_2008.ico' : './assets/favicon.ico')],
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
         ['/images/newspaper.gif', './assets/images/newspaper.gif'],
@@ -176,6 +179,11 @@ async function followPath(urlPath) {
         ['/images/nav_logo6.png', './assets/images/nav_logo6.png'],
         ['/intl/ja/images/jawh_prodicons1.png', './assets/images/ja/jawh_prodicons1.png'],
     ]
+
+    if (fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) {
+        const json = JSON.parse(fs.readFileSync(path.join(__dirname, "_downloaded", ".map.json")))
+        json.forEach(path => { pathes.push(path) })
+    }
 
     for (let i = 0; i < pathes.length; i++) {
         try {
@@ -444,7 +452,7 @@ app.use(async (req, res, next) => {
         }
     }
 
-    const assets = await followPath(req._parsedUrl.pathname)
+    const assets = await followPath(req._parsedUrl.pathname, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     if (assets) {
         res.send(assets)
         return;
@@ -452,6 +460,62 @@ app.use(async (req, res, next) => {
     if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
     next()
 })
+
+async function downloadAllPath(listPath) {
+    const tag = "dl"
+    // basically same with yt2009's post-setup asset downloader
+    // credit belongs to ftde0
+    async function downloadStuff(array, count) {
+        setTimeout(async () => {
+            const item = array[count]
+            if (!fs.existsSync(path.join(__dirname, "_downloaded", item[0]))) {
+                try {
+                    log.i("downloading doodle logos: " + item[0] + " [" + count + "/" + (array.length - 1) + "]", tag)
+                    const result = await fetch(item[1]);
+                    const fileStream = fs.createWriteStream(path.resolve(path.join(__dirname, "_downloaded", item[0])), {"flags": "wx"})
+                    await finished(Readable.fromWeb(result.body).pipe(fileStream))
+                    if (!fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify([]))
+                    const fileMap = JSON.parse(fs.readFileSync(path.join(__dirname, "_downloaded", ".map.json")))
+                    fileMap.push([item[0], path.resolve(path.join(__dirname, "_downloaded", item[0]))])
+                    fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify(fileMap))
+                } catch(e) {
+                    log.e("failed to download file, skipping: " + item[0] + " [" + count + "/" + (array.length - 1) + "]", tag)
+                } 
+            } else {
+                log.i("skipping download: " + item[0] + " [" + count + "/" + (array.length - 1) + "]", tag)
+            }
+            if (array.length - 1 == count) {
+                log.i("download complete for doodles", "download")
+                return true;
+            } else {
+                const result = await downloadStuff(array, count + 1)
+                if (result) return result;
+            }
+        }, 500 + getRandomInt(1000))
+    }
+
+    const downloadList = []
+
+    fs.readdirSync(path.join(__dirname, "languages")).forEach(dir => {
+        if (fs.existsSync(path.join(__dirname, "languages", dir, "doodles.json"))) {
+            const doodleList = JSON.parse(fs.readFileSync(path.join(__dirname, "languages", dir, "doodles.json")))
+            doodleList.forEach(async (item) => {
+                item[1].path.forEach(async (pathes) => {
+                    downloadList.push(pathes)
+                })
+            })
+        }
+    })
+
+    let count = 0;
+    for (let i = 0; i < downloadList.length; i++) {
+        if (fs.existsSync(path.join(__dirname, "_downloaded", downloadList[i][0]))) count++;
+    }
+    if (count !== downloadList.length) downloadStuff(downloadList, 0)
+    else log.i("all of the file required for doodles exist, skipping download", tag)
+}
+
+downloadAllPath("doodles.json")
 
 if (config.server.https.enabled) {
     if (!fs.existsSync(path.join(config.server.https.cert_path)) || !fs.existsSync(path.join(config.server.https.privatekey_path))) {
@@ -796,6 +860,37 @@ app.get('/', async (req, res) => {
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_index) : 
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_index)
 
+        const doodlePath = fs.existsSync(path.join(__dirname, "languages", language, "doodles.json")) ? path.join(__dirname, "languages", language, "doodles.json") : path.join(__dirname, "languages", "en", "doodles.json")
+        const nowDate = new Date(Date.now())
+        // const date = Number(grabEras(grabSettings(req.cookies.GS2009_SETTINGS)).replace(/[a-z]/g, "")).toString() + (nowDate.getUTCDate() + 1 < 10 ? "0" + (nowDate.getUTCDate() + 1) : (nowDate.getUTCDate() + 1)) + (nowDate.getUTCDay() < 10 ? "0" + nowDate.getUTCDay() : nowDate.getUTCDay())
+        const date = "20091031"
+        const doodleList = JSON.parse(fs.readFileSync(doodlePath))
+        let doodle = ""
+        for (let i = 0; i < doodleList.length; i++) {
+            const item = doodleList[i]
+            if (item[0] == date) {
+                item[1].path.forEach(async (pathes) => {
+                    if (!fs.existsSync(path.join(__dirname, "_downloaded", pathes[0]))) {
+                        const result = await fetch(pathes[1]);
+                        const fileStream = fs.createWriteStream(path.resolve(path.join(__dirname, "_downloaded", pathes[0])), {"flags": "wx"})
+                        await finished(Readable.fromWeb(result.body).pipe(fileStream))
+                        if (!fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify([]))
+                        const fileMap = JSON.parse(fs.readFileSync(path.join(__dirname, "_downloaded", ".map.json")))
+                        fileMap.push([pathes[0], path.resolve(path.join(__dirname, "_downloaded", pathes[0]))])
+                        fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify(fileMap))
+                    }
+                })
+                if (fs.existsSync(path.join(__dirname, "_downloaded", item[1].path[0][0]))) {
+                    const size = imageSizeFromFile(path.join(__dirname, "_downloaded", item[1].path[0][0]))
+                    doodle = '<a href="' + item[1].href + '" ' + (item[1].onclick ? ('onclick="' + item[1].onclick + '"') : '') + '><img src="' + item[1].path[0][0] + '" width="' + size.width + '" height="' + size.height + '" border="0" alt="' + item[1].description + '" title="' + item[1].description + '" id="logo" onload="window.lol&amp;&amp;lol()"></a>'
+                }
+            }
+            if (doodle !== "") {
+                repl = repl.replace(/<br clear=.*<form/gms, '<br clear=all id=lgpd>' + doodle + '<br><br><form')
+                i = doodleList.length
+            }
+        }
+        
         const messages = fs.existsSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8')) : undefined
 
         const now = new Date()
@@ -1408,16 +1503,16 @@ app.get('/search', async (req, res) => {
                         topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
                     } else {
                         let actualsnippets = ""
-                        let already_br = false
+                        let rangeRequires = 35
                         const snippetsSeparated = ad.snippets.split(" ")
                         snippetsSeparated.forEach((words) => {
                             actualsnippets = actualsnippets + words + " "
-                            console.log(actualsnippets)
-                            if (!already_br && actualsnippets.length > 35) {
+                            if (actualsnippets.length > rangeRequires) {
                                 actualsnippets = actualsnippets + "<br>"
-                                already_br = true;
+                                rangeRequires = rangeRequires * 2
                             }
                         })
+                        actualsnippets = actualsnippets.replace(/<br>(?!.*e)/, "")
                         adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
                     }
                 }
@@ -1455,10 +1550,6 @@ app.get('/search', async (req, res) => {
         let adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
 
         repl = repl.replace('<div id="res" class="med">', adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
-    }
-
-    if (true) { // linklist
-
     }
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
