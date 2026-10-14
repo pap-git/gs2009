@@ -4,10 +4,15 @@
         {
             "description": "Happy New Year",
             "href": "/search?q=new+year+2007",
+            "respath": "/logos/newyear07res.gif",
             "path": [
                 [
                     "/logos/newyear07.gif",
                     "https://web.archive.org/web/20070101190647im_/http://www.google.com/logos/newyear07.gif"
+                ],
+                [
+                    "/logos/newyear07res.gif",
+                    "https://web.archive.org/web/20070101190647im_/http://www.google.com/logos/newyear07res.gif"
                 ]
             ]
         }
@@ -56,10 +61,15 @@
         {
             "description": "Happy Mother's Day",
             "href": "/search?q=mother's+day",
+            "respath": "/logos/mothers_day07res.gif",
             "path": [
                 [
                     "/logos/mothers_day07.gif",
                     "https://web.archive.org/web/20070513102412im_/http://www.google.com/logos/mothers_day07.gif"
+                ],
+                [
+                    "/logos/mothers_day07res.gif",
+                    "https://web.archive.org/web/20070513231731im_/http://www.google.com/logos/mothers_day07res.gif"
                 ]
             ]
         }
@@ -82,10 +92,15 @@
         {
             "description": "Happy Independence Day",
             "href": "/search?q=july+4th",
+            "respath": "/logos/july4th07.gif",
             "path": [
                 [
                     "/logos/july4th07.gif",
                     "https://web.archive.org/web/20070704105748im_/http://www.google.com/logos/july4th07.gif"
+                ],
+                [
+                    "/logos/july4th07.gif",
+                    "https://web.archive.org/web/20071005115649im_/http://www.google.com/logos/july4th07res.gif"
                 ]
             ]
         }
@@ -107,10 +122,15 @@
         {
             "description": "Sputnik - 50th Anniversary",
             "href": "/search?q=sputnik+anniversary",
+            "respath": "/logos/google_sputnik_res.gif",
             "path": [
                 [
                     "/logos/google_sputnik.gif",
                     "https://web.archive.org/web/20071004200945im_/http://www.google.com/logos/google_sputnik.gif"
+                ],
+                [
+                    "/logos/google_sputnik_res.gif",
+                    "https://web.archive.org/web/20071004102219im_/http://www.google.com/logos/google_sputnik_res.gif"
                 ]
             ]
         }
@@ -133,10 +153,15 @@
         {
             "description": "Happy Halloween",
             "href": "/search?q=halloween",
+            "respath": "/logos/halloween07res.gif",
             "path": [
                 [
                     "/logos/halloween07.gif",
                     "https://web.archive.org/web/20071031195226im_/http://www.google.com/logos/halloween07.gif"
+                ],
+                [
+                    "/logos/halloween07res.gif",
+                    "https://web.archive.org/web/20110915230845im_/http://www.google.com/logos/halloween07res.gif"
                 ]
             ]
         }
@@ -172,10 +197,15 @@
         {
             "description": "Happy Holidays from Google",
             "href": "/doodle13.html",
+            "respath": "/logos/holiday07_1res.gif",
             "path": [
                 [
                     "/logos/holiday07_1.gif",
                     "https://web.archive.org/web/20071223171907im_/http://www.google.com/logos/holiday07_1.gif"
+                ],
+                [
+                    "/logos/holiday07_1res.gif",
+                    "https://web.archive.org/web/20200810081126im_/http://www.google.com/logos/holiday07_1res.gif"
                 ]
             ]
         }
@@ -185,10 +215,15 @@
         {
             "description": "Happy Holidays from Google",
             "href": "/doodle13.html",
+            "respath": "/logos/holiday07_2res.gif",
             "path": [
                 [
                     "/logos/holiday07_2.gif",
                     "https://web.archive.org/web/20071223171907im_/http://www.google.com/logos/holiday07_2.gif"
+                ],
+                [
+                    "/logos/holiday07_2res.gif",
+                    "https://web.archive.org/web/20200810081126im_/http://www.google.com/logos/holiday07_2res.gif"
                 ]
             ]
         }
@@ -198,10 +233,15 @@
         {
             "description": "Happy Holidays from Google",
             "href": "/doodle13.html",
+            "respath": "/logos/holiday07_3res.gif",
             "path": [
                 [
                     "/logos/holiday07_3.gif",
                     "https://web.archive.org/web/20071223171907im_/http://www.google.com/logos/holiday07_3.gif"
+                ],
+                [
+                    "/logos/holiday07_3res.gif",
+                    "https://web.archive.org/web/20200810081047im_/http://www.google.com/logos/holiday07_3res.gif"
                 ]
             ]
         }
@@ -211,10 +251,15 @@
         {
             "description": "Happy Holidays from Google",
             "href": "/doodle13.html",
+            "respath":"/logos/holiday07_4res.gif",
             "path": [
                 [
                     "/logos/holiday07_4.gif",
                     "https://web.archive.org/web/20071223171907im_/http://www.google.com/logos/holiday07_4.gif"
+                ],
+                [
+                    "/logos/holiday07_4res.gif",
+                    "https://web.archive.org/web/20200810081051im_/http://www.google.com/logos/holiday07_4res.gif"
                 ]
             ]
         }
@@ -224,10 +269,15 @@
         {
             "description": "Happy Holidays from Google",
             "href": "/doodle13.html",
+            "respath":"/logos/holiday07_4res.gif",
             "path": [
                 [
                     "/logos/holiday07_4.gif",
                     "https://web.archive.org/web/20071223171907im_/http://www.google.com/logos/holiday07_4.gif"
+                ],
+                [
+                    "/logos/holiday07_4res.gif",
+                    "https://web.archive.org/web/20200810081051im_/http://www.google.com/logos/holiday07_4res.gif"
                 ]
             ]
         }
@@ -237,10 +287,15 @@
         {
             "description": "Happy New Year & 25 years of TCP/IP",
             "href": "/search?q=January 1 tcp/ip",
+            "respath": "/logos/newyear08res.gif",
             "path": [
                 [
                     "/logos/newyear08.gif",
                     "https://web.archive.org/web/20080101042906im_/http://www.google.com/logos/newyear08.gif"
+                ],
+                [
+                    "/logos/newyear08res.gif",
+                    "https://web.archive.org/web/20110910170711im_/http://www.google.com/logos/newyear08res.gif"
                 ]
             ]
         }
@@ -250,10 +305,15 @@
         {
             "description": "Happy New Year & 25 years of TCP/IP",
             "href": "/search?q=January 1 tcp/ip",
+            "respath": "/logos/newyear08res.gif",
             "path": [
                 [
                     "/logos/newyear08.gif",
                     "https://web.archive.org/web/20080101042906im_/http://www.google.com/logos/newyear08.gif"
+                ],
+                [
+                    "/logos/newyear08res.gif",
+                    "https://web.archive.org/web/20110910170711im_/http://www.google.com/logos/newyear08res.gif"
                 ]
             ]
         }
@@ -275,10 +335,15 @@
         "20080128",
         {
             "description": "50th anniversary of the LEGO brick",
+            "respath": "/logos/lego08_res.gif",
             "path": [
                 [
                     "/logos/lego08.gif",
                     "https://web.archive.org/web/20080128230615im_/http://www.google.com/logos/lego08.gif"
+                ],
+                [
+                    "/logos/lego08_res.gif",
+                    "https://web.archive.org/web/20080829173015im_/http://www.google.com/logos/lego08_res.gif"
                 ]
             ]
         }
@@ -288,10 +353,15 @@
         {
             "description": "Chinese New Year 2008",
             "href": "/search?q=chinese+new+year",
+            "respath": "/logos/lunarnewyear08res.gif",
             "path": [
                 [
                     "/logos/lunarnewyear08.gif",
                     "https://web.archive.org/web/20080207204539im_/http://www.google.com/logos/lunarnewyear08.gif"
+                ],
+                [
+                    "/logos/lunarnewyear08res.gif",
+                    "https://web.archive.org/web/20080215070057im_/http://www.google.com/logos/lunarnewyear08res.gif"
                 ]
             ]
         }
@@ -301,10 +371,15 @@
         {
             "description": "Happy St. Patrick's Day",
             "href": "/search?q=st.+patrick's+day",
+            "respath": "/logos/stpatricks_08res.gif",
             "path": [
                 [
                     "/logos/stpatricks_08.gif",
                     "https://web.archive.org/web/20080317072637im_/http://www.google.com/logos/stpatricks_08.gif"
+                ],
+                [
+                    "/logos/stpatricks_08res.gif",
+                    "https://web.archive.org/web/20101002012954im_/http://www.google.com/logos/stpatricks_08res.gif"
                 ]
             ]
         }
@@ -340,10 +415,15 @@
         {
             "description": "Earth Day",
             "href": "/search?q=earth+day",
+            "respath": "/logos/earthday08_res.gif",
             "path": [
                 [
-                    "/logos/mlk08.gif",
-                    "https://web.archive.org/web/20080122055115im_/http://www.google.com/logos/mlk08.gif"
+                    "/logos/earthday08.gif",
+                    "https://web.archive.org/web/20080422143505im_/http://www.google.com/logos/earthday08.gif"
+                ],
+                [
+                    "/logos/earthday08_res.gif",
+                    "https://web.archive.org/web/20080917224914im_/http://www.google.com/logos/earthday08_res.gif"
                 ]
             ]
         }
@@ -379,10 +459,15 @@
         {
             "description": "Invention of the first laser",
             "href": "/search?q=first+laser&hl=en",
+            "respath": "/logos/laser08_res.gif",
             "path": [
                 [
                     "/logos/laser08.gif",
                     "https://web.archive.org/web/20080516182451im_/http://www.google.com/logos/laser08.gif"
+                ],
+                [
+                    "/logos/laser08_res.gif",
+                    "https://web.archive.org/web/20080516192109im_/http://www.google.com/logos/laser08_res.gif"
                 ]
             ]
         }
@@ -444,10 +529,15 @@
         {
             "description": "Happy Birthday, Marc Chagall! Chagall images are copyrighted and used with permission.",
             "href": "/search?q=Marc+Chagall&hl=en",
+            "respath": "/logos/chagall_res.gif",
             "path": [
                 [
                     "/logos/chagall.gif",
                     "https://web.archive.org/web/20080707172919im_/http://www.google.com/logos/chagall.gif"
+                ],
+                [
+                    "/logos/chagall_res.gif",
+                    "https://web.archive.org/web/20080707232301im_/http://www.google.com/logos/chagall_res.gif"
                 ]
             ]
         }
@@ -1069,10 +1159,22 @@
             "href": "/search?q=halloween+2009&ct=clickortreat1&oi=ddle",
             "onclick": "var i=this.firstChild,j=parseInt(i.src.match(/([0-9]).gif/)[1])+1;if(j<5){i.src='/logos/clickortreat'+j+'.gif';return false}",
             "path": [
-                ["/logos/clickortreat1.gif", "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat1.gif"],
-                ["/logos/clickortreat2.gif", "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat2.gif"],
-                ["/logos/clickortreat3.gif", "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat3.gif"],
-                ["/logos/clickortreat4.gif", "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat4.gif"]
+                [
+                    "/logos/clickortreat1.gif",
+                    "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat1.gif"
+                ],
+                [
+                    "/logos/clickortreat2.gif",
+                    "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat2.gif"
+                ],
+                [
+                    "/logos/clickortreat3.gif",
+                    "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat3.gif"
+                ],
+                [
+                    "/logos/clickortreat4.gif",
+                    "https://web.archive.org/web/20091031224710im_/http://www.google.com/logos/clickortreat4.gif"
+                ]
             ]
         }
     ],
