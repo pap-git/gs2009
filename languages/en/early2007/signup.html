@@ -1,0 +1,455 @@
+<html>    <head>
+  <title> Google Accounts </title>  <style type="text/css"><!--
+
+      .body { margin-left: 3em;
+              margin-right: 5em;
+              font-family: arial,sans-serif; }
+
+      div.errorbox-good {}
+
+      div.errorbox-bad {} 
+
+      div.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;}
+      font.errormsg { color: red; font-size: smaller; font-family: arial,sans-serif;} 
+    </style>  </head>   <style type="text/css"><!--
+ 
+  
+   
+  .gaia.ops.gsl { font-family: arial, sans-serif; color: #3366cc; font-weight: bold;} 
+  
+   
+  .gaia.sub.el { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+  .gaia.sub.pl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold; }
+  .gaia.sub.rpl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold; }
+  .gaia.sub.es { font-family: arial, sans-serif; font-size: smaller; font-style: italic; }
+  .gaia.sub.seex { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+  .gaia.sub.pc { font-family: arial,sans-serif; font-size: smaller; color: #6f6f6f; }
+   
+    
+   .gaia.cca.al { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+  .gaia.cca.ol { font-family: arial, sans-serif; font-size: x-small;}
+  .gaia.cca.cmt { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+      
+    
+   .gaia.cud.cl { font-family: arial, sans-serif; font-size: smaller; font-weight: bold;}
+   
+    
+  .gaia.captchahtml.desc { font-family: arial, sans-serif; font-size: smaller; } 
+  .gaia.captchahtml.cmt { font-family: arial, sans-serif; font-size: smaller; color: #6f6f6f; }
+
+  //--> </style>  <body alink="#ff0000" text="#000000" bgcolor="#ffffff" link="#0000cc" vlink="#551a8b" dir="ltr">      <!-- NewAccount.naui=default -->  <script type="text/javascript"><!--
+ 
+  if (top.location != self.location) {
+   top.location = self.location.href;
+  }
+
+  //--> </script>       <script type="text/javascript"><!--
+
+    function onPreCreateAccount() {
+    
+      return true;
+    
+    }
+
+    function onPreLogin() {
+    
+      
+      if (window["onlogin"] != null) {
+        return onlogin();
+      } else {
+        return true;
+      }
+    
+    }
+  //--> </script>                     <table cellpadding="2" width="100%" cellspacing="0" border="0"> <tr> <td colspan="2"><img width="1" alt="" height="2"></td> </tr> <tr> <td width="1%" valign="top">  <a href="/accounts/"> <img src="/accounts/googleaccountslogo.gif" alt="Google" border="0" align="left">   </a>  </td> <td valign="top"> <table cellpadding="0" width="100%" cellspacing="0" border="0"> <tr> <td colspan="2"><img width="1" alt="" height="15"></td> </tr> <tr bgcolor="#3366cc"> <td><img width="1" alt="" height="1"></td> </tr> <tr bgcolor="#e5ecf9"> <td style="padding-left: 4px; padding-bottom:3px; padding-top:2px; font-family:arial,sans-serif;"> <b>Create a Google Account</b></td> </tr> <tr> <td colspan="2"><img width="1" alt="" height="5"></td> </tr>  </table> </td> </tr> </table>  <div class="body">         <h3> Create an Account </h3>    <table width="700"> <tr> <td>  <font size="-1">  If you already have a Google Account, you can <a href="Login">sign in here</a>.  </font> </td> </tr> </table>    <br>  <form action="/accounts/CreateAccount" onsubmit="return(onPreCreateAccount());" id="createaccount" name="createaccount" method="post">                                     <input type="hidden" name="dsh" value="5705974042124299353">                                                                      <input type="hidden" name="t" value="null">  <table cellpadding="2" bgcolor="white" cellspacing="0" border="0" width="1%"> <tr><td> <table cellpadding="2" bgcolor="#cbdced" cellspacing="0" border="0" width="1%"> <tr><td> <table cellpadding="2" bgcolor="#eeeeee" cellspacing="0" border="0" width="100%"> <tr><td bgcolor="#ffffff" align="center" valign="top"> <table cellpadding="5" bgcolor="#ffffff" cellspacing="0" border="0" width="100%"> <tr> <td colspan="2" valign="top"> <span class="gaia ops gsl">  Required information for Google account  </span> </td> </tr>              <tr> <td nowrap valign="top"><span class="gaia sub el">Your current email address:</span></td> <td>  <div class="errorbox-good"> <input type="text" name="Email" value="" class="gaia sub emailtxtfield" size="30">  </div> <span class="gaia sub seex"> e.g. myname@example.com. This will be used to sign-in to your account. </span>  </td> </tr> <tr><td nowrap valign="top"><span class="gaia sub pl">Choose a password:</span><b>&nbsp;&nbsp;</b></td> <td> <table cellpadding="0" cellspacing="0" border="0"> <tbody> <tr> <td><div class="errorbox-good"> <input type="password" name="Passwd" onkeyup="CreateRatePasswdReq(0)" class="gaia sub passwdtxtfield" size="30">  </div> <span class="gaia sub pc">Minimum of 6 characters in length.</span> <span style="display:none;" id="passwordHelpLink" class="gaia sub pc"><a style="text-decoration:none;" href="PasswordHelp" target="_blank">[?]</a></span> <noscript> <span class="gaia sub pc"><a style="text-decoration:none;" href="PasswordHelp" target="_blank">[?]</a></span> </noscript> </td>                             <script src="/accounts/GaiaCaribou.js" type="text/javascript"></script>            <script type="text/javascript"><!--
+
+  ratingMsgs = new Array(6);
+  ratingMsgColors = new Array(6);
+  barColors = new Array(6);
+
+  ratingMsgs[0] = "Too short";
+  ratingMsgs[1] = "Weak";
+  ratingMsgs[2] = "Fair";
+  ratingMsgs[3] = "Good";
+  ratingMsgs[4] = "Strong";
+  ratingMsgs[5] = "Not rated"; //If the password server is down
+
+  ratingMsgColors[0] = "#676767";
+  ratingMsgColors[1] = "#aa0033";
+  ratingMsgColors[2] = "#f5ac00";
+  ratingMsgColors[3] = "#6699cc";
+  ratingMsgColors[4] = "#008000";
+  ratingMsgColors[5] = "#676767";
+
+  barColors[0] = "#dddddd";
+  barColors[1] = "#aa0033";
+  barColors[2] = "#ffcc33";
+  barColors[3] = "#6699cc";
+  barColors[4] = "#008000";
+  barColors[5] = "#676767";
+
+  function CreateRatePasswdReq(formKey) {
+    if (!isBrowserCompatible) {
+      return;
+    }
+
+    var passwd = document.forms[formKey]["Passwd"].value;
+
+    if (document.forms[formKey]["Email"]) {
+      var email = getUserName(document.forms[formKey]["Email"].value);
+    }
+
+    if (document.forms[formKey]["LastName"]) {
+      // If Last name exists, It has to be Caribou Sign up.  We'll have
+      // all the functions defined in CaribouSignUpBox.gxp
+      var lastname = escape(document.forms[formKey]["LastName"].value);
+    }
+
+    if (document.forms[formKey]["FirstName"]) {
+      var firstname = escape(document.forms[formKey]["FirstName"].value);
+    }
+
+    var min_passwd_len = 6;
+    var passwdKey = "Passwd";
+    var emailKey = "Email";
+    var FirstNameKey = "FirstName";
+    var LastNameKey = "LastName";
+
+  
+    if (passwd.length < min_passwd_len)  {
+      if (passwd.length > 0) {
+        DrawBar(0);
+      } else {
+        ResetBar();
+      }
+    } else {
+  	  //We need to escape the password now so it won't mess up with length test
+      passwd = escape(passwd);
+      var params = passwdKey + "=" + passwd + "&" +
+                   emailKey + "=" + email + "&" +
+                   FirstNameKey + "=" + firstname + "&" +
+                   LastNameKey + "=" + lastname;
+      myxmlhttp = CreateXmlHttpReq(RatePasswdXmlHttpHandler);
+  
+      XmlHttpPOST(myxmlhttp, "/accounts/RatePassword", params);
+  
+    }
+  }
+
+  function getElement(name) {
+    if (document.all) {
+      return document.all(name);
+    }
+    return document.getElementById(name);
+  }
+
+  function getUserName(s) {
+	  var parts = s.split("@");
+	  return parts[0];
+  }
+
+  function RatePasswdXmlHttpHandler() {
+    // Can't check status since safari doesn't support it
+    if (myxmlhttp.readyState != 4) {
+      return;
+    }
+    rating = parseInt(myxmlhttp.responseText);
+    DrawBar(rating);
+  }
+
+  function DrawBar(rating) {
+    var posbar = getElement('posBar');
+    var negbar = getElement('negBar');
+    var passwdRating = getElement('passwdRating');
+    var barLength = getElement('passwdBar').width;
+
+    if (rating >= 0 && rating <= 4) {  //We successfully got a rating
+      posbar.style.width = barLength / 4 * rating + "px";
+      negbar.style.width = barLength / 4 * (4 - rating) + "px";
+    } else {
+      posbar.style.width = "0px";
+      negbar.style.width = barLength + "px";
+      rating = 5; // Not rated Rating
+    }
+    posbar.style.background = barColors[rating];
+    passwdRating.innerHTML = "<font color='" + ratingMsgColors[rating] +
+                             "'>" + ratingMsgs[rating] + "</font>";
+  }
+  	
+  //Resets the password strength bar back to its initial state without any message showing.
+  function ResetBar() {
+    var posbar = getElement('posBar');
+    var negbar = getElement('negBar');
+    var passwdRating = getElement('passwdRating');
+    var barLength = getElement('passwdBar').width;
+
+    posbar.style.width = "0px";
+    negbar.style.width = barLength + "px";
+    passwdRating.innerHTML = "";
+  }
+
+  /* Checks Browser Compatibility */
+  var agt = navigator.userAgent.toLowerCase();
+  var is_op = (agt.indexOf("opera") != -1);
+  var is_ie = (agt.indexOf("msie") != -1) && document.all && !is_op;
+  var is_mac = (agt.indexOf("mac") != -1);
+  var is_gk = (agt.indexOf("gecko") != -1);
+  var is_sf = (agt.indexOf("safari") != -1);
+
+  function gff(str, pfx) {
+    var i = str.indexOf(pfx);
+    if (i != -1) {
+      var v = parseFloat(str.substring(i + pfx.length));
+      if (!isNaN(v)) {
+      return v;
+      }
+    }
+    return null;
+  }
+  function Compatible() {
+    if (is_ie && !is_op && !is_mac) {
+      var v = gff(agt, "msie ");
+      if (v != null) {
+        return (v >= 6.0);
+      }
+    }
+
+    if (is_gk && !is_sf) {
+      var v = gff(agt, "rv:");
+      if (v != null) {
+         return (v >= 1.4);
+      } else {
+         v = gff(agt, "galeon/");
+         if (v != null) {
+           return (v >= 1.3);
+         }
+      }
+    }
+
+    if (is_sf) {
+      var v = gff(agt, "applewebkit/");
+      if (v != null) {
+        return (v >= 124);
+      }
+    }
+
+    return false;
+  }
+
+  /* We also try to create an xmlhttp object to see if the browser supports it */
+  var myxmlhttp = CreateXmlHttpReq(RatePasswdXmlHttpHandler);
+  var isBrowserCompatible = Compatible() && myxmlhttp;
+
+  
+//--> </script>  <td width="10px"></td> <td width="180" style="display:none" nowrap id="passwdBarDiv" valign="top"> <table cellpadding="0" cellspacing="0" border="0"> <tr> <td width="0" nowrap valign="top"> <font size="-1" face="Arial, sans-serif"> <a href="javascript:var popup=window.open('/accounts/PasswordHelp', 'PasswordHelp', 'width=600, height=600, location=no, menubar=no, status=no, toolbar=no, scrollbars=yes, resizable=yes');">  Password strength:</a> </font> </td> <td nowrap valign="top"> <font color="#808080" size="-1" face="Arial, sans-serif"><b> <div id="passwdRating"> </div> </b></font> </td> </tr> <tr> <td height="3"></td> </tr> <tr> <td colspan="2"> <table width="180" border="0" bgcolor="#ffffff" cellpadding="0" cellspacing="0" id="passwdBar"><tr> <td width="0%" id="posBar" bgcolor="#e0e0e0" height="4"></td> <td width="100%" id="negBar" bgcolor="#e0e0e0" height="4"></td> </tr> </table> </td> </tr> </table> </td> <script type="text/javascript"><!--
+
+
+  var hidePasswordBar = false;
+
+  if (isBrowserCompatible && ! hidePasswordBar) {
+    document.getElementById("passwdBarDiv").style.display = "block";
+  } else {
+    var helpLink = document.getElementById("passwordHelpLink");
+    if (helpLink) {
+      helpLink.style.display = "inline";
+    }
+  }
+
+//--> </script>    </tr> </tbody> </table> </td> </tr> <tr> <td valign="top"> <span class="gaia sub rpl">  Re-enter password:  </span> </td> <td> <div class="errorbox-good"> <input type="password" name="PasswdAgain" class="gaia sub passwdtxtfield" size="30">  </div> </td> <input type="hidden" name="p" value=""> </tr>    <tr> <td nowrap>&nbsp;</td> <td align="left"> <font size="-1">      <input type="checkbox" name="PersistentCookie" value="yes" checked>&nbsp; <input type="hidden" name="rmShown" value="1">  Remember me on this computer. </font> </td> </tr>              <input type="hidden" id="smhhk" value="1" name="smhhk"> <tr> <td nowrap>&nbsp;</td> <td align="left"> <font size="-1" face="Arial, sans-serif">  Creating a Google Account activates Personalized Search, which finds the search results most relevant to you based on your search history <a href="/support/bin/answer.py?answer=26651&amp;topic=1593&amp;hl=en" target="_blank">and more</a>.  </font> <br>  <input type="checkbox" name="smhck" value="1" checked id="smhck"> <input type="hidden" id="nshk" value="1" name="nshk"> <font size="-1" face="Arial, sans-serif">  Enable Personalized Search.  </font>  </td> </tr>      <tr> <td colspan="2"><hr></td> </tr>                                                    <noscript> <input type="hidden" name="hl" value="en"> </noscript>  <tr> <td nowrap valign="top"> <font size="-1" face="Arial, sans-serif"> <b>Location:</b> </font> </td> <td> <select name="loc" onchange="javascript:reloadTos(reloadTimeZones)" id="loc">   <option value="AF"> Afghanistan (افغانستان) </option>  <option value="AX"> Aland Islands </option>  <option value="AL"> Albania (Shqipëria) </option>  <option value="DZ"> Algeria (الجمهورية الجزائرية) </option>  <option value="AS"> American Samoa </option>  <option value="AD"> Andorra </option>  <option value="AO"> Angola </option>  <option value="AI"> Anguilla </option>  <option value="AQ"> Antarctica </option>  <option value="AG"> Antigua and Barbuda </option>  <option value="AR"> Argentina </option>  <option value="AM"> Armenia (Հայաստան) </option>  <option value="AW"> Aruba </option>  <option value="AU"> Australia </option>  <option value="AT"> Austria (Österreich) </option>  <option value="AZ"> Azerbaijan (Azərbaycan) </option>  <option value="BS"> Bahamas </option>  <option value="BH"> Bahrain (بحرين) </option>  <option value="BD"> Bangladesh (বাংলাদেশ) </option>  <option value="BB"> Barbados </option>  <option value="BY"> Belarus (Белару́сь) </option>  <option value="BE"> Belgium (België) </option>  <option value="BZ"> Belize </option>  <option value="BJ"> Benin (Bénin) </option>  <option value="BM"> Bermuda </option>  <option value="BT"> Bhutan (འབྲུག་ཡུལ) </option>  <option value="BO"> Bolivia </option>  <option value="BA"> Bosnia and Herzegovina (Bosna i Hercegovina) </option>  <option value="BW"> Botswana </option>  <option value="BV"> Bouvet Island </option>  <option value="BR"> Brazil (Brasil) </option>  <option value="IO"> British Indian Ocean Territory </option>  <option value="BN"> Brunei (Brunei Darussalam) </option>  <option value="BG"> Bulgaria (България) </option>  <option value="BF"> Burkina Faso </option>  <option value="BI"> Burundi (Uburundi) </option>  <option value="KH"> Cambodia (Kampuchea) </option>  <option value="CM"> Cameroon (Cameroun) </option>  <option value="CA"> Canada </option>  <option value="CV"> Cape Verde (Cabo Verde) </option>  <option value="KY"> Cayman Islands </option>  <option value="CF"> Central African Republic (République Centrafricaine) </option>  <option value="TD"> Chad (Tchad) </option>  <option value="CL"> Chile </option>  <option value="CN"> China (中国) </option>  <option value="CX"> Christmas Island </option>  <option value="CC"> Cocos Islands </option>  <option value="CO"> Colombia </option>  <option value="KM"> Comoros (Comores) </option>  <option value="CG"> Congo </option>  <option value="CD"> Congo, Democratic Republic of the </option>  <option value="CK"> Cook Islands </option>  <option value="CR"> Costa Rica </option>  <option value="CI"> Côte d'Ivoire </option>  <option value="HR"> Croatia (Hrvatska) </option>  <option value="CU"> Cuba </option>  <option value="CY"> Cyprus (Κυπρος) </option>  <option value="CZ"> Czech Republic (Česko) </option>  <option value="DK"> Denmark (Danmark) </option>  <option value="DJ"> Djibouti </option>  <option value="DM"> Dominica </option>  <option value="DO"> Dominican Republic </option>  <option value="TL"> East Timor (Timor-Leste) </option>  <option value="EC"> Ecuador </option>  <option value="EG"> Egypt (مصر) </option>  <option value="SV"> El Salvador </option>  <option value="GQ"> Equatorial Guinea (Guinea Ecuatorial) </option>  <option value="ER"> Eritrea (Ertra) </option>  <option value="EE"> Estonia (Eesti) </option>  <option value="ET"> Ethiopia (Ityop'iya) </option>  <option value="FK"> Falkland Islands </option>  <option value="FO"> Faroe Islands </option>  <option value="FJ"> Fiji </option>  <option value="FI"> Finland (Suomi) </option>  <option value="FR"> France </option>  <option value="GF"> French Guiana </option>  <option value="PF"> French Polynesia </option>  <option value="TF"> French Southern Territories </option>  <option value="GA"> Gabon </option>  <option value="GM"> Gambia </option>  <option value="GE"> Georgia (საქართველო) </option>  <option value="DE"> Germany (Deutschland) </option>  <option value="GH"> Ghana </option>  <option value="GI"> Gibraltar </option>  <option value="GR"> Greece ('Eλλας) </option>  <option value="GL"> Greenland </option>  <option value="GD"> Grenada </option>  <option value="GP"> Guadeloupe </option>  <option value="GU"> Guam </option>  <option value="GT"> Guatemala </option>  <option value="GG"> Guernsey </option>  <option value="GN"> Guinea (Guinée) </option>  <option value="GW"> Guinea-Bissau (Guiné-Bissau) </option>  <option value="GY"> Guyana </option>  <option value="HT"> Haiti (Haïti) </option>  <option value="HM"> Heard Island and McDonald Islands </option>  <option value="HN"> Honduras </option>  <option value="HK"> Hong Kong </option>  <option value="HU"> Hungary (Magyarország) </option>  <option value="IS"> Iceland (Ísland) </option>  <option value="IN"> India </option>  <option value="ID"> Indonesia </option>  <option value="IR"> Iran (ایران) </option>  <option value="IQ"> Iraq (العراق) </option>  <option value="IE"> Ireland </option>  <option value="IM"> Isle of Man </option>  <option value="IL"> Israel (ישראל) </option>  <option value="IT"> Italy (Italia) </option>  <option value="JM"> Jamaica </option>  <option value="JP"> Japan (日本) </option>  <option value="JE"> Jersey </option>  <option value="JO"> Jordan (الارد) </option>  <option value="KZ"> Kazakhstan (Қазақстан) </option>  <option value="KE"> Kenya </option>  <option value="KI"> Kiribati </option>  <option value="KW"> Kuwait (الكويت) </option>  <option value="KG"> Kyrgyzstan (Кыргызстан) </option>  <option value="LA"> Laos (ນລາວ) </option>  <option value="LV"> Latvia (Latvija) </option>  <option value="LB"> Lebanon (لبنان) </option>  <option value="LS"> Lesotho </option>  <option value="LR"> Liberia </option>  <option value="LY"> Libya (ليبية) </option>  <option value="LI"> Liechtenstein </option>  <option value="LT"> Lithuania (Lietuva) </option>  <option value="LU"> Luxembourg (Lëtzebuerg) </option>  <option value="MO"> Macao </option>  <option value="MK"> Macedonia (Македонија) </option>  <option value="MG"> Madagascar (Madagasikara) </option>  <option value="MW"> Malawi </option>  <option value="MY"> Malaysia </option>  <option value="MV"> Maldives (ގުޖޭއްރާ ޔާއްރިހޫމްޖ) </option>  <option value="ML"> Mali </option>  <option value="MT"> Malta </option>  <option value="MH"> Marshall Islands </option>  <option value="MQ"> Martinique </option>  <option value="MR"> Mauritania (موريتانية) </option>  <option value="MU"> Mauritius </option>  <option value="YT"> Mayotte </option>  <option value="MX"> Mexico (México) </option>  <option value="FM"> Micronesia </option>  <option value="MD"> Moldova </option>  <option value="MC"> Monaco </option>  <option value="MN"> Mongolia (Монгол Улс) </option>  <option value="MS"> Montserrat </option>  <option value="MA"> Morocco (مغرب) </option>  <option value="MZ"> Mozambique (Moçambique) </option>  <option value="MM"> Myanmar (Լեռնային Ղարաբաղ) </option>  <option value="NA"> Namibia </option>  <option value="NR"> Nauru (Naoero) </option>  <option value="NP"> Nepal (नेपाल) </option>  <option value="NL"> Netherlands (Nederland) </option>  <option value="AN"> Netherlands Antilles </option>  <option value="NC"> New Caledonia </option>  <option value="NZ"> New Zealand </option>  <option value="NI"> Nicaragua </option>  <option value="NE"> Niger </option>  <option value="NG"> Nigeria </option>  <option value="NU"> Niue </option>  <option value="NF"> Norfolk Island </option>  <option value="MP"> Northern Mariana Islands </option>  <option value="KP"> North Korea (조선) </option>  <option value="NO"> Norway (Norge) </option>  <option value="OM"> Oman (عمان) </option>  <option value="PK"> Pakistan (پاکستان) </option>  <option value="PW"> Palau (Belau) </option>  <option value="PS"> Palestine </option>  <option value="PA"> Panama (Panamá) </option>  <option value="PG"> Papua New Guinea </option>  <option value="PY"> Paraguay </option>  <option value="PE"> Peru (Perú) </option>  <option value="PH"> Philippines (Pilipinas) </option>  <option value="PN"> Pitcairn </option>  <option value="PL"> Poland (Polska) </option>  <option value="PT"> Portugal </option>  <option value="PR"> Puerto Rico </option>  <option value="QA"> Qatar (قطر) </option>  <option value="RE"> Reunion </option>  <option value="RO"> Romania (România) </option>  <option value="RU"> Russia (Россия) </option>  <option value="RW"> Rwanda </option>  <option value="SH"> Saint Helena </option>  <option value="KN"> Saint Kitts and Nevis </option>  <option value="LC"> Saint Lucia </option>  <option value="PM"> Saint Pierre and Miquelon </option>  <option value="VC"> Saint Vincent and the Grenadines </option>  <option value="WS"> Samoa </option>  <option value="SM"> San Marino </option>  <option value="ST"> São Tomé and Príncipe </option>  <option value="SA"> Saudi Arabia (العربية السعودية) </option>  <option value="SN"> Senegal (Sénégal) </option>  <option value="CS"> Serbia and Montenegro (Србија и Црна Гора) </option>  <option value="SC"> Seychelles </option>  <option value="SL"> Sierra Leone </option>  <option value="SG"> Singapore (Singapura) </option>  <option value="SK"> Slovakia (Slovensko) </option>  <option value="SI"> Slovenia (Slovenija) </option>  <option value="SB"> Solomon Islands </option>  <option value="SO"> Somalia (Soomaaliya) </option>  <option value="ZA"> South Africa </option>  <option value="GS"> South Georgia and the South Sandwich Islands </option>  <option value="KR"> South Korea (한국) </option>  <option value="ES"> Spain (España) </option>  <option value="LK"> Sri Lanka </option>  <option value="SD"> Sudan (السودان) </option>  <option value="SR"> Suriname </option>  <option value="SJ"> Svalbard and Jan Mayen </option>  <option value="SZ"> Swaziland </option>  <option value="SE"> Sweden (Sverige) </option>  <option value="CH"> Switzerland (Schweiz) </option>  <option value="SY"> Syria (سورية) </option>  <option value="TW"> Taiwan (台灣) </option>  <option value="TJ"> Tajikistan (Тоҷикистон) </option>  <option value="TZ"> Tanzania </option>  <option value="TH"> Thailand (ราชอาณาจักรไทย) </option>  <option value="TG"> Togo </option>  <option value="TK"> Tokelau </option>  <option value="TO"> Tonga </option>  <option value="TT"> Trinidad and Tobago </option>  <option value="TN"> Tunisia (تونس) </option>  <option value="TR"> Turkey (Türkiye) </option>  <option value="TM"> Turkmenistan (Türkmenistan) </option>  <option value="TC"> Turks and Caicos Islands </option>  <option value="TV"> Tuvalu </option>  <option value="UG"> Uganda </option>  <option value="UA"> Ukraine (Україна) </option>  <option value="AE"> United Arab Emirates (الإمارات العربيّة المتّحد) </option>  <option value="GB"> United Kingdom </option>  <option value="US" selected> United States </option>  <option value="UM"> United States minor outlying islands </option>  <option value="UY"> Uruguay </option>  <option value="UZ"> Uzbekistan (O'zbekiston) </option>  <option value="VU"> Vanuatu </option>  <option value="VA"> Vatican City (Città del Vaticano) </option>  <option value="VE"> Venezuela </option>  <option value="VN"> Vietnam (Việt Nam) </option>  <option value="VG"> Virgin Islands, British </option>  <option value="VI"> Virgin Islands, U.S. </option>  <option value="WF"> Wallis and Futuna </option>  <option value="EH"> Western Sahara (صحراوية) </option>  <option value="YE"> Yemen (اليمن) </option>  <option value="ZM"> Zambia </option>  <option value="ZW"> Zimbabwe </option>  </select>  <input type="submit" name="default_submit" value="" style="display:none" id="default_submit"> <input type="submit" name="change_location" value="Change" style="display:inline" id="change_location">  </td> </tr>                   <tr> <td valign="top"> <span class="gaia cud cl">  Word Verification:  </span> </td> <td> <table>                            <input type="hidden" id="newaccounttoken" value="EeMfyvwt0GOx6bIpRT8Is-7Jt0LEAPCApsWD0rhFkWXDMY33tbVNSRiOP15X52b1:ArWVlzpGlzwNI26fvBCo7A" name="newaccounttoken"> <input type="hidden" id="newaccounturl" value="Captcha?ctoken=EeMfyvwt0GOx6bIpRT8Is-7Jt0LEAPCApsWD0rhFkWXDMY33tbVNSRiOP15X52b1%3AArWVlzpGlzwNI26fvBCo7A&amp;email=&amp;cstyle=0" name="newaccounturl"> <tr> <td valign="top"></td> <td valign="top"> <span class="gaia captchahtml desc"> Type the characters you see in the picture below. </span> <div> <img width="200" alt=" Visual verification " height="70" src="/accounts/Captcha?ctoken=EeMfyvwt0GOx6bIpRT8Is-7Jt0LEAPCApsWD0rhFkWXDMY33tbVNSRiOP15X52b1%3AArWVlzpGlzwNI26fvBCo7A&amp;email=&amp;cstyle=0">   </div>  <input type="hidden" id="newaccounttoken_audio" value="nALMW17DEjk2Ay_BnYe2FRVCiqH72mK0ev2Zw6B5Dv6XVjnuFUKls_Lphov_-yRs:VJ9Ceb4-c76pU9iSefgpGQ" name="newaccounttoken_audio"> <input type="hidden" id="newaccounturl_audio" value="Captcha?ctoken=nALMW17DEjk2Ay_BnYe2FRVCiqH72mK0ev2Zw6B5Dv6XVjnuFUKls_Lphov_-yRs%3AVJ9Ceb4-c76pU9iSefgpGQ&amp;email=&amp;cstyle=8" name="newaccounturl_audio"> <div id="snd1"></div><div id="noEm"></div> <div id="playAudio"></div>  </td> </tr>  <tr> <td></td> <td> <div class="errorbox-good"> <input name="newaccountcaptcha" title="Type the characters you see or numbers you hear" value="" type="text" id="newaccountcaptcha" size="22">     <script type="text/javascript"><!--
+
+          document.write('<a href="javascript:playCaptcha()">');
+          document.write('<img src="accessibility.gif" border="0" style="width: 1em; height: 1.2em;" ');
+          document.write('alt="Listen and type the numbers you hear"></a>');
+        //--> </script> <noscript> <a href="Captcha?ctoken=nALMW17DEjk2Ay_BnYe2FRVCiqH72mK0ev2Zw6B5Dv6XVjnuFUKls_Lphov_-yRs%3AVJ9Ceb4-c76pU9iSefgpGQ&amp;email=&amp;cstyle=8" target="_blank"> <img src="/accounts/accessibility.gif" alt="Listen and type the numbers you hear" border="0" style="width: 1em; height: 1.2em;" align="absmiddle">  </a> </noscript>  <a href="/support/accounts/bin/answer.py?answer=33974" target="_top">  <img width="1" alt="For more help with screen readers, click here." border="0" height="1">   </a>    </div> <span class="gaia captchahtml cmt">  Letters are not case-sensitive  </span> </td> </tr>   <script type="text/javascript"><!--
+
+
+// cross platform equiv. to document.getElementById
+function gGetElementById(s) {
+ var o = (document.getElementById ? document.getElementById(s)
+                                  : document.all[s]);
+ return ((o == null) ? false : o);
+}
+
+
+function playCaptcha() {
+  var wavURL    = '"Captcha?ctoken\u003dnALMW17DEjk2Ay_BnYe2FRVCiqH72mK0ev2Zw6B5Dv6XVjnuFUKls_Lphov_-yRs%3AVJ9Ceb4-c76pU9iSefgpGQ&email\u003d&cstyle\u003d8"';
+  var embedCode = '<EMBED SRC=' + wavURL + ' HIDDEN="true" AUTOSTART="true" />';
+
+  gGetElementById("playAudio").innerHTML = ""; 
+  gGetElementById("playAudio").innerHTML = embedCode; 
+
+  gGetElementById("newaccountcaptcha").value="";
+  gGetElementById("newaccountcaptcha").focus();
+}
+
+
+//--> </script>     </table> </td> </tr>                          <!-- Tos.naui=default -->    <tr> <td nowrap valign="top"> <font size="-1" face="Arial, sans-serif"> <b>Terms of Service:</b> </font> </td> <td valign="top"> <font size="-1" face="Arial, sans-serif">  Please check the Google Account information you've entered above (feel free to change anything you like), and review the Terms of Service below.  </font> </td> </tr>  <tr> <td>&nbsp;</td> <td valign="top"> <div class="errorbox-good"> <div style="display:inline" id="tos_div">          <table cellpadding="0" cellspacing="0" border="0"> <tr><td align="right" valign="top"> <font size="-1"> <a href="TOS?loc=US&amp;hl=en" target="_blank">Printable Version</a> </font> </td></tr> <tr><td>  <textarea onfocus="this.rows=10" style="width:100%;text-align:left" rows="5" cols="80" readonly>﻿Google Terms of Service for Your Personal Use
+
+Welcome! By using Google's search engine or other Google services (&quot;Google Services&quot;), you agree to be bound by the following terms and conditions (the &quot;Terms of Service&quot;). As used in this agreement, &quot;Google Services&quot; does not include the Adwords or Adsense programs
+
+Content Linked to by Google
+
+The sites displayed as search results or linked to by Google Services are developed by people over whom Google exercises no control. The search results that appear from Google's indices are indexed by Google's automated machinery and computers, and Google cannot and does not screen the sites before including them in the indices from which such automated search results are gathered. A search using Google Services may produce search results and links to sites that some people find objectionable, inappropriate, or offensive. We cannot guarantee that a Google search will not locate unintended or objectionable content and assume no responsibility for the content of any site included in any search results or otherwise linked to by the Google Services.
+Personal Use Only
+
+The Google Services are made available for your personal, non-commercial use only. You may not use the Google Services to sell a product or service, or to increase traffic to your Web site for commercial reasons, such as advertising sales. You may not take the results from a Google search and reformat and display them, or mirror the Google home page or results pages on your Web site. You may not &quot;meta-search&quot; Google. If you want to make commercial use of the Google Services, you must enter into an agreement with Google to do so in advance. Please contact us for more information.
+
+If you are interested in adding a Google search box to your web site or your company's web site, we encourage you to do so.
+No Automated Querying
+
+You may not send automated queries of any sort to Google's system without express permission in advance from Google. Note that &quot;sending automated queries&quot; includes, among other things:
+
+    * using any software which sends queries to Google to determine how a website or webpage &quot;ranks&quot; on Google for various queries;
+    * &quot;meta-searching&quot; Google; and
+    * performing &quot;offline&quot; searches on Google.
+
+Please do not write to Google to request permission to &quot;meta-search&quot; Google for a research project, as such requests will not be granted.
+Privacy Policy
+
+Click here to review the Google Privacy Policy.
+Changes In Terms and Conditions and Google Search Service
+
+We may modify or terminate our services from time to time, for any reason, and without notice, including the right to terminate with or without notice, without liability to you, any other user or any third party. We reserve the right to modify these Terms of Service from time to time without notice. Please review these Terms of Service from time to time so that you will be apprised of any changes.
+Intellectual Property Policy
+
+It is our policy to respond to notices of alleged infringement that comply with the Digital Millennium Copyright Act. For directions and more information, please click here.
+
+For information regarding our trademark complaint procedure, please click here.
+Disclaimer of Warranties
+
+Google disclaims any and all responsibility or liability for the accuracy, content, completeness, legality, reliability, or operability or availability of information or material displayed in the GOOGLE SERVICES results. Google disclaims any responsibility for the deletion, failure to store, misdelivery, or untimely delivery of any information or material. Google disclaims any responsibility for any harm resulting from downloading or accessing any information or material on the Internet through the GOOGLE SERVICES.
+
+THE GOOGLE SERVICES, AND ALL MATERIALS, INFORMATION, PRODUCTS AND SERVICES INCLUDED IN THE GOOGLE SERVICES ARE PROVIDED &quot;AS IS,&quot; WITH NO WARRANTIES WHATSOEVER. GOOGLE AND ITS LICENSORS EXPRESSLY DISCLAIM TO THE FULLEST EXTENT PERMITTED BY LAW ALL EXPRESS, IMPLIED, AND STATUTORY WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT OF PROPRIETARY RIGHTS. GOOGLE AND ITS LICENSORS DISCLAIM ANY WARRANTIES REGARDING THE SECURITY, RELIABILITY, TIMELINESS, AND PERFORMANCE OF THE GOOGLE SERVICES. GOOGLE AND ITS LICENSORS DISCLAIM, ANY WARRANTIES FOR ANY INFORMATION OR ADVICE OBTAINED THROUGH THE GOOGLE SERVICES. GOOGLE AND ITS LICENSORS DISCLAIM ANY WARRANTIES FOR SERVICES OR GOODS RECEIVED THROUGH OR ADVERTISED ON THE GOOGLE SERVICES OR RECEIVED THROUGH ANY LINKS PROVIDED BY THE GOOGLE SERVICES, AS WELL AS FOR ANY INFORMATION OR ADVICE RECEIVED THROUGH ANY LINKS PROVIDED IN THE GOOGLE SERVICES.
+
+YOU UNDERSTAND AND AGREE THAT YOU DOWNLOAD OR OTHERWISE OBTAIN MATERIAL OR DATA THROUGH THE USE OF THE GOOGLE SERVICES AT YOUR OWN DISCRETION AND RISK AND THAT YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGES TO YOUR COMPUTER SYSTEM OR LOSS OF DATA THAT RESULTS FROM THE DOWNLOAD OF SUCH MATERIAL OR DATA.
+
+SOME STATES OR OTHER JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF IMPLIED WARRANTIES, SO THE ABOVE EXCLUSIONS MAY NOT APPLY TO YOU. YOU MAY ALSO HAVE OTHER RIGHTS THAT VARY FROM STATE TO STATE AND JURISDICTION TO JURISDICTION.
+Limitation of Liability
+
+UNDER NO CIRCUMSTANCES SHALL GOOGLE OR ITS LICENSORS BE LIABLE TO ANY USER ON ACCOUNT OF THAT USER'S USE OR MISUSE OF OR RELIANCE ON THE GOOGLE SERVICES. ARISING FROM ANY CLAIM RELATING TO THIS AGREEMENT OR THE SUBJECT MATTER HEREOF SUCH LIMITATION OF LIABILITY SHALL APPLY TO PREVENT RECOVERY OF DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, EXEMPLARY, AND PUNITIVE DAMAGES WHETHER SUCH CLAIM IS BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, (EVEN IF GOOGLE OR ITS LICENSORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES). SUCH LIMITATION OF LIABILITY SHALL APPLY WHETHER THE DAMAGES ARISE FROM USE OR MISUSE OF AND RELIANCE ON THE GOOGLE SERVICES, FROM INABILITY TO USE THE GOOGLE SERVICES, OR FROM THE INTERRUPTION, SUSPENSION, OR TERMINATION OF THE GOOGLE SERVICES (INCLUDING SUCH DAMAGES INCURRED BY THIRD PARTIES). THIS LIMITATION SHALL ALSO APPLY WITH RESPECT TO DAMAGES INCURRED BY REASON OF OTHER SERVICES OR GOODS RECEIVED THROUGH OR ADVERTISED ON THE GOOGLE SERVICES OR RECEIVED THROUGH ANY LINKS PROVIDED IN THE GOOGLE SERVICES, AS WELL AS BY REASON OF ANY INFORMATION OR ADVICE RECEIVED THROUGH OR ADVERTISED ON THE GOOGLE SERVICES OR RECEIVED THROUGH ANY LINKS PROVIDED IN THE GOOGLE SERVICES. THIS LIMITATION SHALL ALSO APPLY, WITHOUT LIMITATION, TO THE COSTS OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, LOST PROFITS, OR LOST DATA. SUCH LIMITATION SHALL FURTHER APPLY WITH RESPECT TO THE PERFORMANCE OR NON-PERFORMANCE OF THE GOOGLE SERVICES OR ANY INFORMATION OR MERCHANDISE THAT APPEARS ON, OR IS LINKED OR RELATED IN ANY WAY TO, THE GOOGLE SERVICES. SUCH LIMITATION SHALL APPLY NOTWITHSTANDING ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY AND TO THE FULLEST EXTENT PERMITTED BY LAW.
+
+SOME STATES OR OTHER JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE ABOVE LIMITATIONS AND EXCLUSIONS MAY NOT APPLY TO YOU.
+
+Without limiting the foregoing, under no circumstances shall Google or its licensors be held liable for any delay or failure in performance resulting directly or indirectly from acts of nature, forces, or causes beyond its reasonable control, including, without limitation, Internet failures, computer equipment failures, telecommunication equipment failures, other equipment failures, electrical power failures, strikes, labor disputes, riots, insurrections, civil disturbances, shortages of labor or materials, fires, floods, storms, explosions, acts of God, war, governmental actions, orders of domestic or foreign courts or tribunals, non-performance of third parties, or loss of or fluctuations in heat, light, or air conditioning.
+Requests for Removal of Links or Cached Materials
+
+Google occasionally receives requests from people to remove links from its indices. Although Google reserves the right to address such requests individually, the general approach that Google takes reflects the following principles:
+
+Google's indices consist of information that has been identified, indexed and compiled through an automated process with no advance review by human beings. Given the enormous volume of web site information added, deleted, and changed on a frequent basis, Google cannot and does not screen anything made available through its indices. For each web site reflected in Google's indices, if either (i) a site owner restricts access to his or her web site or (ii) a site is taken down from the web, then, upon receipt of a request by the site owner or a third party in the second instance, Google would consider on a case-by-case basis requests to remove the link to that site from its indices. However, if the operator of the site does not take steps to prevent it, the automatic facilities used to create the indices are likely to find that site and index it again in a relatively short amount of time.
+
+Google stores many web pages in its cache to retrieve for users as a back-up in case the page's server temporarily fails. Site owners may block Google from returning cached versions of their pages by using the NOARCHIVE meta-tag. Site owners may also request immediate removal of cached page from the Google Search Service. Google evaluates such requests for the immediate removal of cached content on a case-by-case basis and does not guarantee that every request will be granted. The steps necessary to remove cached pages, and to prevent a site from being cached and/or included in the indices are described in the Google FAQ, accessible from the home page of this site.
+Miscellaneous Provisions
+
+These Terms of Service will be governed by and construed in accordance with the laws of the State of California, without giving effect to its conflict of laws provisions or your actual state or country of residence. If for any reason a court of competent jurisdiction finds any provision or portion of the Terms of Service to be unenforceable, the remainder of the Terms of Service will continue in full force and effect.
+
+These Terms of Service constitute the entire agreement between the parties with respect to the subject matter hereof and supersedes and replaces all prior or contemporaneous understandings or agreements, written or oral, regarding such subject matter. Any waiver of any provision of the Terms of Service will be effective only if in writing and signed by Google.
+
+</textarea>  </td></tr> <tr><td>&nbsp;</td></tr> <tr><td>  <font size="-1">  By clicking on 'I accept' below you are agreeing to the <a href="TOS?loc=US&amp;hl=en" target="_blank">Terms of Service</a> above and the <a href="/intl/en/privacy.html" target="_blank">Privacy Policy</a>.  </font>  </td></tr>  </table>   <input type="hidden" id="privacy_policy_url" value="/intl/en/privacy.html" name="privacy_policy_url">    <input type="hidden" id="requested_tos_language" value="en" name="requested_tos_language">   <input type="hidden" id="served_tos_location" value="US" name="served_tos_location">   <input type="hidden" id="served_tos_language" value="en" name="served_tos_language">   </div>  </div> </td> </tr>     <script src="/accounts/XmlHttp.js" type="text/javascript"></script>  <script src="/accounts/TimeZones.js" type="text/javascript"></script> <script type="text/javascript"><!--
+
+  
+    
+      reloadTos(reloadTimeZones);
+    
+  
+
+
+function reloadTos(nextAction) {
+
+  var xmlhttp = initXmlHttp();
+
+  
+  
+  if (xmlhttp != null) {
+    var buttonKey = "change_location";
+    var button = getFieldFromForm("createaccount", buttonKey);
+    if (button != null) {
+      button.style.display = "none";
+    }
+  } else {
+    return;
+  }
+
+  var ccKey = "loc";
+  var ccField = getFieldFromForm("createaccount", ccKey);
+
+  
+  
+  
+  
+  
+  if ((ccField != null) &&
+      (document.forms["gaia_langform"] != null) &&
+      (document.forms["gaia_langform"].elements[ccKey] != null)) {
+      document.forms["gaia_langform"].elements[ccKey].value = ccField.value;
+  }
+
+  var hlKey = "hl";
+  var hlField = getFieldFromForm("gaia_langform", hlKey);
+
+  var p1Key = "program_policy_url";
+  var p1Field = getFieldFromForm("createaccount", p1Key);
+
+  var p2Key = "privacy_policy_url";
+  var p2Field = getFieldFromForm("createaccount", p2Key);
+
+  var url = "SelectTos?";
+  if (ccField != null) {
+    url += "&" + ccKey + "=" + ccField.value;
+  }
+  if (hlField != null) {
+    url += "&" + hlKey + "=" + hlField.value;
+  }  
+  if (p1Field != null) {
+    url += "&" + p1Key + "=" + p1Field.value;
+  }
+  if (p2Field != null) {
+    url += "&" + p2Key + "=" + p2Field.value;
+  }  
+
+  
+  
+  
+  
+  
+  var tosDivKey = "tos_div";
+  var tosDiv = document.getElementById(tosDivKey);
+
+  xmlhttp.open("GET", url, true);
+  
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4) {
+      if (tosDiv != null) {
+        tosDiv.innerHTML = xmlhttp.responseText;
+      }
+      var agt = navigator.userAgent.toLowerCase();
+      var is_op = (agt.indexOf("opera") != -1);
+      if (is_op && (nextAction != undefined) &&
+        (nextAction != null)) {
+        
+        nextAction();
+      }
+    } else if (xmlhttp.readyState == 2) {
+      
+      if ((nextAction != undefined) && (nextAction != null)) {
+        nextAction();
+      }
+    }
+  }
+  
+  xmlhttp.send(null);
+
+}
+//--> </script>    <tr> <td colspan="1"> &nbsp; </td> <td colspan="1" align="center">  <input style="width:19em" type="SUBMIT" id="submitbutton" value="I accept. Create my account." name="submitbutton">  </td> </tr>  </table> </td></tr> </table> </td> </tr> </table> </td></tr> </table>  </form>  </div>         <style type="text/css"><!--
+
+.footer { padding-right: 5px;
+          padding-left: 5px;
+          padding-bottom: 5px;
+          padding-top: 5px;
+          font-size: 83%;
+          border-top: #ffffff 1px solid;
+          border-bottom: #ffffff 1px solid;
+          background: #e5ecf9;
+          text-align: center;
+          font-family: arial,sans-serif;
+}
+</style> <br><br> <div align="center" class="footer"> <font color="#666666">  &copy;2007 Google  </font>  - <a href="/">Google Home</a> - <a href="/accounts/TOS?hl=en">Terms of Service</a> - <a href="/intl/en/privacy.html">Privacy Policy</a> - <a href="/support/accounts?hl=en">Help</a>  </div>  </body> </html>

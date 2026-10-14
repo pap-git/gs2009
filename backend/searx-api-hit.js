@@ -52,7 +52,7 @@ export default async function searxngfetch(searchip, query,
             else category = category + "," + c
         })
     }
-    url = url1 + "/search?q=" + query + "&format=json" + "&pageno=" + page + (category == "" ? "&categories=" + category : "")
+    url = url1 + "/search?q=" + query + "&format=json" + "&pageno=" + page + "&language=all" + (category == "" && category == undefined ? "&categories=" + category : "")
 
     /*
     if (lr != undefined) {

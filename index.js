@@ -16,11 +16,13 @@ import { dirname } from 'path';
 import user from "./backend/user.js";
 import toml from "toml"
 import { dump } from "js-toml";
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 import { createServer } from "https";
 import { imageSizeFromFile } from "image-size/fromFile";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
+import os from "node:os"
+import keys from "keys-tree"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -32,10 +34,11 @@ const __dirname = dirname(__filename);
 
 var config = toml.parse(cfg.template)
 var searxng_ishttps = false;
+var branch = ""
 
 log.i("starting gs2009 instance, version " + gs2009_version, "init")
 
-async function branchWarning() {
+async function setBranch() {
     const tag = "branch"
     // Source - https://stackoverflow.com/a/62228183
     // Posted by Aayush Mall, modified by community. See post 'Timeline' for change history
@@ -46,25 +49,27 @@ async function branchWarning() {
             log.e("Failed to retrive current branch from this directory", tag)
             return false
         }
-
-        if (typeof stdout === 'string' && (stdout.trim() !== 'main')) {
-            log.w("You're now in '" + stdout.trim() + "' which looks not main branch. If you are in the development branch you might see some issues or crashes!", tag)
-        }
+        branch = stdout.trim()
+        const br = stdout.trim()
+        if (br !== "main") log.w("You're now in '" + br + "' which looks not main branch. If you are in the development branch you might see some issues or crashes!", "branch")
     });
 }
 
-await branchWarning()
+await setBranch()
 
 function getLanguage(host, settings) {
-    function checkHostLanguage(host) {
+    function checkHostLanguage(host, og) {
         const h = host.replace("www.", "")
         switch (h) {
             case "google.co.th":
                 return "th"
             case "google.co.jp":
                 return "ja"
-            default:
+            case "google.com":
                 return "en"
+            default:
+                if (og) return og
+                else return config.frontend.defaults.language
         }
     }
 
@@ -79,7 +84,7 @@ function getLanguage(host, settings) {
         else return config.frontend.defaults.language
     }
     else try {
-        if (j.lang_dependsOnDomainAndParams) return checkHostLanguage(host)
+        if (j.lang_dependsOnDomainAndParams && host && !host.match(/[0-9]\.[0-9]\.[0-9]\.[0-9]/ && !host.match("localhost"))) return checkHostLanguage(host, j.language)
         else return j.language
     } catch {
         return config.frontend.defaults.language
@@ -96,8 +101,7 @@ function grabSettings(settings) {
 }
 
 function getEraYears(settings) {
-    const s = grabSettings(settings)
-    return Number(s.eras.replace(/[a-z]/g, ""))
+    return Number(grabEras(settings).replace(/[a-z]/g, ""))
 }
 
 function grabEras(settings) {
@@ -118,16 +122,37 @@ function grabEras(settings) {
 }
 
 async function grabEraPath(afterPath, language, era){
-    const pathes = [
-        path.join(__dirname, "/languages/", language, era, afterPath),
-        path.join(__dirname, "/languages/", config.frontend.defaults.language, era, afterPath),
-        path.join(__dirname, "/languages/", "en", era, afterPath),
-        path.join(__dirname, "/languages/", language, "/defaults/", afterPath),
-        path.join(__dirname, "/languages/", config.frontend.defaults.language, "/defaults/", afterPath),
-        path.join(__dirname, "/languages/", "en", "/defaults/", afterPath)
-    ]
+    const pathes = []
+
+    pathes.push(path.join(__dirname, "/languages/", language, era, afterPath))
+    pathes.push(path.join(__dirname, "/languages/", config.frontend.defaults.language, era, afterPath))
+    pathes.push(path.join(__dirname, "/languages/", "en", era, afterPath))
+
+    if (fs.existsSync(path.join(__dirname, "/languages/", language, era, "info.json")) ||
+        fs.existsSync(path.join(__dirname, "/languages/", config.frontend.defaults.language, era, "info.json")) || 
+        fs.existsSync(path.join(__dirname, "/languages/", "en", era, "info.json"))) {
+            const infoPathes = [
+                path.join(__dirname, "/languages/", language, era, "info.json"),
+                path.join(__dirname, "/languages/", config.frontend.defaults.language, era, "info.json"),
+                path.join(__dirname, "/languages/", "en", era, "info.json")
+            ]
+            for (let i = 0; i < infoPathes.length; i++) {
+                if (fs.existsSync(infoPathes[i])) {
+                    const mirror = JSON.parse(fs.readFileSync(infoPathes[i])).mirror
+                    pathes.push(path.join(__dirname, "/languages/", language, mirror, afterPath))
+                    pathes.push(path.join(__dirname, "/languages/", config.frontend.defaults.language, mirror, afterPath))
+                    pathes.push(path.join(__dirname, "/languages/", "en", mirror, afterPath))
+                    break;
+                }
+            }
+        }
+
+    pathes.push(path.join(__dirname, "/languages/", language, "/defaults/", afterPath))
+    pathes.push(path.join(__dirname, "/languages/", config.frontend.defaults.language, "/defaults/", afterPath))
+    pathes.push(path.join(__dirname, "/languages/", "en", "/defaults/", afterPath))
 
     for (let i = 0; i < pathes.length; i++) {
+        console.log(pathes[i])
         if (fs.existsSync(pathes[i])) { return pathes[i] }
     }
 }
@@ -135,23 +160,33 @@ async function grabEraPath(afterPath, language, era){
 async function followPath(urlPath, era) {
     let result = undefined;
     const pathes = [
-        // i would move these thing to another json file or js
         // [original path, folder path]
-        ["/__gs2009_wallma_/ig_main.js", "./assets/admin/assets/ig_main.js"],
-        ["/__gs2009_wallma_/lib/libdrag.js", "./assets/admin/assets/libdrag.js"],
-        ["/__gs2009_wallma_/lib/libtabs.js", "./assets/admin/assets/libtabs.js"],
-        ["/__gs2009_wallma_/ig.css", "./assets/admin/assets/ig.css"],
-        ["/__gs2009_wallma_/gs2009_wallma.png", "./assets/admin/assets/images/gs2009_wallma.png"],
-        ["/__gs2009_wallma_/smiley.png", "./assets/admin/assets/images/smiley.png"],
-        ["/__gs2009_wallma_/balls.gif", "./assets/images/balls.gif"],
-        ["/__gs2009_wallma_/tl.gif", "./assets/admin/assets/images/tl.gif"],
-        ["/__gs2009_wallma_/bl.gif", "./assets/admin/assets/images/bl.gif"],
-        ["/__gs2009_wallma_/tr.gif", "./assets/admin/assets/images/tr.gif"],
-        ["/__gs2009_wallma_/br.gif", "./assets/admin/assets/images/br.gif"],
-        ["/__gs2009_wallma_/login.css", "./assets/admin/login.css"],
+        ["/images/google_sm.gif", "./assets/images/google_sm.gif"],
+        ["/images/x2.gif", "./assets/images/x2.gif"],
+        ["/wallma/ig_main.js", "./assets/admin/assets/ig_main.js"],
+        ["/wallma/lib/libdrag.js", "./assets/admin/assets/libdrag.js"],
+        ["/wallma/lib/libtabs.js", "./assets/admin/assets/libtabs.js"],
+        ["/wallma/ig.css", "./assets/admin/assets/ig.css"],
+        ["/wallma/gs2009_wallma.png", "./assets/admin/assets/images/gs2009_wallma.png"],
+        ["/wallma/smiley.png", "./assets/admin/assets/images/smiley.png"],
+        ["/wallma/balls.gif", "./assets/images/balls.gif"],
+        ["/wallma/tl.gif", "./assets/admin/assets/images/tl.gif"],
+        ["/wallma/bl.gif", "./assets/admin/assets/images/bl.gif"],
+        ["/wallma/tr.gif", "./assets/admin/assets/images/tr.gif"],
+        ["/wallma/br.gif", "./assets/admin/assets/images/br.gif"],
+        ["/wallma/login.css", "./assets/admin/login.css"],
         ["/gs2009.png", "./assets/images/gs2009.png"],
+        ["/images/hp0.gif", "./assets/images/hp0.gif"],
+        ["/images/hp1.gif", "./assets/images/hp1.gif"],
+        ["/images/hp2.gif", "./assets/images/hp2.gif"],
+        ["/images/hp3.gif", "./assets/images/hp3.gif"],
+        ['/images/sm_aids_ribbon.gif', './assets/images/sm_aids_ribbon.gif'],
+        ['/images/hpp-cart.gif', './assets/images/hpp-cart.gif'],
         ["/images/logo_sm.gif", './assets/images/logo_sm.gif'],
         ['/accounts/msh.gif', './assets/images/accounts/msh.gif'],
+        ['/accounts/alerts.gif', './assets/images/accounts/alerts.gif'],
+        ['/accounts/groups.gif', './assets/images/accounts/groups.gif'],
+        ['/accounts/froogle.gif', './assets/images/accounts/froogle.gif'],
         ['/intl/ja_ALL/images/logos/images_logo_lg.gif', './assets/images/ja-ALL/images_logo_lg.gif'],
         ['/accounts/ig.gif', './assets/images/accounts/ig.gif'],
         ['/accounts/sierra.gif', './assets/images/accounts/sierra.gif'],
@@ -161,6 +196,7 @@ async function followPath(urlPath, era) {
         ['/accounts/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
         ['/favicon.ico', (era == "early2009" || Number(era.replace(/[a-z]/g, "")) < 2009 ? './assets/favicon_2008.ico' : './assets/favicon.ico')],
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
+        ['/images/nav_logo.png', './assets/images/nav_logo.png'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
         ['/images/newspaper.gif', './assets/images/newspaper.gif'],
         ["/images/malware_logo.gif", "./assets/images/malware_logo.gif"],
@@ -179,6 +215,16 @@ async function followPath(urlPath, era) {
         ['/images/nav_logo6.png', './assets/images/nav_logo6.png'],
         ['/intl/ja/images/jawh_prodicons1.png', './assets/images/ja/jawh_prodicons1.png'],
     ]
+
+    if (fs.existsSync(path.join(__dirname, "backend", "flagsPath.json"))) {
+        const json = JSON.parse(fs.readFileSync(path.join(__dirname, "backend", "flagsPath.json")))
+        json.forEach(path => { pathes.push(path) })
+    }
+
+    if (fs.existsSync(path.join(__dirname, "backend", "optionsIconPath.json"))) {
+        const json = JSON.parse(fs.readFileSync(path.join(__dirname, "backend", "optionsIconPath.json")))
+        json.forEach(path => { pathes.push(path) })
+    }
 
     if (fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) {
         const json = JSON.parse(fs.readFileSync(path.join(__dirname, "_downloaded", ".map.json")))
@@ -279,33 +325,67 @@ async function retriveLanguageStrings(lang) {
             mayharm: GiveMeTheResult(string_lang, "search", "mayharm"),
             sponsored_link: GiveMeTheResult(string_lang, "search", "sponsored_link"),
             sponsored_links: GiveMeTheResult(string_lang, "search", "sponsored_links")
+        },
+        NewAccount: {
+            requiredField: GiveMeTheResult(string_lang, "NewAccount", "requiredField"),
+            passwordNotMatch: GiveMeTheResult(string_lang, "NewAccount", "passwordNotMatch"),
+            passwordRequirements: GiveMeTheResult(string_lang, "NewAccount", "passwordRequirements"),
         }
     }
 }
 
-function retriveTemplate(lang) {
-    function GiveMeTheResult(lang, next_path) {
-        const langTemplatePath = path.join(__dirname, "/languages/", lang, "/defaults/_templates")
-        const enTemplatePath = path.join(__dirname, "/languages/", "en", "/defaults/_templates")
-        return fs.existsSync(path.join(langTemplatePath, next_path)) ? path.join(langTemplatePath, next_path) : path.join(enTemplatePath, next_path)
+function retriveTemplate(lang, era) {
+    function GiveMeTheResult(lang, era, next_path) {
+        const pathes = []
+
+        pathes.push(path.join(__dirname, "/languages/", lang, era, "_templates"))
+        pathes.push(path.join(__dirname, "/languages/", "en", era, "/_templates"))
+
+        if (fs.existsSync(path.join(__dirname, "/languages/", lang, era, "info.json")) ||
+            fs.existsSync(path.join(__dirname, "/languages/", "en", era, "info.json"))) {
+                const infoPathes = [
+                    path.join(__dirname, "/languages/", lang, era, "info.json"),
+                    path.join(__dirname, "/languages/", "en", era, "info.json")
+                ]
+
+                for (let i = 0; i < infoPathes.length; i++) {
+                    if (fs.existsSync(infoPathes[i])) {
+                        const mirror = JSON.parse(fs.readFileSync(infoPathes[i])).mirror
+                        pathes.push(path.join(__dirname, "/languages/", lang, mirror, "_templates"))
+                        pathes.push(path.join(__dirname, "/languages/", "en", mirror, "_templates"))
+                        break;
+                    }
+                }
+            }
+
+        pathes.push(path.join(__dirname, "/languages/", lang, "/defaults/_templates"))
+        pathes.push(path.join(__dirname, "/languages/", "en", "/defaults/_templates"))
+
+        for (let i = 0; i < pathes.length; i++) {
+            // :broken_heart:
+            if (fs.existsSync(path.join(pathes[i], next_path))) {
+                return path.join(pathes[i], next_path)
+            }
+        }
     }
 
     const paths = {
-        gbar_user: GiveMeTheResult(lang, "/gbar_user.txt"), // ext_t_g_u
-        gbar_user_index: GiveMeTheResult(lang, "/gbar_user_index.txt"), // ext_t_g_u
-        gbar_user_logged: GiveMeTheResult(lang, "/gbar_user_logged.txt"), // ext_t_g_u_l
-        gbar_user_logged_index: GiveMeTheResult(lang, "/gbar_user_logged_index.txt"),
+        gbar_user: GiveMeTheResult(lang, era, "/gbar_user.txt"), // ext_t_g_u
+        gbar_user_index: GiveMeTheResult(lang, era, "/gbar_user_index.txt"), // ext_t_g_u
+        gbar_user_logged: GiveMeTheResult(lang, era, "/gbar_user_logged.txt"), // ext_t_g_u_l
+        gbar_user_logged_index: GiveMeTheResult(lang, era, "/gbar_user_logged_index.txt"),
 
-        auth_mismatch: GiveMeTheResult(lang, "/auth_mismatch.txt"),
+        auth_mismatch: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
+        auth_acc_disabled: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
 
-        search_normal: GiveMeTheResult(lang, "/search/normal.txt"), // ext_t_s_n
-        search_more: GiveMeTheResult(lang, "/search/more.txt"), // ext_t_s_m
-        search_EOM: GiveMeTheResult(lang, "/search/more_eom.txt"), // ext_t_s_EOM
-        search_notfound: GiveMeTheResult(lang, "/search/not_found.txt"), // ext_t_s_nf
-        search_related: GiveMeTheResult(lang, "/search/related_search.txt"),
-        search_news_section: GiveMeTheResult(lang, "/search/news.txt"),
+        search_normal: GiveMeTheResult(lang, era, "/search/normal.txt"), // ext_t_s_n
+        search_more: GiveMeTheResult(lang, era, "/search/more.txt"), // ext_t_s_m
+        search_EOM: GiveMeTheResult(lang, era, "/search/more_eom.txt"), // ext_t_s_EOM
+        search_notfound: GiveMeTheResult(lang, era, "/search/not_found.txt"), // ext_t_s_nf
+        search_related: GiveMeTheResult(lang, era, "/search/related_search.txt"),
+        search_news_section: GiveMeTheResult(lang, era, "/search/news.txt"),
 
-        did_you_mean: GiveMeTheResult(lang, "/search/did_you_mean.txt"), // ext_t_dym
+        did_you_mean: GiveMeTheResult(lang, era, "/search/did_you_mean.txt"), // ext_t_dym
     }
 
     const data = {
@@ -315,6 +395,7 @@ function retriveTemplate(lang) {
         gbar_user_logged_index: fs.readFileSync(paths.gbar_user_logged_index, "utf8"),
 
         auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
+        auth_acc_disabled: fs.readFileSync(paths.auth_acc_disabled, "utf8"),
 
         search_normal: fs.readFileSync(paths.search_normal, "utf8"),
         search_more: fs.readFileSync(paths.search_more, "utf8"),
@@ -501,7 +582,7 @@ async function downloadAllPath(listPath) {
             const doodleList = JSON.parse(fs.readFileSync(path.join(__dirname, "languages", dir, "doodles.json")))
             doodleList.forEach(async (item) => {
                 item[1].path.forEach(async (pathes) => {
-                    downloadList.push(pathes)
+                    if (!fs.existsSync(path.join(__dirname, "_downloaded", pathes[0]))) downloadList.push(pathes)
                 })
             })
         }
@@ -517,6 +598,26 @@ async function downloadAllPath(listPath) {
 
 downloadAllPath("doodles.json")
 
+const stats = {
+    gs2009: {
+        version: gs2009_version
+    },
+    git: {
+        branchName: branch,
+        commitID: await execSync('git rev-parse HEAD').toString().trim()
+    },
+    server: {
+        https: {
+            status: config.server.https.enabled ? "running" : "not running",
+            port: config.server.https.port
+        },
+        http: {
+            status: "running", // this is not always true
+            port: config.server.port
+        },
+        starttime: Date.now()
+    }
+}
 if (config.server.https.enabled) {
     if (!fs.existsSync(path.join(config.server.https.cert_path)) || !fs.existsSync(path.join(config.server.https.privatekey_path))) {
         log.e("HTTPS enabled but either private key or certs file does not exist! Exiting", "cfg")
@@ -604,20 +705,7 @@ app.get('/setprefs', (req, res) => {
 })
 
 app.get('/intl/ja_jp/images/logo.gif', (req, res) => {
-    let now = new Date
-    let nowdate = (now.getUTCMonth() + 1) + (now.getUTCDay() < 10 ? 0 + now.getUTCDay().toString() : now.getUTCDay())
-    
-    let logo_path;
-
-    switch(nowdate){
-        case "0209":
-            logo_path = './assets/logos/soseki10-hp.gif'
-            break;
-        default:
-            logo_path = './assets/images/ja_jp/logo.gif';
-    }
-
-    res.type("gif").send(fs.readFileSync(logo_path))
+    res.type("gif").send(fs.readFileSync('./assets/images/ja_jp/logo.gif'))
 })
 
 app.get('/logos/olympics10.png', (req, res) => {
@@ -671,6 +759,9 @@ app.get('/extern_js/f/autocomplete.js', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     let jsFilePath
     switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
+        case "early2008":
+        case "mid2008":
+        case "late2008":
         case "early2009":
             jsFilePath = './assets/extern_js/autocomplete_early2009.js'
             break;
@@ -741,49 +832,13 @@ app.get('/generate_204'), ((req, res) => {
 })
 
 app.get('/notepad', (req, res) => {
-    const filePath = path.join(__dirname, "/html/eggs/notepad.html");
+    const filePath = path.join(__dirname, "/assets/eggs/notepad.html");
     fs.readFile(filePath, (err, data) => {
         let repl = data.toString();
         const wordlist = ["evilest", "evil", "cool", "wowie", "googlest", "coolest", "greatest", "pre", "applest", "everest", "more cooler", "very", ""]
 
         repl = repl.replace(/okest/, wordlist[getRandomInt(wordlist.length)])
         res.send(repl)
-    } )
-    return
-});
-
-app.get('/search_csstest', (req, res) => {
-    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
-    // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
-    let SimLogin = undefined;
-    try {
-        SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
-    } catch {}
-    const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html");
-    fs.readFile(filePath, (err, data) => {
-        let repl = "";
-        
-        if (language == "ja") {
-            repl = iconv.decode(data, 'shift_jis')
-        } else {
-            repl = data.toString();
-        }
-
-        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_i)
-        } else {
-            repl = repl.replace("gbar_user_REPLACE_HERE", ext_t_g_u_l)
-        }
-        
-        repl = repl.replace(/gbar_username/g, SimLogin)
-        if (language == "ja"){
-            let encoded = iconv.encode(repl, 'shift_jis')
-            res.set("Content-Type", "text/html;charset=Shift_JIS")
-            res.send(encoded)
-            return
-        }
-        res.send(repl)
-        
     } )
     return
 });
@@ -821,7 +876,7 @@ app.get('/csi', async (req, res) => {
 
 app.get('/', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
-    const template = retriveTemplate(language)
+    const template = retriveTemplate(language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     // console.log("[INFO] Simulated login username: " + req.cookies.SimLogin);
     let SimLogin = undefined;
     try {
@@ -832,26 +887,9 @@ app.get('/', async (req, res) => {
     let nowmonth = now.getUTCMonth() + 1
     let tmp = now.getDay()
 
-    let filePath
-
-    switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
-        case "early2010":
-            if (nowmonth == 2){
-                if (tmp >= 12 && tmp <= 23) {
-                    filePath = await grabEraPath("/index-olympics10.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
-                } else {
-                    filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
-                }
-            } else {
-                filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
-            }
-            break;
-        default:
-            filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
-            break;
-    }
+    const filePath = await grabEraPath("/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
         
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(filePath, async (err, data) => {
         let repl = "";
         
         repl = language == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
@@ -866,6 +904,7 @@ app.get('/', async (req, res) => {
         const doodleList = JSON.parse(fs.readFileSync(doodlePath))
         let doodle = ""
         for (let i = 0; i < doodleList.length; i++) {
+            // note: https://web.archive.org/web/20080726235547if_/http://www.google.com/
             const item = doodleList[i]
             if (item[0] == date) {
                 item[1].path.forEach(async (pathes) => {
@@ -880,22 +919,19 @@ app.get('/', async (req, res) => {
                     }
                 })
                 if (fs.existsSync(path.join(__dirname, "_downloaded", item[1].path[0][0]))) {
-                    const size = imageSizeFromFile(path.join(__dirname, "_downloaded", item[1].path[0][0]))
-                    doodle = '<a href="' + item[1].href + '" ' + (item[1].onclick ? ('onclick="' + item[1].onclick + '"') : '') + '><img src="' + item[1].path[0][0] + '" width="' + size.width + '" height="' + size.height + '" border="0" alt="' + item[1].description + '" title="' + item[1].description + '" id="logo" onload="window.lol&amp;&amp;lol()"></a>'
+                    const size = await imageSizeFromFile(path.join(__dirname, "_downloaded", item[1].path[0][0]))
+                    doodle = (item[1].href ? ('<a href="' + item[1].href + '" ' + (item[1].onclick ? ('onclick="' + item[1].onclick + '"') : '') + '>') : '') + '<img src="' + item[1].path[0][0] + '" width="' + size.width + '" height="' + size.height + '" border="0" alt="' + item[1].description + '" title="' + item[1].description + '" id="logo" onload="window.lol&amp;&amp;lol()">' + (item[1].href ? '</a>' : "")
                 }
             }
             if (doodle !== "") {
-                repl = repl.replace(/<br clear=.*<form/gms, '<br clear=all id=lgpd>' + doodle + '<br><br><form')
-                i = doodleList.length
+                if (getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) == 2009) repl = repl.replace(/<br clear=.*<form/gms, '<br clear=all id=lgpd>' + doodle + '<br><br><form')
+                else repl = repl.replace(/<center><table.*<\/table><br>/g, "<center>" + doodle + "<br><br>")
             }
         }
         
-        const messages = fs.existsSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + "/defaults/" + 'messages.json'), 'utf8')) : undefined
+        if (date == "20080726") repl = repl.replace(/<\/a><\/font><\/p>/, '</a><br><br>In Memoriam: <a href="http://www.youtube.com/watch?v=ji5_MqicxSo">Randy Pausch</a> (1960-2008)</font></p>')
+        const messages = fs.existsSync(path.join(__dirname, '/languages/' + language + 'messages.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, '/languages/' + language + 'messages.json'), 'utf8')) : undefined
 
-        const now = new Date()
-        const nowmonth = (now.getUTCMonth() + 1) < 10 ? "0" + (now.getUTCMonth() + 1) : now.getUTCMonth() + 1
-        const nowday = now.getUTCDay() < 10 ? "0" + now.getUTCDay() : now.getUTCDay()
-        const nowdate = getEraYears(req.cookies.GS2009_SETTINGS) + nowmonth.toString() + nowday.toString()
         let message = "";
 
         if (messages) {
@@ -927,7 +963,7 @@ app.get('/', async (req, res) => {
                         }
                     }
                     for (let i = 0; i < dates.length; i++) {
-                        if (dates[i] == nowdate) {
+                        if (dates[i] == date) {
                             message = item[1] + "<br><br>"
                             break;
                         }
@@ -935,11 +971,15 @@ app.get('/', async (req, res) => {
                 }
             })
         }
-        repl = repl.replace(/message/g, message)
+        if (repl.match(/message/g)) repl = repl.replace(/message/g, message)
+        else repl = repl.replace(/<\/form><br><br>/, "</form><br>" + message + "</br>")
+
         repl = repl.replace(/message/g, "")
         
         repl = repl.replace(/undefined/g, "")
         repl = repl.replace(/gbar_username/g, SimLogin)
+
+        repl = repl.replace(/([0-9]{4} )/gms, getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) + " ")
         if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -953,12 +993,12 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/gs2009settings', (req, res) => {
-    res.redirect("/__gs2009_wallma_/ig")
+    res.redirect("/wallma/ig")
 })
 
 app.get('/accounts/Login', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
-    const template = retriveTemplate(language)
+    const template = retriveTemplate(language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     const file = await grabEraPath("/signin.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     let repl = fs.readFileSync(file)
     
@@ -969,12 +1009,34 @@ app.get('/accounts/Login', async (req, res) => {
         repl = repl.toString()
     }
 
+    repl = repl.replace(/([0-9]{4} )/gms, getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) + " ")
+
     if (req.cookies.GS2009_AUTH_MISMATCH) {
         switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
+            case "early2007":
+            case "mid2007":
+            case "late2007":
+            case "early2008":
+            case "mid2008":
+            case "late2008":
             case "early2009":
                 repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr>[^{a-z}]*td align="right" va/, '<td align="left">' + template.data.auth_mismatch + '</td></tr><tr><td align="right" va')
             default:
                 repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr id="re/, '<td align="left">' + template.data.auth_mismatch + '</td></tr><tr id="re')
+        }
+        res.clearCookie("GS2009_AUTH_MISMATCH")
+    } else if (req.cookies.GS2009_AUTH_ACC_DISABLED) {
+        switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
+            case "early2007":
+            case "mid2007":
+            case "late2007":
+            case "early2008":
+            case "mid2008":
+            case "late2008":
+            case "early2009":
+                repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr>[^{a-z}]*td align="right" va/, '<td align="left">' + template.data.auth_acc_disabled + '</td></tr><tr><td align="right" va')
+            default:
+                repl = repl.replace(/<td align="left">[^{a-z}]*<\/td>[^{a-z}]*<\/tr>[^{a-z}]*<tr id="re/, '<td align="left">' + template.data.acc_disabled + '</td></tr><tr id="re')
         }
         res.clearCookie("GS2009_AUTH_MISMATCH")
     }
@@ -1047,11 +1109,34 @@ app.post('/accounts/LoginAuth', async (req, res) => {
 
 app.get('/accounts/NewAccount', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+    const strings = await retriveLanguageStrings(language)
     const filePath = await grabEraPath("/signup.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
     fs.readFile(filePath, (err, data) => {
         let repl = "";
         
         repl = language == "ja" ? iconv.decode(data, 'shift_jis') : repl = data.toString();
+        repl = repl.replace(/([0-9]{4} )/gms, getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) + " ")
+
+        if (req.cookies.GS2009_NEWACC_MISMATCH) {
+            const j = JSON.parse(req.cookies.GS2009_NEWACC_MISMATCH)
+            switch (grabEras(grabSettings(req.cookies.GS2009_SETTINGS))) {
+                case "early2007":
+                case "mid2007":
+                case "late2007":
+                    if (!(j.filled.email)) repl = repl.replace('class="gaia sub emailtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_Email">' + strings.NewAccount.requiredField + '</div>')
+                    else repl = repl.replace('class="gaia sub emailtxtfield"', 'value="' + j.value?.email ? j.value?.email : "" + '" $&')
+                    if (!(j.filled.password)) repl = repl.replace('class="gaia sub passwdtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_Passwd">' + strings.NewAccount.requiredField + '</div>')
+                    if (!(j.filled.passwordagain)) repl = repl.replace('name="PasswdAgain" class="gaia sub passwdtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_PasswdAgain">' + strings.NewAccount.requiredField + '</div>')
+                    if (!(j.passwordmatch) && j.filled.password && j.filled.passwordagain) { 
+                        repl = repl.replace('class="gaia sub passwdtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_Passwd">' + strings.NewAccount.passwordNotMatch + '</div>') 
+                        repl = repl.replace('name="PasswdAgain" class="gaia sub passwdtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_PasswdAgain">' + strings.NewAccount.passwordNotMatch + '</div>')
+                    }
+                    if (!(j.passwordMatchesrequirement) && j.filled.password) repl = repl.replace('class="gaia sub passwdtxtfield" size="30">', '$&<div role="alert" class="errormsg" id="errormsg_0_Passwd">' + strings.NewAccount.passwordRequirements + '</div>') 
+                    break;
+            }
+            res.clearCookie("GS2009_NEWACC_MISMATCH")
+        }
+
         if (language == "ja"){
             let encoded = iconv.encode(repl, 'shift_jis')
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -1067,9 +1152,32 @@ app.get("/accounts/ServiceLogin", (req, res) => {
     res.redirect("/accounts/Login")
 })
 
+app.get("/accounts/", (req, res) => {
+    res.redirect("/accounts/ManageAccount")
+})
+
+app.get("/accounts/ManageAccount/", (req, res) => {
+    res.redirect("/accounts/Login")
+})
+
 app.post('/accounts/CreateAccount', async (req, res) => {
-    if (await user.exists(req.body.Email, "boolean")) { log.e("Failed to register the user '" + req.body.Email + "' to database: User already exists"); res.send("<head><title>gogul account</title></head>you failed to register the user but i am so tired to implement the feature to show proper error so go back to previous page bro"); return; }
-    if (!(req.body.Passwd == req.body.PasswdAgain) || (req.body.Passwd.length < 8 || req.body.PasswdAgain.length < 8)) { log.e("Failed to register the user '" + req.body.Email + "' to database: Password mismatch"); res.send("<head><title>gogul account</title></head>you failed to register the user but i am so tired to implement the feature to show proper error so go back to previous page bro"); return; }
+    const result = {
+        value: {
+            email: req.body.Email !== "" && typeof(req.body.Email) !== "undefined" ? req.body.Email : ""
+        },
+        filled: {
+            email: req.body.Email ? true : false,
+            password: req.body.Passwd ? true : false,
+            passwordagain: req.body.PasswdAgain ? true : false
+        },
+        passwordmatch: req.body.Passwd === req.body.PasswdAgain ? true : false,
+        passwordMatchesrequirement: req.body.Passwd.toString().length > 5 ? true : false
+    }
+    if (!(result.filled.email && result.filled.password && result.filled.passwordagain) || !result.passwordmatch || !result.passwordMatchesrequirement) {
+        res.cookie("GS2009_NEWACC_MISMATCH", JSON.stringify(result))
+        res.redirect("/accounts/NewAccount")
+        return
+    }
     await user.add(req.body.Email, user.md5saltMe(req.body.Passwd))
 
     let age = {};
@@ -1083,7 +1191,7 @@ app.post('/accounts/CreateAccount', async (req, res) => {
         stayWithMe: req.body.PersistentCookie === "yes" ? JSON.parse(true) : JSON.parse(false)
     }), age)
     res.cookie('GS2009_SETTINGS', JSON.stringify(userdata.settings), age);
-    res.send()
+    res.send("wait bro")
 })
 
 app.get('/clearcookies', (req, res) => {
@@ -1104,6 +1212,10 @@ app.get('/search', async (req, res) => {
     if (sqparam.q == "" || sqparam.q == undefined) {
         log.w("query was empty, redirecting to /", tag)
         res.redirect('/');
+        return
+    }
+    if (sqparam.q.match(/(please )?give me (an )?ticket(s)? to wallma/) && req.query.btnI == "I'm Feeling Lucky") {
+        res.redirect('/wallma/ManageServer')
         return
     }
     if (sqparam.q.includes('%')) {
@@ -1256,8 +1368,8 @@ app.get('/search', async (req, res) => {
 
     log.i("Sorted Alphabet list: " + linkalplist.toString(), tag)
 
-    const data = fs.readFileSync(path.join(__dirname, "/languages/" + language + "/defaults/" + "/search.html"));
-    const template = retriveTemplate(language)
+    const data = fs.readFileSync(await grabEraPath("/search.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS))));
+    const template = retriveTemplate(language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
 
     let repl = "";
     
@@ -1280,6 +1392,8 @@ app.get('/search', async (req, res) => {
     
     repl = repl.replace(/gbar_username/g, SimLogin)
 
+    repl = repl.replace(/([0-9]{4} )/gms, getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) + " ")
+
     if (result.data.items.length < 1) {
         log.i("no result found for the query: " + query, tag)
         repl = repl.replace(/didyoumean/g, "");
@@ -1287,20 +1401,23 @@ app.get('/search', async (req, res) => {
 
         repl = repl.replace(/topItem/g, template.data.search_notfound);
 
-        repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
+        if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
+        else 
 
         repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
 
-        const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s)[0]
-                        .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
-                        .replace(/<p>/g, "").replace(/<\/p>/g, "")
-                        
-        repl = repl.replace(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s, "!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
-        repl = repl.replace("OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing",
-            '<style>.z { display: none; } .t {background: #d5ddf3; color: #000; padding: 5px 1px 4px} div,td,.n a,.n a:visited {color: #000} .bt {border-top: 1px solid #36c }</style><p><hr class="z"><div style="padding:2px" class="t n bt"><font size="-1"></font>' + links + "</div><br>")
+        if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) {
+            const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s)[0]
+                            .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+                            .replace(/<p>/g, "").replace(/<\/p>/g, "")
+                            
+            repl = repl.replace(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s, "!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
+            repl = repl.replace("OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing",
+                '<style>.z { display: none; } .t {background: #d5ddf3; color: #000; padding: 5px 1px 4px} div,td,.n a,.n a:visited {color: #000} .bt {border-top: 1px solid #36c }</style><p><hr class="z"><div style="padding:2px" class="t n bt"><font size="-1"></font>' + links + "</div><br>")
 
-        repl = repl.replace(/<table id="nav".*<\/table>/s, "")
-        repl = repl.replace(/<p>.*<\/div>.*<div id="res" class="med">/s, '<p>&nbsp;<nobr></div><div id="res" class="med">')
+            repl = repl.replace(/<table id="nav".*<\/table>/s, "")
+            repl = repl.replace(/<p>.*<\/div>.*<div id="res" class="med">/s, '<p>&nbsp;<nobr></div><div id="res" class="med">')
+        }
 
         if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
             repl = repl.replace(/query/g, actualq)
@@ -1775,6 +1892,9 @@ app.get('/search', async (req, res) => {
     }
 
     repl = repl.replace(/topItem/g, "")
+
+    repl = repl.replace(/[^<]\/[a-z]*>/g, "PLACEHOLDERTEXT!!!!" + "$&").replace("PLACEHOLDERTEXT!!!! ", "<")
+
     log.i("Sending replaced result", tag)
     if (language == "ja"){
         let encoded = iconv.encode(repl, 'shift_jis')
@@ -1789,35 +1909,458 @@ app.get('/gs2009', async (req, res) => {
     // here will be user configuration
 })
 
-app.get('/__gs2009_wallma_/ig', async (req, res) => {
-    if (!req.cookies.GS2009_ACCOUNTS_ADMIN) { res.redirect("/__gs2009_wallma_/Login"); return }
+app.get('/wallma/ManageServer', async (req, res) => {
+    if (!req.cookies.GS2009_ACCOUNTS_ADMIN) { res.redirect("/wallma/Login"); return }
     const userinfo = JSON.parse(req.cookies.GS2009_ACCOUNTS_ADMIN)
     if (!(userinfo.user == config.server.settingsPage.auth.user && userinfo.auth == user.md5saltMe(config.server.settingsPage.auth.password))) {
-        res.redirect("/__gs2009_wallma_/Login"); return 
+        res.redirect("/wallma/Login"); return 
     }
-    res.send(fs.readFileSync("./assets/admin/iguess.html").toString())
+    let repl = fs.readFileSync("./assets/admin/ManageServer.html").toString()
+
+    repl = repl.replace("GS2009_ADMIN_USERNAME", (config.server.settingsPage.auth.user ? config.server.settingsPage.auth.user + "@gs2009" : "Administrator"))
+    repl = repl.replace("GS2009_VERSION", stats.gs2009.version)
+    repl = repl.replace("GS2009_BRANCH_NAME", branch)
+    repl = repl.replace("GS2009_COMMIT_ID", stats.git.commitID)
+    repl = repl.replace("GS2009_OS_INFO", os.version() + " " + os.release())
+    repl = repl.replace("GS2009_HTTP_STATUS", stats.server.http.status)
+    repl = repl.replace("GS2009_HTTPS_STATUS", stats.server.https.status)
+    if (!config.server.https.enabled) repl = repl.replace("on port GS2009_HTTPS_PORT", "")
+    repl = repl.replace("GS2009_HTTP_PORT", stats.server.http.port)
+    repl = repl.replace("GS2009_HTTPS_PORT", stats.server.https.port)
+    repl = repl.replace("GS2009_USERS_COUNT", "secret: " + (await user.count()).secret + ", userdata: " + (await user.count()).userdata)
+    repl = repl.replace("GS2009_USERS_DISABLED_COUNT", (await user.count("disabled")))
+    res.send(repl)
 })
 
-app.get('/__gs2009_wallma_/Login', (req, res) => {
+const wallma = {
+    checkAuth: function(auth, res) {
+        try {
+            const userinfo = JSON.parse(auth)
+            if (!(userinfo.user == config.server.settingsPage.auth.user && userinfo.auth == user.md5saltMe(config.server.settingsPage.auth.password))) {
+                if (res) { res.redirect("/wallma/Login"); return }
+                else return false;
+            }
+            return true;
+        } catch {
+            if (res) {res.redirect("/wallma/Login"); return}
+            else return false;
+        }
+    },
+    builder: {
+        base: async function(pageProperties) {
+            return fs.readFileSync("./assets/admin/ManageServer_template.html")
+            .toString()
+            .replace("GS2009_ADMIN_USERNAME", (config.server.settingsPage.auth.user ? config.server.settingsPage.auth.user + "@gs2009" : "some user"))
+            .replace("GS2009_ADMIN_PAGENAME", pageProperties.title)
+        },
+        add: function(to, objectName, properties) {
+            const objects = {
+                table: {
+                    html: '<table cellpadding="6" cellspacing="0"><tr><td><font><b>{title}</b></font></td></tr></table><table cellspacing="0" cellpadding="3" width="99%"><tr bgcolor="#cbdced"><td><table width="100%" cellpadding="2" cellspacing="0"><tr bgcolor="#ffffff"><td><blockquote><br>{contents}</blockquote><p></td></tr></table></td></tr></table>',
+                    construct: function(properties) {
+                        let result = this.html
+                        for (let o = 0; o < Object.keys(properties).length; o++) {
+                            const propertyName = Object.keys(properties)[o]
+                            if (properties[propertyName] == undefined) break;
+                            result = result.replace("{" + propertyName + "}", properties[propertyName])
+                        }
+                        return result
+                    }
+                },
+                tabTable: {
+                    html: `
+                    <style>
+                    .prefgroup {width: 100%}
+                    .pref_all {
+      background-color: #CCE5ED;
+      margin: 10px 0 10px 0;
+      padding: 4px 4px 4px 4px;
+      width: 100%;
+    }
+      .pref_tabs {
+      font-size: smaller;
+      margin: 0 0 0 0;
+      padding: 0 0 0 0;
+      border: none;
+      width: 100%;
+    }
+
+    .pref_content {
+      background-color: #ffffff;
+      margin: 0 0 0 0;
+      width: 100%;
+    }
+
+    .tab {
+      width: 1px;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      margin: 0 0 0 0;
+      padding: .2em .8em .4em .8em;
+    }
+
+    .tab a:visited {
+      font-color: #00c;
+    }
+
+    .tab_selected {
+      width: 1px;
+      background-color: #ffffff;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      margin: 0 0 0 0;
+      padding: .2em .8em .4em .8em;
+    }
+    .s {
+      font-size: smaller
+    }
+      .phead {
+      font-weight: bold;
+      font-size: smaller;
+      vertical-align: top;
+      border-bottom: 2px solid #CCE5ED;
+      margin: 0px;
+      padding: 16px 8px 16px 8px
+    }
+
+    .pbody {
+      border-bottom: 2px solid #CCE5ED;
+      margin: 0px;
+      padding: 16px 8px 16px 8px
+    }
+
+    .pref-last {
+      border-bottom: 0px
+    }
+                    </style>
+                    <table class="pref_all" border="0" id="table_pref_all"><tr><td colspan=2><table class="pref_tabs" cellspacing="0" cellpadding="0" border="0"><tr>
+                {tabs}
+            <td align=right valign=top>
+              <nobr><input type=submit value="Save Preferences" name=submit2 ID="Submit1"></nobr>
+            </td>
+          </tr>
+        </table>
+        <table class="pref_content">
+          <tr>
+            <td>
+                <table class="prefgroup" cellpadding=0 cellspacing=0>
+                {TableInsideContent}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+                    `,
+                    htmlObject: {
+                        tab: '<td class="{tabStyle}"><a href="{tabHref}"><nobr>{tabTitle}</nobr> </td>'
+                    },
+                    construct: function(properties) {
+                        let tabsResult = ""
+                        properties.tabs.forEach((tab, i) => {
+                            let tabResult = this.htmlObject.tab
+                            if (i == properties.selectedTab) tabResult = tabResult.replace("{tabStyle}", "tab_selected")
+                            else tabResult = tabResult.replace("{tabStyle}", "tab q")
+                            tabResult = tabResult.replace("{tabTitle}", tab.title).replace("{tabHref}", tab.href)
+                            tabsResult = tabsResult + tabResult
+                        })
+                        return this.html.replace("{tabs}", tabsResult).replace("{TableInsideContent}", properties.content)
+                    }
+                },
+                tabTableContent: {
+                    html: `<tr><td class="pbody"><div class="s" style="display:none"> </div><div class="s">{content}</div></tr>`,
+                    construct: function(properties) {
+                        let result = this.html
+                        for (let o = 0; o < Object.keys(properties).length; o++) {
+                            const propertyName = Object.keys(properties)[o]
+                            if (properties[propertyName] == undefined) break;
+                            result = result.replace("{" + propertyName + "}", properties[propertyName])
+                        }
+                        return result
+                    }
+                },
+                tabTableContent_hasTitle: {
+                    html: `<tr><td class="phead">{title}</td><td class="pbody"><div class="s" style="display:none"> </div><div class="s">{content}</div></tr>`,
+                    construct: function(properties) {
+                        let result = this.html
+                        for (let o = 0; o < Object.keys(properties).length; o++) {
+                            const propertyName = Object.keys(properties)[o]
+                            if (properties[propertyName] == undefined) break;
+                            result = result.replace("{" + propertyName + "}", properties[propertyName])
+                        }
+                        return result
+                    }
+                }
+            }
+            for (let i = 0; i < Object.keys(objects).length; i++) {
+                const itemName = Object.keys(objects)[i]
+                if (itemName == objectName) {
+                    return to.replace("{contents}", objects[objectName].construct(properties) + "{contents}")
+                }
+            }
+            throw new Error("Tried to add the object that isn't registered at object array: " + objectName)
+        },
+        cleanUp: function(to) {
+            return to.replace("{contents}", "")
+        }
+    }
+}
+
+app.get('/wallma', (req, res) => { res.redirect("/wallma/Login") })
+
+app.get('/wallma/credits', async (req, res) => {
+    const pageProperties = { title: "gs2009 Credits" }
+    let repl = await wallma.builder.base(pageProperties)
+
+    const creditsText = `
+        <b>gs2009</b>: Google 2009 recreation frontend for SearXNG<br>
+        (most of the links in here requires modern browser)<br>
+        Credits for the modules used for this project belongs to the module author.<br>
+        <br>
+        <b>paphere (<a href="http://paphere.nekoweb.org/">paphere.nekoweb.org</a>)</b> - The current owner of the gs2009 repository, <br>
+        <b>lily (<a href="https://mrrpmeowfurry.dev/">mrrpmeowfurry.dev</a>)</b> - Contributed for Thai language translation, and fixed issue #5 #16<br>
+        <br>
+        <b>Services:</b><br>
+        <b>Wayback Machine</b> - without these archived pages for Google, this project was impossible<br>
+        <b>SearXNG</b> - As alternative of Google Custom Search JSON API, and for the SearXNG API references documentation<br>
+        <b>Google</b> - For almost all of the elements and pages, assets included on this project<br>
+        <br>
+        <b>Thanks to all of the users who used and contributed to this frontend!</b>
+    `
+
+    repl = wallma.builder.add(repl, "table", {
+        title: "",
+        contents: `<code>${creditsText.replace("\r\n", "<br>")}</code>`
+    })
+
+    res.send(wallma.builder.cleanUp(repl));
+})
+
+app.get('/wallma/ManageServer/serverPreferences', async (req, res) => {
+    wallma.checkAuth(req.cookies.GS2009_ACCOUNTS_ADMIN, res);
+
+    const pageProperties = { title: "Server Preferences" }
+    let repl = await wallma.builder.base(pageProperties)
+    /*
+    repl = wallma.builder.add(repl, "table", {
+        title: pageProperties.title,
+        contents: "You're currently in code editor. Click 'Save Preferences' to save.<br><br>" + '<textarea style="width: 100%; height: 500px;">' + (fs.readFileSync("config.toml")).toString() + "</textarea>"
+    })
+    */
+
+    function generateTables(config) {
+        // Source - https://stackoverflow.com/a/47063174
+        // Posted by Olian04, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-10-14, License - CC BY-SA 4.0
+
+        // thanks bro
+
+        const keyify = (obj, prefix = '') => 
+        Object.keys(obj).reduce((res, el) => {
+            if( Array.isArray(obj[el]) ) {
+            return [...res, prefix + el]
+            } else if( typeof obj[el] === 'object' && obj[el] !== null ) {
+            return [...res, ...keyify(obj[el], prefix + el + '.')];
+            }
+            return [...res, prefix + el];
+            }, []);
+
+        const en = {
+            server: {
+                title: "Server Settings",
+                port: {
+                    title: "HTTP Server: Port",
+                    description: "Port for HTTP server. (Example: 80)"
+                },
+                https: {
+                    title: "HTTPS Server",
+                    enabled: {
+                        title: "Enabled",
+                        description: "Run HTTPS server with the port in below."
+                    },
+                    port: {
+                        title: "Port",
+                        description: "Port for HTTPS server. (Example: 443)"
+                    },
+                    cert_path: {
+                        title: "Certificate Path",
+                        description: "Path to crt file. Required to use HTTPS."
+                    },
+                    privatekey_path: {
+                        title: "Private Key Path",
+                        description: "Path to pem file. Required to use HTTPS."
+                    }
+                },
+                settingsPage: {
+                    title: "Server Settings Page",
+                    enabled: {
+                        title: "Enabled",
+                        description: "Enable this page. Recommend to set up with admin specific auth."
+                    },
+                    authEnabled: {
+                        title: "Require authentication",
+                        description: "Require own authentication for Administrator Page."
+                    },
+                    auth: {
+                        title: "Authentication",
+                        user: {
+                            title: "Username",
+                            description: "&nbsp;"
+                        },
+                        password: {
+                            title: "Password",
+                            description: "&nbsp;"
+                        }
+                    }
+                }
+            },
+            engine: {
+                title: "Engine Settings"
+            },
+            users: {
+                title: "Account Settings"
+            },
+            frontend: {
+                title: "Default Frontend Settings"
+            }
+        }
+        function generate(parent, object) {
+            let result = ""
+            keyify(object[parent]).forEach((item) => {
+                let objectContent = object;
+                let objectResult = "";
+                let previousTitleKey = "";
+                let previousTitle;
+                let lang = en;
+                (parent + "." + item).split(".").forEach(key => {
+                    if (lang == undefined) return;
+                    lang = lang[key]
+                });
+                (parent + "." + item).split(".").forEach((key, i) => {
+                    if (i == ((parent + "." + item).split(".").length - 1)) return;
+                    previousTitleKey = previousTitleKey + (previousTitleKey.match(".") ? ".": "") + key
+                })
+                if (previousTitleKey.match(/\./)) {
+                    let object = en;
+                    previousTitleKey.split(".").forEach(key => {
+                        if (object == undefined) return;
+                        object = object[key]
+                    })
+                    previousTitle = typeof(object) !== "undefined" ? object.title : undefined
+                }
+
+                const title = (typeof(lang) !== "undefined") ? ((previousTitle ? previousTitle + ": " : "") + lang.title) : (parent + "." + item);
+                const description = (typeof(lang) !== "undefined" && typeof(lang.description) !== "undefined") ? lang.description : undefined;
+                (parent + "." + item).split(".").forEach(key => {
+                    objectContent = objectContent[key]
+                })
+                const type = typeof(objectContent)
+                
+                switch (type) {
+                    case "number":
+                        objectResult = "<b>" + title + "</b>" + (description ? ": " + description : ": No description available for this item.") + "<br>" + `<input type="number" min="10" max="100" value="${objectContent}"><br>`
+                        break;
+                    case "string":
+                        objectResult = "<b>" + title + "</b>" + (description ? ": " + description : ": No description available for this item.") + "<br>" + `<input style="width: 300px;" value="${objectContent}"><br>`
+                        break;
+                    case "boolean":
+                        objectResult = "<b>" + title + "</b>" + `<div><input type="checkbox" ${(objectContent ? "checked" : "")} >` + (description ? "&nbsp;" + description : "Enable this settings.") + "</div>"
+                        break;
+                    default:
+                        objectResult = "<b>" + title + ": </b>" + "<label>This option is currently unavailable. Please use 'Code Editor' instead of Visual Editor.</label><br>"
+                        break;
+                }
+                result = result + objectResult + "<br>"
+            })
+            return result
+        }
+
+        let result = "{contents}"
+        Object.keys(config).forEach(parent => {
+            result = wallma.builder.add(result, "tabTableContent_hasTitle", {
+                title: en[parent].title,
+                content: generate(parent, config)
+            })
+        })
+        return wallma.builder.cleanUp(result)
+    }
+
+    function generateEditor(file) {
+        const result = wallma.builder.add("{contents}", "tabTableContent", {
+            content: `<textarea style="width: 100%; height: 400px;">${file.toString()}</textarea>`
+        })
+        return wallma.builder.cleanUp(result)
+    }
+
+    repl = wallma.builder.add(repl, "tabTable", {
+        tabs: [
+            {
+                title: "Visual Editor",
+                href: "/wallma/ManageServer/serverPreferences?selectedTab=0",
+            },
+            {
+                title: "Code Editor",
+                href: "/wallma/ManageServer/serverPreferences?selectedTab=1",
+            },
+        ],
+        selectedTab: req.query.selectedTab ? req.query.selectedTab : 0,
+        content: req.query.selectedTab == 1 ? generateEditor(fs.readFileSync("config.toml")) : generateTables(config)
+    })
+    res.send(wallma.builder.cleanUp(repl))
+})
+
+app.get('/wallma/ManageServer/userDirectory', async (req, res) => {
+    wallma.checkAuth(req.cookies.GS2009_ACCOUNTS_ADMIN, res);
+    const pageProperties = { title: "User Directory" }
+    let repl = await wallma.builder.base(pageProperties)
+    repl = wallma.builder.add(repl, "table", {
+        title: "User Directory",
+        content: "yo"
+    })
+    res.send(wallma.builder.cleanUp(repl))
+})
+
+app.get('/wallma/Login', (req, res, next) => {
     if (config.server.settingsPage.enabled) {
+        if (wallma.checkAuth(req.cookies.GS2009_ACCOUNTS_ADMIN)) { res.redirect("/wallma/ManageServer"); return; }
         res.clearCookie("GS2009_AUTH_MISMATCH")
         res.send(fs.readFileSync(path.join("./assets/admin/login.html")).toString().replace(req.cookies.GS2009_AUTH_MISMATCH === "true" ? "" : "<div class=\"errormsg\">The username or password you entered is incorrect.</div>", ""))
     } else {
-        res.status(404).send("")
+        next()
     }
 })
 
-app.post('/__gs2009_wallma_/LoginAuth', (req, res) => {
+app.post('/wallma/LoginAuth', (req, res) => {
     if (req.body.u == config.server.settingsPage.auth.user && req.body.pw == config.server.settingsPage.auth.password) {
         res.cookie("GS2009_ACCOUNTS_ADMIN", JSON.stringify({
             user: req.body.u,
             auth: user.md5saltMe(req.body.pw)
         }))
-        res.redirect("/__gs2009_wallma_/ig")
+        res.redirect("/wallma/ManageServer")
     } else {
         res.cookie("GS2009_AUTH_MISMATCH", JSON.stringify(true))
-        res.redirect("/__gs2009_wallma_/Login")
+        res.redirect("/wallma/Login")
     }
+})
+
+app.get('/wallma/clearCookie', (req, res) => {
+    res.clearCookie("GS2009_ACCOUNTS_ADMIN")
+    res.redirect("/")
+})
+
+app.use(async (req, res, next) => {
+    if (req.originalUrl.match(/\/intl\/.*\//)) {
+        const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+        const to = (req.originalUrl.split("/")[3].match(/\.html/) ? req.originalUrl.split("/")[3] : req.originalUrl.split("/")[3].replace(".htm", "") + ".html")
+        const filePath = await grabEraPath("intl/" + to, language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
+        if (fs.existsSync(filePath)) {
+            res.send(fs.readFileSync(filePath).toString())
+            return
+        }
+    }
+    next()
 })
 
 app.get('/interstitial', async (req, res) => {
@@ -1832,6 +2375,11 @@ app.get('/interstitial', async (req, res) => {
         repl = data.toString();
     }
     res.send(repl.replace(/GS2009__URL/, req.query.url))
+})
+
+app.use((req, res) => {
+    const errorpage = fs.readFileSync("./assets/404.html").toString()
+    res.status(404).send(errorpage.replace("LINK", req.originalUrl))
 })
 
 process.on('SIGINT', function() {

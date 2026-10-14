@@ -3,6 +3,7 @@ import path from "node:path"
 import { md5 } from "js-md5"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { log } from "./things.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,6 +20,7 @@ async function sendDB(path, object) {
 }
 
 const user = {
+    tag: "user",
     secretDB: path.join("secretdb.json"),
     userdataDB: path.join("userdb.json"),
     add: async function(email, auth) {
@@ -28,6 +30,7 @@ const user = {
             "email": email,
             "auth": auth
         })
+        if (!(fs.existsSync(user.secretDB))) { log.w("Generated Secrets Database. Please do not share the DB file of secret unless you know what are you doing!", user.tag) }
         const result = await sendDB(user.secretDB, db)
         return result
     },
@@ -60,7 +63,7 @@ const user = {
         });
         return result;
     },
-    get: async function(email, auth, serviceID) {
+    get: async function(email, serviceID) {
         const db = await getDB(user.userdataDB)
         let userData = undefined
         if (!(user.exists(email, "boolean"))) throw new Error("No userdata exists for this user.")
@@ -76,10 +79,10 @@ const user = {
     md5saltMe: function(string) {
         return md5(md5(md5(string) + process.env.GS2009_AUTH_SECRET1) + process.env.GS2009_AUTH_SECRET2)
     },
-    modifyData: async function(email, serviceID, object, returnObject) {
+    modifyData: async function(email, serviceID, object, returnObject, isDisabled) {
         if (!await user.exists(email, "boolean")) throw new Error("User does not exist in database.")
         let db = await getDB(user.userdataDB)
-        if (!((await user.exists(email, "array")).includes("userdata"))) db.push({ email: email, data: [] })
+        if (!((await user.exists(email, "array")).includes("userdata"))) db.push({ email: email, disabled: isDisabled, data: [] })
 
         db.forEach((user) => {
             if (!(user.email == email)) return
@@ -101,6 +104,22 @@ const user = {
             settings: object
         }
         else return true
+    },
+    count: async function(type) {
+        const secretDB = await getDB(user.secretDB)
+        const userDB = await getDB(user.userdataDB)
+        if (type) {
+            let count = 0;
+            userDB.forEach(user => {
+                if (user.disabled) count++
+            })
+            return count;
+        } else {
+            return {
+                secret: secretDB.length,
+                userdata: userDB.length
+            }
+        }
     }
 }
 

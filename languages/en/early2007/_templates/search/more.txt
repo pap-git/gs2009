@@ -1,0 +1,22 @@
+<div class="g" style="margin-left:2.5em">
+    <h2 class="r"><a
+            href="UrlLink"
+            class="l">htmlTitle</a></h2>
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td class="j">
+                    <font size="-1">htmlSnippet<br><span
+                            class="a">UrlLink - 
+                        </span>
+                        <nobr><a class="fl"
+                                href="https://web.archive.org/web/20070510142717/http://72.14.253.104/search?q=cache:d1v0VmToX6YJ:www.geocities.com/christiancodes/myhomepage/musiccodes-pre.html+musiccodes&amp;hl=en&amp;ct=clnk&amp;cd=6&amp;gl=us">Cached</a>
+                            - <a class="fl"
+                                href="/web/20070510142717/http://www.google.com/search?hl=en&amp;rls=GGLD,GGLD:2004-34,GGLD:en&amp;q=related:UrlLink">Similar
+                                pages</a></nobr><br>[ <a class="fl" href="/search?hl=en&amp;lr=&amp;q=+site:htmlFormattedUrl">More results from UrlLink</a> ]
+                    </font>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

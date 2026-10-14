@@ -7,3 +7,8 @@ related="Searches related to: <b>query</b>"
 mayharm="This site may harm your computer."
 sponsored_link="Sponsored Link"
 sponsored_links="Sponsored Links"
+
+[NewAccount]
+requiredField="Required field cannot be left blank"
+passwordNotMatch="Password do not match. Please re-enter the password again."
+passwordRequirements="Password you've entered is not met requirements. Please try with different password."
