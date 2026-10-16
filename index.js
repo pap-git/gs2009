@@ -152,7 +152,6 @@ async function grabEraPath(afterPath, language, era){
     pathes.push(path.join(__dirname, "/languages/", "en", "/defaults/", afterPath))
 
     for (let i = 0; i < pathes.length; i++) {
-        console.log(pathes[i])
         if (fs.existsSync(pathes[i])) { return pathes[i] }
     }
 }
@@ -161,6 +160,33 @@ async function followPath(urlPath, era) {
     let result = undefined;
     const pathes = [
         // [original path, folder path]
+        ["/ig/images/x.gif", "./assets/ig/images/x.gif"],
+        ["/ig/images/x2.gif", "./assets/ig/images/x2.gif"],
+        ["/ig/images/x3.gif", "./assets/ig/images/x3.gif"],
+        ["/ig/images/yellow_warning.gif", "./assets/ig/images/yellow_warning.gif"],
+        ["/calendar/images/close.gif", "./assets/calendar/images/close.gif"],
+        ["/calendar/images/corner_tl.gif", "./assets/calendar/images/corner_tl.gif"],
+        ["/calendar/images/corner_tr.gif", "./assets/calendar/images/corner_tr.gif"],
+        ["/calendar/images/corner_bl.gif", "./assets/calendar/images/corner_bl.gif"],
+        ["/calendar/images/corner_br.gif", "./assets/calendar/images/corner_br.gif"],
+        ["/ig/images/weather_welcome_image.jpg", "./assets/ig/images/weather_welcome_image.jpg"],
+        ["/ig/images//weather_welcome_image.jpg", "./assets/ig/images/weather_welcome_image.jpg"],
+        ["/ig/images/min_blue.gif", "./assets/ig/images/min_blue.gif"],
+        ["/ig/images/max_blue.gif", "./assets/ig/images/max_blue.gif"],
+        ["/ig/images/x_blue.gif", "./assets/ig/images/x_blue.gif"],
+        ["/ig/images/min_blue_highlight.gif", "./assets/ig/images/min_blue_highlight.gif"],
+        ["/ig/images/max_blue_highlight.gif", "./assets/ig/images/max_blue_highlight.gif"],
+        ["/ig/images/x_blue_highlight.gif", "./assets/ig/images/x_blue_highlight.gif"],
+        ["/ig/modules/datetime_content/l-blue.png", "./assets/ig/modules/datetime_content/l-blue.png"],
+        ["/ig/modules/datetime_content/b-blue.png", "./assets/ig/modules/datetime_content/b-blue.png"],
+        ["/ig/modules/datetime_content/r-blue.png", "./assets/ig/modules/datetime_content/r-blue.png"],
+        ["/ig/modules/datetime_content/clock.png", "./assets/ig/modules/datetime_content/clock.png"],
+        ["/ig/modules/datetime_content/hm.png", "./assets/ig/modules/datetime_content/hm.png"],
+        ["/ig/modules/datetime_content/hh.png", "./assets/ig/modules/datetime_content/hh.png"],
+        ["/ig/modules/calendar_content/calendar.js", "./assets/ig/modules/calendar_content/calendar.js"],
+        ["/ig/images/cleardot.gif", "./assets/ig/images/cleardot.gif"],
+        ["/ig/f/ErDgb1vejI8/ig.js", "./assets/ig/f/ErDgb1vejI8/ig.js"],
+        ["/ig/f/eTWJWNhA55A/ifpc.js", "./assets/ig/f/eTWJWNhA55A/ifpc.js"],
         ["/images/google_sm.gif", "./assets/images/google_sm.gif"],
         ["/images/x2.gif", "./assets/images/x2.gif"],
         ["/wallma/ig_main.js", "./assets/admin/assets/ig_main.js"],
@@ -1199,6 +1225,24 @@ app.get('/clearcookies', (req, res) => {
     res.clearCookie('GS2009_ACCOUNTS');
     res.clearCookie('GS2009_SETTINGS');
     res.redirect('/');
+})
+
+app.get('/ig', async (req, res) => {
+    const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+    const strings = await retriveLanguageStrings(language)
+    const filePath = await grabEraPath("/ig.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
+
+    fs.readFile(filePath, (err, data) => {
+        let repl = data.toString()
+        res.send(repl)
+    })
+})
+
+app.get('/ig/setp', async (req, res) => {
+    console.log(req.url)
+    console.log(req.body)
+    console.log(req.cookies)
+    res.send()
 })
 
 app.get('/search', async (req, res) => {
@@ -2460,6 +2504,7 @@ app.get('/interstitial', async (req, res) => {
 
 app.use((req, res) => {
     const errorpage = fs.readFileSync("./assets/404.html").toString()
+    log.e("Requested by client but not found: " + req.url, "404")
     res.status(404).send(errorpage.replace("LINK", req.originalUrl))
 })
 
