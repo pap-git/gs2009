@@ -1,12 +1,3 @@
-var _____WB$wombat$assign$function_____=function(name){return (globalThis._wb_wombat && globalThis._wb_wombat.local_init && globalThis._wb_wombat.local_init(name))||globalThis[name];};if(!globalThis.__WB_pmw){globalThis.__WB_pmw=function(obj){this.__WB_source=obj;return this;}}{
-let window = _____WB$wombat$assign$function_____("window");
-let self = _____WB$wombat$assign$function_____("self");
-let document = _____WB$wombat$assign$function_____("document");
-let location = _____WB$wombat$assign$function_____("location");
-let top = _____WB$wombat$assign$function_____("top");
-let parent = _____WB$wombat$assign$function_____("parent");
-let frames = _____WB$wombat$assign$function_____("frames");
-let opener = _____WB$wombat$assign$function_____("opener");
 function _CalendarModule(__MODULE_ID__){
 Function.prototype.bind=function(a){if(typeof this!="function"){throw new Error("Bind must be called as a method of a function object.");}var b=this,c=Array.prototype.splice.call(arguments,1,arguments.length);return function(){var d=c.concat();for(var e=0;e<arguments.length;e++){d.push(arguments[e])}return b.apply(a,d)}};var ib,ve;(function(){var a={},b=0;function c(g){if(!g.gc){g.gc=++b}return g.gc}function d(g,h,i,j){var l=c(g),n=c(i);j=!(!j);var q=l+"_"+h+"_"+n+"_"+
 j;return q}ib=function(g,h,i,j){var l=d(g,h,i,j);if(l in a){return l}var n=e.bind(null,l);a[l]={listener:i,proxy:n};if(g.addEventListener){g.addEventListener(h,n,j)}else if(g.attachEvent){g.attachEvent("on"+h,n)}else{throw new Error("Node {"+g+"} does not support event listeners.");}return l};ve=function(g,h,i,j){var l=d(g,h,i,j);if(!(l in a)){return false}var n=a[l].proxy;if(g.removeEventListener){g.removeEventListener(h,n,j)}else if(g.detachEvent){g.detachEvent("on"+h,n)}delete a[l];return true};
@@ -177,28 +168,4 @@ hd();return false};Db("quickadd"+s);return false};m("agendaCloseBox"+s).onmoused
 ""+O);if(O){Ib=false;ya(v.Zb()||R)}else{m(Fb).style.display="none"}Uc()}function Uc(){var a=O?"Hide Agenda":"Show Agenda";m(Zc).innerHTML=a}m(Zc).onclick=pe;function oc(a,b){this.title=null;this.Fa=function(){return b};this.$=function(){return Y.read};this.feedUrl=a;this.f=function(){return this.title};this.Yb=function(){return true};this.Ub=function(){return false};this.O=function(c){this.title=c}}var fb,Td={black:1,silver:1,gray:1,white:1,maroon:1,red:1,purple:1,fuchsia:1,green:1,lime:1,olive:1,
 yellow:1,navy:1,blue:1,teal:1,aqua:1,orange:1,cyan:1};function de(a){if(!a)return false;a=Ga(a).toLowerCase();if(a.match(/^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/))return true;if(a.match(/^#[0-9A-F]{3,6}$/i))return true;return a in Td}if(aa){var ue="m_"+s+"_url",Yc=m(ue),Qc=window._pid;Yc.innerHTML="Calendar";Yc.href="https://web.archive.org/web/20071022125544/http://www.google.com/calendar/hosted/"+Qc+"/";m("createEventLinks"+s).href="https://web.archive.org/web/20071022125544/http://www.google.com/calendar/hosted/"+Qc+"/event?action=TEMPLATE";m("open-quick-add"+s).style.display="none";
 m("createEvent"+s).href=Pb();m("calListPopup"+s).style.display="none";if(W)vc()}else if(hb||bb){Ec(function(a){a.location=N+"hello";$c()})}else if(ma){var ua,eb={},Fc=true;for(var gb=0;gb<4;++gb){var db=E.getString("c"+gb+"u"),sc=db.match(/(.*\/)basic/);if(sc){db=sc[1]+"full"}if(db){ua=E.getString("c"+gb+"c");if(!de(ua)){ua="rgb(17,42,187)"}eb[db]=ua;Fc=false}}if(Fc)O=false;J=eb;for(var cb in eb){ua=eb[cb];var Vb=new oc(cb,ua);Ha[cb]=Vb.Fa();Ac[cb]=Vb;$.push(Vb)}var Wc=E.getString("start");if(Wc){var kb=
-Wc.match(/^\s*(\d{4})-(\d{1,2})-(\d{1,2})\s*$/);if(kb){fb=t.create(kb[1],parseInt(kb[2],10),parseInt(kb[3],10));v.sa(fb);v.ta(fb)}}var Pd=v.Ha(),he=v.Ia();Ma(Pd,he,function(){ya(fb)})}else{Nc()};
-
-}
-}
-
-/*
-     FILE ARCHIVED ON 12:55:44 Oct 22, 2007 AND RETRIEVED FROM THE
-     INTERNET ARCHIVE ON 21:36:29 Oct 16, 2026.
-     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
-
-     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
-     SECTION 108(a)(3)).
-*/
-/*
-playback timings (ms):
-  captures_list: 0.567
-  exclusion.robots: 0.067
-  exclusion.robots.policy: 0.055
-  esindex: 0.009
-  cdx.remote: 7.443
-  LoadShardBlock: 272.072 (3)
-  PetaboxLoader3.datanode: 850.033 (4)
-  PetaboxLoader3.resolve: 61.475 (2)
-  load_resource: 728.256
-*/
+Wc.match(/^\s*(\d{4})-(\d{1,2})-(\d{1,2})\s*$/);if(kb){fb=t.create(kb[1],parseInt(kb[2],10),parseInt(kb[3],10));v.sa(fb);v.ta(fb)}}var Pd=v.Ha(),he=v.Ia();Ma(Pd,he,function(){ya(fb)})}else{Nc()};}

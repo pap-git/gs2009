@@ -1,0 +1,1 @@
+<a href="/webhp" class=gb4>Classic Home</a> | <a href="/accounts/Login?hl=en&continue=http://www.google.com/" class=gb4>Sign in</a>

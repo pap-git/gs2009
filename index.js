@@ -398,8 +398,10 @@ function retriveTemplate(lang, era) {
     const paths = {
         gbar_user: GiveMeTheResult(lang, era, "/gbar_user.txt"), // ext_t_g_u
         gbar_user_index: GiveMeTheResult(lang, era, "/gbar_user_index.txt"), // ext_t_g_u
+        gbar_user_ig: GiveMeTheResult(lang, era, "/gbar_user_ig.txt"),
         gbar_user_logged: GiveMeTheResult(lang, era, "/gbar_user_logged.txt"), // ext_t_g_u_l
         gbar_user_logged_index: GiveMeTheResult(lang, era, "/gbar_user_logged_index.txt"),
+        gbar_user_logged_ig: GiveMeTheResult(lang, era, "/gbar_user_logged_ig.txt"),
 
         auth_mismatch: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
         auth_acc_disabled: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
@@ -417,8 +419,10 @@ function retriveTemplate(lang, era) {
     const data = {
         gbar_user: fs.readFileSync(paths.gbar_user, "utf8"),
         gbar_user_index: fs.readFileSync(paths.gbar_user_index, "utf8"),
+        gbar_user_ig: fs.readFileSync(paths.gbar_user_ig, "utf8"),
         gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
         gbar_user_logged_index: fs.readFileSync(paths.gbar_user_logged_index, "utf8"),
+        gbar_user_logged_ig: fs.readFileSync(paths.gbar_user_logged_ig, "utf8"),
 
         auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
         auth_acc_disabled: fs.readFileSync(paths.auth_acc_disabled, "utf8"),
@@ -1230,10 +1234,25 @@ app.get('/clearcookies', (req, res) => {
 app.get('/ig', async (req, res) => {
     const language = getLanguage(req.host, req.cookies.GS2009_SETTINGS)
     const strings = await retriveLanguageStrings(language)
+    const template = retriveTemplate(language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     const filePath = await grabEraPath("/ig.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
 
     fs.readFile(filePath, (err, data) => {
         let repl = data.toString()
+
+        let SimLogin = undefined;
+        try {
+            SimLogin = JSON.parse(req.cookies.GS2009_ACCOUNTS).email
+        } catch {}
+
+        if (SimLogin == undefined || SimLogin == "" || SimLogin == "undefined") {
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_ig)
+        } else {
+            repl = repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_ig)
+        }
+
+        repl = repl.replace(/gbar_username/g, SimLogin)
+
         res.send(repl)
     })
 })
