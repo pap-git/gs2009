@@ -220,7 +220,7 @@ async function followPath(urlPath, era) {
         ['/intl/ja/images/logos/accounts_logo.gif', './assets/images/ja/accounts_logo.gif'],
         ['/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
         ['/accounts/intl/en/images/logos/accounts_logo.gif', './assets/images/en/accounts_logo.gif'],
-        ['/favicon.ico', (era == "early2009" || Number(era.replace(/[a-z]/g, "")) < 2009 ? './assets/favicon_2008.ico' : './assets/favicon.ico')],
+        ['/favicon.ico', (era == "early2009" || Number(era.replace(/[a-z]/g, "")) < 2009 ? (era == "early2007" || Number(era.replace(/[a-z]/g, "")) < 2007  ? './assets/favicon_2006.ico' : './assets/favicon_2008.ico') : './assets/favicon.ico')],
         ['/intl/en_ALL/images/logo.gif', './assets/images/en-ALL/logo.gif'],
         ['/images/nav_logo.png', './assets/images/nav_logo.png'],
         ['/images/nav_logo3.png', './assets/images/nav_logo3.png'],
