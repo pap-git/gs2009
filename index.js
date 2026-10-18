@@ -172,7 +172,11 @@ async function followPath(urlPath, era) {
         ["/ig/images/weather_welcome_image.jpg", "./assets/ig/images/weather_welcome_image.jpg"],
         ["/ig/images//weather_welcome_image.jpg", "./assets/ig/images/weather_welcome_image.jpg"],
         ["/ig/images/min_blue.gif", "./assets/ig/images/min_blue.gif"],
+        ["/ig/images/arrow_blue.gif", "./assets/ig/images/arrow_blue.gif"],
+        ["/ig/images/arrow_blue_highlight.gif", "./assets/ig/images/arrow_blue_highlight.gif"],
         ["/ig/images/max_blue.gif", "./assets/ig/images/max_blue.gif"],
+        ["/ig/images/max_dark_blue.gif", "./assets/ig/images/max_dark_blue.gif"],
+        ["/ig/images/max_dark_blue_highlight.gif", "./assets/ig/images/max_dark_blue_highlight.gif"],
         ["/ig/images/x_blue.gif", "./assets/ig/images/x_blue.gif"],
         ["/ig/images/min_blue_highlight.gif", "./assets/ig/images/min_blue_highlight.gif"],
         ["/ig/images/max_blue_highlight.gif", "./assets/ig/images/max_blue_highlight.gif"],
@@ -185,8 +189,11 @@ async function followPath(urlPath, era) {
         ["/ig/modules/datetime_content/hh.png", "./assets/ig/modules/datetime_content/hh.png"],
         ["/ig/modules/calendar_content/calendar.js", "./assets/ig/modules/calendar_content/calendar.js"],
         ["/ig/images/cleardot.gif", "./assets/ig/images/cleardot.gif"],
-        ["/ig/f/ErDgb1vejI8/ig.js", "./assets/ig/f/ErDgb1vejI8/ig.js"],
-        ["/ig/f/eTWJWNhA55A/ifpc.js", "./assets/ig/f/eTWJWNhA55A/ifpc.js"],
+        ["/ig/f/k_fLiUrIqz0/ig.js", "./assets/ig/f/early2007/ig.js"],
+        ["/ig/f/eTWJWNhA55A/ifpc.js", "./assets/ig/f/early2007/ifpc.js"],
+        ["/ig/f/gCWFONvECOE/ig.js", "./assets/ig/f/mid2007/ig.js"],
+        ["/ig/f/early2007/ig.css", "./assets/ig/f/early2007/ig.css"],
+        ["/ig/f/mid2007/ig.css", "./assets/ig/f/mid2007/ig.css"],
         ["/images/google_sm.gif", "./assets/images/google_sm.gif"],
         ["/images/x2.gif", "./assets/images/x2.gif"],
         ["/wallma/ig_main.js", "./assets/admin/assets/ig_main.js"],
@@ -260,6 +267,7 @@ async function followPath(urlPath, era) {
     for (let i = 0; i < pathes.length; i++) {
         try {
             if (pathes[i][0] == urlPath) {
+                //console.log(pathes[i][1] + ": " + fs.existsSync(pathes[i][1]))
                 result = fs.readFileSync(pathes[i][1])
                 break;
             }
@@ -494,7 +502,7 @@ async function fetchResults({ askOtherCategories, existingfilePath }) {
                             searxng_ishttps = undefined
                         }
                         // result = await searxngfetch(config.engine.searxng.url, searxng_ishttps, true, query, start, lr, true)
-                        result = await searxngfetch(config.engine.searxng.url, query, { ishttps: true, start: start, categories: askOtherCategories ? "news" : "" })
+                        result = await searxngfetch(config.engine.searxng.url, query, { ishttps: false, start: start, categories: "general" })
                         searxng_ishttps = temp_searxng_ishttps
 
                         if (result.data.error) throw new Error("bye bro")
