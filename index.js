@@ -264,6 +264,17 @@ async function followPath(urlPath, era) {
         json.forEach(path => { pathes.push(path) })
     }
 
+    if (urlPath.match("/ig/images/") && urlPath.split("/")[3] == "skins") {
+        const skinResPath = path.join(__dirname, "/assets/ig/images/skins/", urlPath.split("/")[4])
+        if (fs.existsSync(skinResPath)) {
+            const dir = fs.readdirSync(skinResPath)
+            dir.forEach(item => {
+                const pathToPush = path.join(skinResPath, item)
+                pathes.push(["/ig/images/skins/" + urlPath.split("/")[4] + "/" + item, pathToPush])
+            })
+        }
+    }
+
     for (let i = 0; i < pathes.length; i++) {
         try {
             if (pathes[i][0] == urlPath) {
@@ -1245,7 +1256,7 @@ app.get('/ig', async (req, res) => {
     const template = retriveTemplate(language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     const filePath = await grabEraPath("/ig.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
 
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(filePath, async (err, data) => {
         let repl = data.toString()
 
         let SimLogin = undefined;
@@ -1261,13 +1272,16 @@ app.get('/ig', async (req, res) => {
 
         repl = repl.replace(/gbar_username/g, SimLogin)
 
+        const ig_css_path = path.join(__dirname, "/assets/ig/skins", "teahouse", "teahouse_3.14am.css")
+        const themecss = fs.existsSync(ig_css_path) ? await fs.readFileSync(ig_css_path).toString() : ""
+        repl = repl.replace(".ADDTHEMECONTENT{}", themecss)
+
         res.send(repl)
     })
 })
 
 app.get('/ig/setp', async (req, res) => {
     console.log(req.url)
-    console.log(req.body)
     console.log(req.cookies)
     res.send()
 })

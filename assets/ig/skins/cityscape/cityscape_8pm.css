@@ -1,0 +1,72 @@
+body {font-family:lucida grande,arial,helvetica,sans-serif;background-color:#a2a0af;}
+#gbar, .gseain {font-size:11px;}
+.gseain input {font-size:12px;}
+#featuretabs {font-size:13px;}
+.gseaopt {font-size:10px;}
+#gsea {padding-bottom:0px;}
+.msg .msg_box,#noscript_box,#new_user_save_box {background-color:#fff;}
+#nhdrwrap {background:#fff url('/ig/images/skins/cityscape/8pm/header_tile.jpg') repeat-x top center;}
+#nhdrwrapinner {background:url('/ig/images/skins/cityscape/8pm/header_bg.gif') no-repeat top center;}
+#nhdrwrapsizer {height: 176px;}
+#no_script {background-color:#fff;}
+#footerwrap {border-top:1px #97b0dd solid;background:url('/ig/images/skins/cityscape/8pm/footer_tile.jpg') repeat-x bottom left;}
+.tab {font-size:12px;border-bottom-color:#9facc4;}
+.selectedtab {border-color:#9facc4;}
+.unselectedtab {background-color:#dae3f2;border-color:#9facc4;}
+.tab_hover {background-color:#9facc4;}
+.modboxin, .modboxin_s {padding:5px 9px 10px 9px;font-size:12px;border:1px #cfd7e5 solid;background-color:#fff;}
+.modtitle, .modtitle_s {background:#c8d0dd url('/ig/images/skins/cityscape/8pm/mt_back.gif') no-repeat;border:1px #9facc4 solid;padding:0px 8px;}
+.modboxin_s, .modtitle_s {border-color:#8a96ab;}
+.modboxin_s {border-top-color:#a9b7d1;background-color:#dae3f2;padding-top:9px;}
+.modtitle, .mtlink, .modtitle_s {font-size:12px;line-height:21px;}
+a.ddbox, a.delbox, a.minbox, a.maxbox {margin-top:4px;}
+a.ddbox {background-image:url('/ig/images/skins/cityscape/8pm/arrow_blue.gif');}
+a.delbox {background-image:url('/ig/images/skins/cityscape/8pm/x_blue.gif');}
+a.minbox {background-image:url('/ig/images/skins/cityscape/8pm/min_blue.gif');}
+a.maxbox {background-image:url('/ig/images/skins/cityscape/8pm/max_blue.gif');}
+a.ddbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/arrow_blue_highlight.gif');}
+a.delbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/x_blue_highlight.gif');}
+a.minbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/min_blue_highlight.gif');}
+a.maxbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/max_blue_highlight.gif');}
+a.fmaxbox, a.fminbox {margin-right:5px;}
+a.fmaxbox {background-image:url('/ig/images/skins/cityscape/8pm/max_dark_blue.gif');}
+a.fminbox {background-image:url('/ig/images/skins/cityscape/8pm/min_dark_blue.gif');}
+a.fmaxbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/max_dark_blue_highlight.gif');}
+a.fminbox:hover {background-image:url('/ig/images/skins/cityscape/8pm/min_dark_blue_highlight.gif');}
+.meditbox {border-top:1px #9facc4 solid;padding: 5px 0px 5px 0px;font-size:12px;}
+.uftl {padding:5px 0px;border:none;border-top:1px solid #fff;border-bottom:1px solid #fff;}
+.sftl {padding:5px 0px;border:none;border-top:1px #9facc4 dotted;border-bottom:1px #9facc4 dotted;}
+.fpad {padding:5px 10px 2px 17px;font-size:92%;}
+.modlabel {padding-bottom:8px;border-bottom:1px #9facc4 dotted;margin-bottom:2px;}
+.tld {width:70px;}
+#more {border-color:#9facc4 !Important;}
+.dd_border {border:1px solid #9facc4;}
+.dd_item {font-size:11px;}
+.edline {border-bottom-color:#dae3f2;}
+
+/* link colors */
+a:link, a:visited, a:active {color:#2466a5;}
+a:hover, a.alt:hover {color:#022f59;text-decoration:underline;}
+.modtitle, a.alt {color:#2466a5;}
+a.mtlink {color:#314d81;}
+a.gre {color:#2a7d01;}
+.tls a {color:#232222;}
+.tls a:hover {text-decoration:underline;}
+#footerwrap a, #nhdrwrap a {text-decoration:none;}
+#nhdrwrapsizer a {color:#fff;}
+#nhdrwrap a:hover, #footerwrap a:hover {text-decoration:underline;}
+#more a.q, #nhdrwrap .msg_box a, #new_user_save_box a {color:#2466a5;}
+
+/* text colors */
+.gseain, #featuretabs, #gbar {color:#000;}
+.selectedtab {color:#262627;}
+.unselectedtab {color:#314d81;}
+.fpad {color:#666666;}
+.modtitle_s {color:#314d81;}
+.tab_hover {color:#fff;}
+
+/* google logo */
+#regular_logo {margin-right: 5px;background:url('/ig/images/skins/cityscape/8pm/logo.png') left top no-repeat;width:150px;height:55px;}
+/* \*/
+* html #regular_logo {background:none;float:left;width:150px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='ig/images/sk_cityscape_8pm/logo.png', sizingMethod='scale');}
+/* */

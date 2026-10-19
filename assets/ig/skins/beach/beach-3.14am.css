@@ -1,0 +1,72 @@
+body {font-family:lucida grande,arial,helvetica,sans-serif;}
+#gbar, .gseain {font-size:11px;}
+.gseain input {font-size:12px;}
+#featuretabs {font-size:13px;}
+.gseaopt {font-size:10px;}
+#gsea {padding-bottom:0px;}
+.msg .msg_box,#noscript_box,#new_user_save_box {background-color:#fff;}
+#nhdrwrap {background:url('/ig/images/skins/beach/3.14am/header_tile.jpg') repeat-x top center;}
+#nhdrwrapinner {background:url('/ig/images/skins/beach/3.14am/header_bg.jpg') no-repeat top center;}
+#nhdrwrapsizer {height: 141px;}
+#no_script {background-color:#fff;}
+#footerwrap {border-top:1px #c7afaf solid;}
+.tab {font-size:12px;border-bottom-color:#fff;}
+.selectedtab {border-color:#fff;}
+.unselectedtab {background-color:#f2e1e1;border-color:#fff;}
+.tab_hover {background-color:#c7afaf;}
+.modboxin, .modboxin_s {padding:5px 9px 10px 9px;font-size:12px;border:1px #e5cfcf solid;background-color:#fff;}
+.modtitle, .modtitle_s {background:#e0d7d7 url('/ig/images/skins/beach/3.14am/mt_back.gif') no-repeat;border:1px #c7afaf solid;padding:0px 8px;}
+.modboxin_s, .modtitle_s {border-color:#ad9999;}
+.modboxin_s {border-top-color:#d4baba;background-color:#f2e1e1;padding-top:9px;}
+.modtitle, .mtlink, .modtitle_s {font-size:12px;line-height:21px;}
+a.ddbox, a.delbox, a.minbox, a.maxbox {margin-top:4px;}
+a.ddbox {background-image:url('/ig/images/skins/beach/3.14am/arrow_blue.gif');}
+a.delbox {background-image:url('/ig/images/skins/beach/3.14am/x_blue.gif');}
+a.minbox {background-image:url('/ig/images/skins/beach/3.14am/min_blue.gif');}
+a.maxbox {background-image:url('/ig/images/skins/beach/3.14am/max_blue.gif');}
+a.ddbox:hover {background-image:url('/ig/images/skins/beach/3.14am/arrow_blue_highlight.gif');}
+a.delbox:hover {background-image:url('/ig/images/skins/beach/3.14am/x_blue_highlight.gif');}
+a.minbox:hover {background-image:url('/ig/images/skins/beach/3.14am/min_blue_highlight.gif');}
+a.maxbox:hover {background-image:url('/ig/images/skins/beach/3.14am/max_blue_highlight.gif');}
+a.fmaxbox, a.fminbox {margin-right:5px;}
+a.fmaxbox {background-image:url('/ig/images/skins/beach/3.14am/max_dark_blue.gif');}
+a.fminbox {background-image:url('/ig/images/skins/beach/3.14am/min_dark_blue.gif');}
+a.fmaxbox:hover {background-image:url('/ig/images/skins/beach/3.14am/max_dark_blue_highlight.gif');}
+a.fminbox:hover {background-image:url('/ig/images/skins/beach/3.14am/min_dark_blue_highlight.gif');}
+.meditbox {border-top:1px #c7afaf solid;padding: 5px 0px 5px 0px;font-size:12px;}
+.uftl {padding:5px 0px;border:none;border-top:1px solid #fff;border-bottom:1px solid #fff;}
+.sftl {padding:5px 0px;border:none;border-top:1px #c7afaf dotted;border-bottom:1px #c7afaf dotted;}
+.fpad {padding:5px 10px 2px 17px;font-size:92%;}
+.modlabel {padding-bottom:8px;border-bottom:1px #c7afaf dotted;margin-bottom:2px;}
+.tld {width:70px;}
+#more {border-color:#cacaca !Important;}
+.dd_border {border:1px solid #c7afaf;}
+.dd_item {font-size:11px;}
+
+/* link colors */
+a:link, a:visited, a:active {color:#2357c3;}
+a:hover, a.alt:hover {color:#002775;text-decoration:underline;}
+a.alt {color:#2357c3;}
+.modtitle, a.mtlink {color:#643d3d;}
+a.gre {color:#2a7d01;}
+.tls a {color:#232222;}
+.tls a:hover {text-decoration:underline;}
+#footerwrap a, #nhdrwrap a {text-decoration:none;}
+#nhdrwrapsizer a, #addstuff a, #tabs li.addtab a {text-decoration:none;color:#fff;}
+#nhdrwrap a:hover, #footerwrap a:hover, #tabs li.addtab a:hover {text-decoration:underline;}
+#more a.q, #nhdrwrap .msg_box a, #new_user_save_box a {color:#2357c3;}
+
+/* text colors */
+.gseain, #featuretabs, #gbar, #addstuff {color:#ffcc00;}
+.selectedtab {color:#262627;}
+.unselectedtab {color:#643d3d;}
+.fpad {color:#666666;}
+.new {color:#ffd400;}
+.modtitle_s {color:#643d3d;}
+.tab_hover {color:#fff;}
+
+/* google logo */
+#regular_logo {margin-right: 5px;background:url('/ig/images/skins/beach/3.14am/logo.png') left top no-repeat;width:150px;height:55px;}
+/* \*/
+* html #regular_logo {background:none;float:left;width:150px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/ig/images/skins/beach/3.14am/logo.png', sizingMethod='scale');}
+/* */

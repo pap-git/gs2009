@@ -1,0 +1,70 @@
+body {background-color:#434c4b;font-family:lucida grande,arial,helvetica,sans-serif;}
+#gbar, .gseain {font-size:11px;}
+.gseain input {font-size:12px;}
+#featuretabs {font-size:13px;}
+.gseaopt {font-size:10px;}
+.msg .msg_box,#noscript_box,#new_user_save_box {background-color:#fff;}
+#nhdrwrap {background:url('/ig/images/skins/teahouse/header_tile3.jpg') repeat-x top center;}
+#nhdrwrapinner {background:url('/ig/images/skins/teahouse/header_bg3.jpg') no-repeat top center;}
+#nhdrwrapsizer {height: 220px;}
+#no_script {background-color:#fff;}
+#footerwrap {border-top:5px #779460 solid;background:url('/ig/images/skins/teahouse/footer_tile3.jpg') repeat-x bottom left;}
+.tab {font-size:12px;border-bottom-color:#fff;}
+.selectedtab {border-color:#fff;}
+.unselectedtab {background-color:#ddedd1;border-color:#fff;}
+.tab_hover {background-color:#a4c98b;}
+.modboxin, .modboxin_s {padding:5px 9px 10px 9px;font-size:12px;border:1px #d8e5cf solid;background-color:#fff;}
+.modtitle, .modtitle_s {background:#c7e4b3 url('/ig/images/skins/teahouse/mt_back.gif') no-repeat;border:1px #a4c98b solid;padding:0px 8px;}
+.modboxin_s, .modtitle_s {border-color:#8fb079;}
+.modboxin_s {border-top-color:#aed694;background-color:#ddedd1;padding-top:9px;}
+.modtitle, .mtlink, .modtitle_s {font-size:12px;line-height:21px;}
+a.ddbox, a.delbox, a.minbox, a.maxbox {margin-top:4px;}
+a.ddbox {background-image:url('/ig/images/skins/teahouse/arrow_blue.gif');}
+a.delbox {background-image:url('/ig/images/skins/teahouse/x_blue.gif');}
+a.minbox {background-image:url('/ig/images/skins/teahouse/min_blue.gif');}
+a.maxbox {background-image:url('/ig/images/skins/teahouse/max_blue.gif');}
+a.ddbox:hover {background-image:url('/ig/images/skins/teahouse/arrow_blue_highlight.gif');}
+a.delbox:hover {background-image:url('/ig/images/skins/teahouse/x_blue_highlight.gif');}
+a.minbox:hover {background-image:url('/ig/images/skins/teahouse/min_blue_highlight.gif');}
+a.maxbox:hover {background-image:url('/ig/images/skins/teahouse/max_blue_highlight.gif');}
+a.fmaxbox, a.fminbox {margin-right:5px;}
+a.fmaxbox {background-image:url('/ig/images/skins/teahouse/max_dark_blue.gif');}
+a.fminbox {background-image:url('/ig/images/skins/teahouse/min_dark_blue.gif');}
+a.fmaxbox:hover {background-image:url('/ig/images/skins/teahouse/max_dark_blue_highlight.gif');}
+a.fminbox:hover {background-image:url('/ig/images/skins/teahouse/min_dark_blue_highlight.gif');}
+.meditbox {border-top:1px #a4c98b solid;padding: 5px 0px 5px 0px;font-size:12px;}
+.uftl {padding:5px 0px;border:none;border-top:1px solid #fff;border-bottom:1px solid #fff;}
+.sftl {padding:5px 0px;border:none;border-top:1px #a4c98b dotted;border-bottom:1px #a4c98b dotted;}
+.fpad {padding:5px 10px 2px 17px;font-size:92%;}
+.modlabel {padding-bottom:8px;border-bottom:1px #a4c98b dotted;margin-bottom:2px;}
+.tld {width:70px;}
+#more {border-color:#a4c98b !Important;}
+.dd_border {border:1px solid #779460;}
+.dd_item {font-size:11px;}
+
+/* link colors */
+a:link, a:visited, a:active {color:#4e8029;}
+a:hover, a.alt:hover, a.mtlink:hover {color:#203311;text-decoration:underline;}
+.modtitle, a.alt, a.mtlink {color:#4e8029;}
+a.gre {color:#4b7e95;}
+.tls a {color:#4b7e95;}
+.tls a:hover {text-decoration:underline;}
+#nhdrwrap a, #footerwrap a {text-decoration:none;color:#fff;}
+#nhdrwrap a:hover, #footerwrap a:hover {text-decoration:underline;}
+#more a.q, #nhdrwrap .msg_box a, #new_user_save_box a {color:#4e8029;}
+.edittab a {color:#4b7e95 !Important;}
+
+/* text colors */
+.gseain, #featuretabs, #gbar, #footer_promos {color:#a9bc9b;}
+.selectedtab {color:#262627;}
+.unselectedtab {color:#4e8029;}
+.fpad {color:#666666;}
+.new {color:#ffd400;}
+.modtitle_s {color:#4e8029;}
+.tab_hover {color:#fff;}
+
+/* google logo */
+#regular_logo {margin-right: 5px;background:url('/ig/images/skins/teahouse/logo.png') left top no-repeat;width:150px;height:55px;}
+/* \*/
+* html #regular_logo {background:none;float:left;width:150px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/ig/images/skins/teahouse/logo.png', sizingMethod='scale');}
+/* */

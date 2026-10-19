@@ -1,0 +1,72 @@
+body {background-color:#89b25c;font-family:lucida grande,arial,helvetica,sans-serif;}
+#gbar, .gseain {font-size:11px;}
+.gseain input {font-size:12px;}
+#featuretabs {font-size:13px;}
+.gseaopt {font-size:10px;}
+.msg .msg_box,#noscript_box,#new_user_save_box {background-color:#fff;}
+#nhdrwrap {background:#78726b url('/ig/images/skins/busstop/header_tile.jpg') repeat-x top center;}
+#nhdrwrapinner {background:url('/ig/images/skins/busstop/header_bg.gif') no-repeat top center;}
+#nhdrwrapsizer {height: 220px;}
+#no_script {background-color:#fff;}
+#footerwrap {border-top:5px #dcd2c4 solid;background:url('/ig/images/skins/busstop/footer_bg.gif') no-repeat top left;}
+#tabs {height:28px;}
+.tab {font-size:12px;border-bottom:5px #dcd2c4 solid;}
+.selectedtab {background-color:#dcd2c4;border-color:#dcd2c4;}
+.unselectedtab {background-color:#a0998f;border-color:#dcd2c4;}
+.tab_hover {background-color:#78726c;}
+.modboxin, .modboxin_s {padding:5px 9px 10px 9px;font-size:12px;border:1px #e4e5cf solid;background-color:#fff;}
+.modtitle, .modtitle_s {background:#e1e5b2 url('/ig/images/skins/busstop/mt_back.gif') no-repeat;border:1px #c7cc8c solid;padding:0px 8px;}
+.modboxin_s, .modtitle_s {border-color:#abb079;}
+.modboxin_s {border-top-color:#d1d694;background-color:#f0f2da;padding-top:9px;}
+.modtitle, .mtlink, .modtitle_s {font-size:12px;line-height:21px;}
+a.ddbox, a.delbox, a.minbox, a.maxbox {margin-top:4px;}
+a.ddbox {background-image:url('/ig/images/skins/busstop/arrow_blue.gif');}
+a.delbox {background-image:url('/ig/images/skins/busstop/x_blue.gif');}
+a.minbox {background-image:url('/ig/images/skins/busstop/min_blue.gif');}
+a.maxbox {background-image:url('/ig/images/skins/busstop/max_blue.gif');}
+a.ddbox:hover {background-image:url('/ig/images/skins/busstop/arrow_blue_highlight.gif');}
+a.delbox:hover {background-image:url('/ig/images/skins/busstop/x_blue_highlight.gif');}
+a.minbox:hover {background-image:url('/ig/images/skins/busstop/min_blue_highlight.gif');}
+a.maxbox:hover {background-image:url('/ig/images/skins/busstop/max_blue_highlight.gif');}
+a.fmaxbox, a.fminbox {margin-right:5px;}
+a.fmaxbox {background-image:url('/ig/images/skins/busstop/max_dark_blue.gif');}
+a.fminbox {background-image:url('/ig/images/skins/busstop/min_dark_blue.gif');}
+a.fmaxbox:hover {background-image:url('/ig/images/skins/busstop/max_dark_blue_highlight.gif');}
+a.fminbox:hover {background-image:url('/ig/images/skins/busstop/min_dark_blue_highlight.gif');}
+.meditbox {border-top:1px #c7cc8c solid;padding: 5px 0px 5px 0px;font-size:12px;}
+.uftl {padding:5px 0px;border:none;border-top:1px solid #fff;border-bottom:1px solid #fff;}
+.sftl {padding:5px 0px;border:none;border-top:1px #c7cc8c dotted;border-bottom:1px #c7cc8c dotted;}
+.fpad {padding:5px 10px 2px 17px;font-size:92%;}
+.modlabel {padding-bottom:8px;border-bottom:1px #c7cc8c dotted;margin-bottom:2px;}
+.tld {width:70px;}
+#more {border-color:#338ca2 !Important;}
+.dd_border {border:1px solid #c7cc8c;}
+.dd_item {font-size:11px;}
+
+/* link colors */
+a:link, a:visited, a:active {color:#0e6276;}
+a:hover, a.alt:hover, a.mtlink:hover {color:#002129;text-decoration:underline;}
+a.alt {color:#0e6276;}
+.modtitle, a.mtlink {color:#696e2f;}
+a.gre {color:#2a7d01;}
+.tls a {color:#2a7d01;}
+.tls a:hover {text-decoration:underline;}
+#nhdrwrap a, #footerwrap a {text-decoration:none;}
+.edittab a {color:#0e6276;}
+#footer_promos a, #addstuff a, #tabs li.addtab a {color:#fff;}
+#footerwrap a:hover, #nhdrwrap a:hover {text-decoration:underline;}
+
+/* text colors */
+.gseain, #featuretabs, #gbar, .selectedtab, #addstuff {color:#262626;}
+#footer_promos {color:#c7e1b2;}
+.unselectedtab {color:#ebe5dd;}
+.fpad {color:#666666;}
+.new {color:#e9cd6d;}
+.modtitle_s {color:#696e2f;}
+.tab_hover {color:#fff;}
+
+/* google logo */
+#regular_logo {margin-right: 5px;background:url('/ig/images/skins/busstop/logo.png') left top no-repeat;width:150px;height:55px;}
+/* \*/
+* html #regular_logo {background:none;float:left;width:150px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/ig/images/skins/busstop/logo.png', sizingMethod='scale');}
+/* */
