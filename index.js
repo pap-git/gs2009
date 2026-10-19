@@ -160,6 +160,11 @@ async function followPath(urlPath, era) {
     let result = undefined;
     const pathes = [
         // [original path, folder path]
+        ["/images/icons/about_groups.gif", "./assets/images/icons/about_groups.gif"],
+        ["/images/icons/about_ff_logo.gif", "./assets/images/icons/about_ff_logo.gif"],
+        ["/images/about_logo.gif", "./assets/images/about_logo.gif"],
+        ["/images/icons/about_checkout.gif", "./assets/images/icons/about_checkout.gif"],
+        ["/images/icons/about_mini.gif", "./assets/images/icons/about_mini.gif"],
         ["/ig/images/x.gif", "./assets/ig/images/x.gif"],
         ["/ig/images/x2.gif", "./assets/ig/images/x2.gif"],
         ["/ig/images/x3.gif", "./assets/ig/images/x3.gif"],
@@ -582,12 +587,13 @@ app.use(async (req, res, next) => {
         }
     }
 
+    if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
+    if (req.url == "/about.html") req.url = "/intl/en/about.html"
     const assets = await followPath(req._parsedUrl.pathname, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)))
     if (assets) {
         res.send(assets)
         return;
     }
-    if (req.url.includes("webhp")) req.url = req.url.replace("webhp", "")
     next()
 })
 
@@ -2545,7 +2551,7 @@ app.get('/interstitial', async (req, res) => {
 
 app.use((req, res) => {
     const errorpage = fs.readFileSync("./assets/404.html").toString()
-    log.e("Requested by client but not found: " + req.url, "404")
+    // log.e("Requested by client but not found: " + req.url, "404")
     res.status(404).send(errorpage.replace("LINK", req.originalUrl))
 })
 
