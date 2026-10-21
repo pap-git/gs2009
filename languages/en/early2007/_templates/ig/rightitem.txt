@@ -1,0 +1,1 @@
+<div class="rf"><b class="new">new! </b><b><a href="#">Choose theme</a></b> | <b><a href="#">Add stuff »</a></b><span class="spacer"></span></div>

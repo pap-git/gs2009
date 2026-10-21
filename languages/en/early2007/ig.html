@@ -193,36 +193,24 @@ document.onclick=function(event){var elems=document.getElementsByName('more');if
 function qs(el) {if (window.RegExp && window.encodeURIComponent) {var qe=encodeURIComponent(document.f.q.value);if (el.href.indexOf("q=")!=-1) {el.href=el.href.replace(new RegExp("q=[^&$]*"),"q="+qe);} else {el.href+="&q="+qe;}}return 1;}if (document.all) {_IG_AddDOMEventHandler(window, "focus",function() {_gel("q").focus();_IG_RemoveDOMEventHandler(window, "focus", arguments.callee);});} else {_gel("q").focus();}
 // -->
 </script><div style="padding-top: 5px;"></div><div id="undel_msg" class="msg" style="display:none;"><div id="undel_box" class="msg_box"><span id="undel_title"></span> has been removed. <a href="javascript:void(_undel())">Undo</a> | <a href="#" class="delbox_u" onclick="_gel('undel_msg').style.display='none';return false;">Close</a></div></div><noscript><div id="noscript_msg" class="msg"><div id="noscript_box" class="msg_box">You need to have JavaScript enabled to use this page.</div></div></noscript><script>_IG_time.stop("parse_header");</script></div>
-</div> 
-</div>
-<div id="tabs">
-    <ul class="tab">
-      <div class="lf">
+<!-- tab starts -->
+<div id="tabs"><ul class="tab"><div class="lf">
         <table border="0" style="margin-top: -2px;" cellpadding="0">
           <tbody>
             <tr>
               <td class="spacer">&nbsp;</td>
-              <td class="selectedtab">
-                <span>Home</span>
-              </td>
-              <td class="unselectedtab">
-                <span>News</span>
-              </td>
-              <td>
-                <span><a href="#" onclick="if (this.innerHTML=='no' && this.innerHTML!='Add a tab') {this.innerHTML='i said no'} else {this.innerHTML='no'}">Add a tab</a></span>
-              </td>
+              <td class="selectedtab"><span>Home</span></td>
+              <td class="unselectedtab"><span>News</span></td>
+              <td><span><a href="#">Add a tab</a></span></td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="rf">
-        <b class="new">new!</b>
-        <b><a href="#">Choose theme</a></b>
-        |
-        <b><a href="#">Add stuff »</a></b>
-        <span class="spacer"></span>
-      </div>
+      {gs2009_ig_rightItem}
     </ul>
+</div>
+<!-- tab ends -->
+</div> 
 </div>
 <div class="c"></div>
 <div id="modules"><div class="yui-b"><div class="yui-gb" id="t_1"><div class="yui-u first" id="c_1"><div id="m_1" class="modbox"><h2 class="modtitle"><a class="delbox" href="#" onclick="return _del('1',32,'n_32=url%3Dcalendar.xml');"></a><a class="minbox" id="m_1_zippy" href="#" onclick="this.blur();return _zm('1', '32');return false;"></a><a class="ddbox" id="DD_tg_1" href="#" onclick="_IG_DD_open(event,1);return false;"></a><script>_IG_DD_create(1, [["Edit settings","","_edit(1)"],["You might also like...","/ig/directory?recommend\x3dcalendar.xml",""],["About this gadget","/ig/directory?url\x3dcalendar.xml",""]]);</script><div id="m_1_h"><a class="mtlink" id="m_1_url" href="/calendar/"><span id="m_1_title" class="modtitle_text">Google Calendar</span></a></div><div class="meditbox"><form id="m_1_form" onsubmit="return _fsetp(this,'1',32);"><script></script><table border="0" cellpadding="0" cellspacing="0" width="95%" align="center"><tr><td colspan="1" align="right" width="35%">Display calendar</td><td colspan="2" nowrap align="left" width="65%"><input type="hidden" id="m_1_0" name="m_1_up_showCalendar2" value="1"><input type="checkbox" checked onclick="_gel('m_1_0').value = this.checked ? '1' : '0';"></td></tr><tr><td colspan="1" align="right" width="35%">First day of week:</td><td colspan="2" nowrap align="left" width="65%">&nbsp;<select id="m_1_3" name="m_1_up_firstDay" style="width:95%;"><option selected value="Sunday">Sunday<option value="Monday">Monday<option value="Saturday">Saturday</select></td></tr><tr><td colspan="1" align="right" width="35%">Time format:</td><td colspan="2" nowrap align="left" width="65%">&nbsp;<select id="m_1_4" name="m_1_up_timeFormat" style="width:95%;"><option selected value="1:00pm">1:00pm<option value="13:00">13:00</select></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="95%" align="center"><tr><td colspan="2" nowrap align="left"><br><a href="/ig/directory?url=calendar.xml&amp;synd=ig"><font size="-1" color="#7777cc">About this gadget</font></a></td><td colspan="1" align="right" valign="bottom"><input id="m_1_numfields" type="hidden" value="6"><input id="save_1" class="submitbtn" type="submit" value="Save"><input type="button" value="Cancel" onclick="return _cedit('1')"></td></tr></table></form></div></h2><div id="m_1_b" class="modboxin"><script><!--

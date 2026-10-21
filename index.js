@@ -427,6 +427,8 @@ function retriveTemplate(lang, era) {
         gbar_user_logged_index: GiveMeTheResult(lang, era, "/gbar_user_logged_index.txt"),
         gbar_user_logged_ig: GiveMeTheResult(lang, era, "/gbar_user_logged_ig.txt"),
 
+        ig_rightitem: GiveMeTheResult(lang, era, "/ig/rightitem.txt"),
+
         auth_mismatch: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
         auth_acc_disabled: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
 
@@ -447,6 +449,8 @@ function retriveTemplate(lang, era) {
         gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
         gbar_user_logged_index: fs.readFileSync(paths.gbar_user_logged_index, "utf8"),
         gbar_user_logged_ig: fs.readFileSync(paths.gbar_user_logged_ig, "utf8"),
+
+        ig_rightitem: fs.readFileSync(paths.ig_rightitem, "utf8"), 
 
         auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
         auth_acc_disabled: fs.readFileSync(paths.auth_acc_disabled, "utf8"),
@@ -1279,7 +1283,11 @@ app.get('/ig', async (req, res) => {
         repl = repl.replace(/gbar_username/g, SimLogin)
 
         const ig_css_path = path.join(__dirname, "/assets/ig/skins", "teahouse", "teahouse_3.14am.css")
-        const themecss = fs.existsSync(ig_css_path) ? await fs.readFileSync(ig_css_path).toString() : ""
+        const themecss = req.cookies.GS2009_ACCOUNTS ? (fs.existsSync(ig_css_path) ? await fs.readFileSync(ig_css_path).toString() : "") : ""
+        if (!req.cookies.GS2009_ACCOUNTS) {
+            repl = repl.replace(/<!-- tab starts.*tab ends -->/sg, `<div class="setup_promo">Welcome to your Google homepage.&nbsp;&nbsp;<a href="javascript:_dlsetp('ss=2')">Make it your own</a>.<div class="setup_promo_subtext">(Already have a page? <a href="/accounts/ServiceLogin?service=ig&amp;passive=true&amp;continue=http://www.google.com/ig&amp;followup=http://www.google.com/ig&amp;cd=US&amp;hl=en&amp;nui=1&amp;ltmpl=default">Sign in</a> to see your stuff.)</div></div>`)
+        }
+        repl = repl.replace("{gs2009_ig_rightItem}", template.data.ig_rightitem)
         repl = repl.replace(".ADDTHEMECONTENT{}", themecss)
 
         res.send(repl)
@@ -1289,6 +1297,7 @@ app.get('/ig', async (req, res) => {
 app.get('/ig/setp', async (req, res) => {
     console.log(req.url)
     console.log(req.cookies)
+    console.log(req.query)
     res.send()
 })
 
@@ -1347,7 +1356,7 @@ app.get('/search', async (req, res) => {
 
     let result;
     try {
-        result = await fetchResults({});
+        result = await fetchResults({ existingfilePath: "placeholder-dev/search_output.json" });
     } catch(e) {
         log.e("Some errors occured during fetching results", tag)
         log.e(e.toString(), tag)
@@ -1680,6 +1689,8 @@ app.get('/search', async (req, res) => {
             const q = grabSettings(req.cookies.GS2009_SETTINGS).before !== false ? actualq : query
             const json = JSON.parse(fs.readFileSync(ogfile))
 
+            let topAdsCount = 0;
+
             json.sponsored.forEach((ad) => {
                 let r = false
                 json.categories.forEach((category) => {
@@ -1708,7 +1719,10 @@ app.get('/search', async (req, res) => {
 
                 if (r) {
                     if (ad.on_top_of_search) {
-                        topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
+                        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
+                        else {
+                            topadsHTML.push(`<div id="tpa1" style="background-color:#e5ecf9;border:1px none #e5ecf9;" onmouseover="ss('go to www.iland.com','aw1')" onmouseout="cs()" onclick="ga(this,event)" class="ch taf">` + (topAdsCount < 1 ? `<div id="spl" align="right" style="padding-right:3px;float:right;"><font size="-1" class="f">` + strings.search.sponsored_links + `</font></div>` : "") + `<a id="pa1" href="/web/20060927184508/http://www.google.com/url?sa=L&amp;ai=BotHNtcYaRajmAaGEgwO7h920Asi99xrYhbvyAeTB3KIC4LHfAQgAEAEYASgCSKY5UNexmN4EmAHAqQeqARpvcmcubW96aWxsYTplbi1VUzpvZmZpY2lhbMgBAZUCJY1gCg&amp;q=http://www.ilandinternet.com/colocation/Ohio_Cincinnati.aspx&amp;sig=__kXWfDlgY4BoyR7nmZSwtCg617Ts=" onmouseover="return ss('go to www.iland.com','aw1')" onmouseout="cs()">Ohio Server <b>Colocation</b></a><br><font size="-1"><span class="a">www.iland.com</span>&nbsp; &nbsp; &nbsp; Fast. Secure. Redundant. Reliable. High-end <b>Colocation</b> Facilities</font></div>`)
+                        }
                     } else {
                         let actualsnippets = ""
                         let rangeRequires = 35
@@ -1721,7 +1735,8 @@ app.get('/search', async (req, res) => {
                             }
                         })
                         actualsnippets = actualsnippets.replace(/<br>(?!.*e)/, "")
-                        adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
+                        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
+                        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) adsHTML.push('<font size="+0"><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></font><br>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><span class="a">' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</span><br><br>')
                     }
                 }
             })
@@ -1755,9 +1770,13 @@ app.get('/search', async (req, res) => {
             links2 = links2 + topadsHTML[i]
         }
 
-        let adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+        // todo: oh my god what the fuck man
+        let adTables;
+        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) adTables = links1.length < 1 ? "" : '<table cellspacing="0" cellpadding="0" width="25%" align="right" id="mbEnd" bgcolor="#ffffff" border="0" class="ra"><tbody><tr><td colspan="4"><font size="-1">&nbsp;</font></td></tr><tr><td rowspan="5">&nbsp;&nbsp;</td><td width="1" bgcolor="#c9d7f1" rowspan="5"><img width="1" height="1" alt=""></td><td rowspan="5">&nbsp;&nbsp;</td><td height="25" align="center"><h2 class="sl f">' + strings.search.sponsored_links + '</h2></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td nowrap="" onmouseover="return ss()"><font size="-1">' + links1 + '</font></td><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td height="25" align="center"><font size="-1"></font></td></tr></tbody></table>'
 
-        repl = repl.replace('<div id="res" class="med">', adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
+        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) repl = repl.replace(/<div id="res"( class="med")?>/, adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
+        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) repl = repl.replace(/<div id="res">/, adTables + (links2.length < 1 ? "" : links2) + '<div id="res">')
     }
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
