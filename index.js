@@ -22,7 +22,6 @@ import { imageSizeFromFile } from "image-size/fromFile";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
 import os from "node:os"
-import keys from "keys-tree"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -37,6 +36,12 @@ var searxng_ishttps = false;
 var branch = ""
 
 log.i("starting gs2009 instance, version " + gs2009_version, "init")
+
+function getEraDate(settings, date) {
+    if (date) return date;
+    const nowDate = new Date(Date.now())
+    return Number(grabEras(grabSettings(settings)).replace(/[a-z]/g, "")).toString() + (nowDate.getUTCDate() + 1 < 10 ? "0" + (nowDate.getUTCDate() + 1) : (nowDate.getUTCDate() + 1)) + (nowDate.getUTCDay() < 10 ? "0" + nowDate.getUTCDay() : nowDate.getUTCDay())
+}
 
 async function setBranch() {
     const tag = "branch"
@@ -959,25 +964,13 @@ app.get('/', async (req, res) => {
                 repl.replace("gbar_user_REPLACE_HERE", template.data.gbar_user_logged_index)
 
         const doodlePath = fs.existsSync(path.join(__dirname, "languages", language, "doodles.json")) ? path.join(__dirname, "languages", language, "doodles.json") : path.join(__dirname, "languages", "en", "doodles.json")
-        const nowDate = new Date(Date.now())
-        const date = Number(grabEras(grabSettings(req.cookies.GS2009_SETTINGS)).replace(/[a-z]/g, "")).toString() + (nowDate.getUTCDate() + 1 < 10 ? "0" + (nowDate.getUTCDate() + 1) : (nowDate.getUTCDate() + 1)) + (nowDate.getUTCDay() < 10 ? "0" + nowDate.getUTCDay() : nowDate.getUTCDay())
+        const date = getEraDate(req.cookies.GS2009_SETTINGS)
         const doodleList = JSON.parse(fs.readFileSync(doodlePath))
         let doodle = ""
         for (let i = 0; i < doodleList.length; i++) {
             // note: https://web.archive.org/web/20080726235547if_/http://www.google.com/
             const item = doodleList[i]
             if (item[0] == date) {
-                item[1].path.forEach(async (pathes) => {
-                    if (!fs.existsSync(path.join(__dirname, "_downloaded", pathes[0]))) {
-                        const result = await fetch(pathes[1]);
-                        const fileStream = fs.createWriteStream(path.resolve(path.join(__dirname, "_downloaded", pathes[0])), {"flags": "wx"})
-                        await finished(Readable.fromWeb(result.body).pipe(fileStream))
-                        if (!fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify([]))
-                        const fileMap = JSON.parse(fs.readFileSync(path.join(__dirname, "_downloaded", ".map.json")))
-                        fileMap.push([pathes[0], path.resolve(path.join(__dirname, "_downloaded", pathes[0]))])
-                        fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify(fileMap))
-                    }
-                })
                 if (fs.existsSync(path.join(__dirname, "_downloaded", item[1].path[0][0]))) {
                     const size = await imageSizeFromFile(path.join(__dirname, "_downloaded", item[1].path[0][0]))
                     doodle = (item[1].href ? ('<a href="' + item[1].href + '" ' + (item[1].onclick ? ('onclick="' + item[1].onclick + '"') : '') + '>') : '') + '<img src="' + item[1].path[0][0] + '" width="' + size.width + '" height="' + size.height + '" border="0" alt="' + item[1].description + '" title="' + item[1].description + '" id="logo" onload="window.lol&amp;&amp;lol()">' + (item[1].href ? '</a>' : "")
@@ -1356,7 +1349,7 @@ app.get('/search', async (req, res) => {
 
     let result;
     try {
-        result = await fetchResults({ existingfilePath: "placeholder-dev/search_output.json" });
+        result = await fetchResults({});
     } catch(e) {
         log.e("Some errors occured during fetching results", tag)
         log.e(e.toString(), tag)
@@ -1721,7 +1714,7 @@ app.get('/search', async (req, res) => {
                     if (ad.on_top_of_search) {
                         if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
                         else {
-                            topadsHTML.push(`<div id="tpa1" style="background-color:#e5ecf9;border:1px none #e5ecf9;" onmouseover="ss('go to www.iland.com','aw1')" onmouseout="cs()" onclick="ga(this,event)" class="ch taf">` + (topAdsCount < 1 ? `<div id="spl" align="right" style="padding-right:3px;float:right;"><font size="-1" class="f">` + strings.search.sponsored_links + `</font></div>` : "") + `<a id="pa1" href="/web/20060927184508/http://www.google.com/url?sa=L&amp;ai=BotHNtcYaRajmAaGEgwO7h920Asi99xrYhbvyAeTB3KIC4LHfAQgAEAEYASgCSKY5UNexmN4EmAHAqQeqARpvcmcubW96aWxsYTplbi1VUzpvZmZpY2lhbMgBAZUCJY1gCg&amp;q=http://www.ilandinternet.com/colocation/Ohio_Cincinnati.aspx&amp;sig=__kXWfDlgY4BoyR7nmZSwtCg617Ts=" onmouseover="return ss('go to www.iland.com','aw1')" onmouseout="cs()">Ohio Server <b>Colocation</b></a><br><font size="-1"><span class="a">www.iland.com</span>&nbsp; &nbsp; &nbsp; Fast. Secure. Redundant. Reliable. High-end <b>Colocation</b> Facilities</font></div>`)
+                            topadsHTML.push((topAdsCount < 1 ? `<div style="padding-top:11px;"></div>` : "") + `<div id="tpa1" style="background-color:#e5ecf9;border:1px none #e5ecf9;" onmouseover="ss('go to www.iland.com','aw1')" onmouseout="cs()" onclick="ga(this,event)" class="ch taf">` + (topAdsCount < 1 ? `<div id="spl" align="right" style="padding-right:3px;float:right;"><font size="-1" class="f">` + strings.search.sponsored_links + `</font></div>` : "") + `<a id="pa1" href="` + ad.href + `" onmouseover="return ss('go to ` + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `','aw1')" onmouseout="cs()">` + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `</a><br><font size="-1"><span class="a">` + ad.domain + `</span>&nbsp; &nbsp; &nbsp;` + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `</font></div>`)
                         }
                     } else {
                         let actualsnippets = ""
@@ -1788,8 +1781,7 @@ app.get('/search', async (req, res) => {
     let items = repl.split("item")
 
     let count = linkalplist.filter(v => /[a-z]/i.test(String(v))).length
-    if (count == 0) {
-    } else {
+    if (count !== 0) {
         result.data.items.forEach((item, i) => {
             if (typeof linkalplist[i] !== 'number') {
                 if (typeof linkalplist[i+1] == 'number') {
@@ -1800,24 +1792,13 @@ app.get('/search', async (req, res) => {
     }
 
     repl = items.join("item")
+    repl = repl.replace(/lastone/g, template.data.search_EOM)
 
     result.data.items.forEach((item, i) => {
-        if (typeof linkalplist[i] !== 'number') {
-            repl = repl.replace(/item/, template.data.search_more)
-            return
-        }
-        repl = repl.replace(/item/, template.data.search_normal)
-        repl = repl.replace(/lastone/, template.data.search_EOM)
-    })
+        let templateToUse;
+        if (typeof linkalplist[i] !== 'number') templateToUse = template.data.search_more
+        else templateToUse = template.data.search_normal
 
-    const search = [];
-    search.htmlTitle = "";
-    search.link = "";
-    search.htmlSnippet = "";
-    search.htmlFormattedUrl = "";
-    search.displayLink = "";
-
-    result.data.items.forEach((item, i) => {
         const search = [];
         search.htmlTitle = "";
         search.link = "";
@@ -1863,7 +1844,7 @@ app.get('/search', async (req, res) => {
                 if (search.link.match(new RegExp(regex[0], regex[1])) && !add) add = true;
             })
         }
-        repl = repl.replace(/htmlTitle/, search.htmlTitle)
+        templateToUse = templateToUse.replace(/htmlTitle/, search.htmlTitle)
         if (grabSettings(req.cookies.GS2009_SETTINGS).redirects?.enabled?.includes("http") == true) {
             search.link = search.link.replace("https://", "http://")
         }
@@ -1921,15 +1902,16 @@ app.get('/search', async (req, res) => {
 
         if (typeof linkalplist[i] !== 'number') {
             if (typeof linkalplist[i+1] == 'number') {
-                repl = repl.replace(/moreRelatedLink/, search.displayLink)
-                repl = repl.replace(/moreRelatedLink/, search.displayLink)
+                templateToUse = templateToUse.replace(/moreRelatedLink/, search.displayLink)
+                templateToUse = templateToUse.replace(/moreRelatedLink/, search.displayLink)
             }
         }
-        repl = repl.replace(/relatedUrlLink/, search.link)
-        repl = repl.replace(/UrlLink/, add ? ("/interstitial?url=" + escape(search.link)) : search.link)
-        repl = repl.replace(/htmlSnippet/, add ? ('<a href="#">' + strings.search.mayharm + '</a><br>' + search.htmlSnippet) : search.htmlSnippet)
-        repl = repl.replace(/htmlFormattedUrl/, search.htmlFormattedUrl)
+        templateToUse = templateToUse.replace(/relatedUrlLink/g, search.link)
+        templateToUse = templateToUse.replace(/UrlLink/g, add ? ("/interstitial?url=" + escape(search.link)) : search.link)
+        templateToUse = templateToUse.replace(/htmlSnippet/g, add ? ('<a href="#">' + strings.search.mayharm + '</a><br>' + search.htmlSnippet) : search.htmlSnippet)
+        templateToUse = templateToUse.replace(/htmlFormattedUrl/g, search.htmlFormattedUrl)
         //repl = repl.replace(/displayLink/, search.displayLink)
+        repl = repl.replace(/item/, templateToUse)
     })
 
     try {
@@ -2005,6 +1987,24 @@ app.get('/search', async (req, res) => {
     repl = repl.replace(/topItem/g, "")
 
     repl = repl.replace(/[^<]\/[a-z]*>/g, "PLACEHOLDERTEXT!!!!" + "$&").replace("PLACEHOLDERTEXT!!!! ", "<")
+
+    const doodlePath = fs.existsSync(path.join(__dirname, "languages", language, "doodles.json")) ? path.join(__dirname, "languages", language, "doodles.json") : path.join(__dirname, "languages", "en", "doodles.json")
+    const date = getEraDate(req.cookies.GS2009_SETTINGS)
+    const doodleList = JSON.parse(fs.readFileSync(doodlePath))
+    let resdoodle = ""
+    console.log(doodlePath)
+    for (let i = 0; i < doodleList.length; i++) {
+        // note: https://web.archive.org/web/20080726235547if_/http://www.google.com/
+        const item = doodleList[i]
+        if (item[0] == date) {
+            if (fs.existsSync(path.join(__dirname, "_downloaded", item[1].respath))) {
+                const size = await imageSizeFromFile(path.join(__dirname, "_downloaded", item[1].respath))
+                repl = repl.replace(/<a id="logo(.*?)<\/a>/gm, `<a href="/webhp"><img src="${item[1].respath}" width="${size.width} height="${size.height} border="0" alt="${item[1].description}" title="${item[1].description}"></a>`)
+            } else {
+                log.w("failed to grab files for doodle: " + date, "doodles")
+            }
+        }
+    }
 
     log.i("Sending replaced result", tag)
     if (language == "ja"){
@@ -2244,7 +2244,7 @@ app.get('/wallma/credits', async (req, res) => {
     let repl = await wallma.builder.base(pageProperties)
 
     const creditsText = `
-        <b>gs2009</b>: Google 2009 recreation frontend for SearXNG<br>
+        <b>gs2009</b>: An various old Google recreation frontend for SearXNG<br>
         (most of the links in here requires modern browser)<br>
         =====================================================================================<br>
         Credits for the modules used for this project belongs to the module author.<br>
