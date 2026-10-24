@@ -1,0 +1,5 @@
+# This is information file for each era folders.
+
+[regex.search]
+pageselector.previous="<td nowrap>(\n| )*<div id=\"nf\">(\n| )*</div>(\n| )*<td nowrap>(\n| )*<div id=\"nc\">(\n| )*</div>(\n| )*<span class=\"i\">(\n| )*1(\n| )*</span>"
+pageselector.next="<td nowarp>"

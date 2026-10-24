@@ -1,0 +1,1 @@
+<a href="/">ホーム</a>&nbsp;|&nbsp;<a href="/accounts/ServiceLogin?service=ig&amp;passive=true&amp;continue=http://www.google.co.jp/ig&amp;followup=http://www.google.co.jp/ig&amp;cd=JP&amp;hl=ja&amp;nui=1&amp;ltmpl=default">ログイン</a>

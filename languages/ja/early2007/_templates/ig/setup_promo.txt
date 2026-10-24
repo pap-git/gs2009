@@ -1,0 +1,1 @@
+<div class="setup_promo">Google ホームページへようこそ。&nbsp;&nbsp;<a href="javascript:_dlsetp('ss=2')">パーソナライズはこちらで</a><div class="setup_promo_subtext">(ページをお持ちの場合は <a href="/accounts/ServiceLogin?service=ig&amp;passive=true&amp;continue=http://www.google.co.jp/ig&amp;followup=http://www.google.co.jp/ig&amp;cd=JP&amp;hl=ja&amp;nui=1&amp;ltmpl=default">ログイン</a>して今すぐアクセス)</div>

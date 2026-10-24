@@ -1,0 +1,1 @@
+<div><font size="-1">&nbsp;&nbsp;<img src="/ig/images/yellow_warning.gif" width="14" height="14" alt="注意報"/>&nbsp;<b>警告</b>: ご利用のブラウザでは、Google パーソナライズド ホームは完全にはサポートされていません。&nbsp;&nbsp;<br><nobr>&nbsp;&nbsp;<a href="/support/bin/answer.py?answer=37971">ここをクリックすると、サポートされているブラウザの一覧が表示されます。</a>&nbsp;&nbsp;</nobr></font></div>

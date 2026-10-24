@@ -169,10 +169,13 @@ async function followPath(urlPath, era) {
         ["/images/icons/about_ff_logo.gif", "./assets/images/icons/about_ff_logo.gif"],
         ["/images/about_logo.gif", "./assets/images/about_logo.gif"],
         ["/images/icons/about_checkout.gif", "./assets/images/icons/about_checkout.gif"],
+        ["/images/icons/about_desktop.jpg", "./assets/images/icons/about_desktop.jpg"],
         ["/images/icons/about_mini.gif", "./assets/images/icons/about_mini.gif"],
+        ["/intl/ja/images/toolbar_about.gif", "./assets/images/ja/toolbar_about.gif"],
         ["/ig/images/x.gif", "./assets/ig/images/x.gif"],
         ["/ig/images/x2.gif", "./assets/ig/images/x2.gif"],
         ["/ig/images/x3.gif", "./assets/ig/images/x3.gif"],
+        ["/images/toolbar.gif", "./assets/images/toolbar.gif"],
         ["/ig/images/yellow_warning.gif", "./assets/ig/images/yellow_warning.gif"],
         ["/calendar/images/close.gif", "./assets/calendar/images/close.gif"],
         ["/calendar/images/corner_tl.gif", "./assets/calendar/images/corner_tl.gif"],
@@ -206,6 +209,7 @@ async function followPath(urlPath, era) {
         ["/ig/f/mid2007/ig.css", "./assets/ig/f/mid2007/ig.css"],
         ["/images/google_sm.gif", "./assets/images/google_sm.gif"],
         ["/images/x2.gif", "./assets/images/x2.gif"],
+        ["/images/art.gif", "./assets/images/art.gif"],
         ["/wallma/ig_main.js", "./assets/admin/assets/ig_main.js"],
         ["/wallma/lib/libdrag.js", "./assets/admin/assets/libdrag.js"],
         ["/wallma/lib/libtabs.js", "./assets/admin/assets/libtabs.js"],
@@ -425,14 +429,16 @@ function retriveTemplate(lang, era) {
     }
 
     const paths = {
+        ig: {
+            rightitem: GiveMeTheResult(lang, era, "/ig/rightitem.txt"),
+            setup_promo: GiveMeTheResult(lang, era, "/ig/setup_promo.txt")
+        },
         gbar_user: GiveMeTheResult(lang, era, "/gbar_user.txt"), // ext_t_g_u
         gbar_user_index: GiveMeTheResult(lang, era, "/gbar_user_index.txt"), // ext_t_g_u
         gbar_user_ig: GiveMeTheResult(lang, era, "/gbar_user_ig.txt"),
         gbar_user_logged: GiveMeTheResult(lang, era, "/gbar_user_logged.txt"), // ext_t_g_u_l
         gbar_user_logged_index: GiveMeTheResult(lang, era, "/gbar_user_logged_index.txt"),
         gbar_user_logged_ig: GiveMeTheResult(lang, era, "/gbar_user_logged_ig.txt"),
-
-        ig_rightitem: GiveMeTheResult(lang, era, "/ig/rightitem.txt"),
 
         auth_mismatch: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
         auth_acc_disabled: GiveMeTheResult(lang, era, "/auth_mismatch.txt"),
@@ -448,14 +454,17 @@ function retriveTemplate(lang, era) {
     }
 
     const data = {
+        ig: { 
+            rightitem: fs.readFileSync(paths.ig.rightitem, "utf8"), 
+            setup_promo: fs.readFileSync(paths.ig.setup_promo, "utf8")
+        },
+
         gbar_user: fs.readFileSync(paths.gbar_user, "utf8"),
         gbar_user_index: fs.readFileSync(paths.gbar_user_index, "utf8"),
         gbar_user_ig: fs.readFileSync(paths.gbar_user_ig, "utf8"),
         gbar_user_logged: fs.readFileSync(paths.gbar_user_logged, "utf8"),
         gbar_user_logged_index: fs.readFileSync(paths.gbar_user_logged_index, "utf8"),
         gbar_user_logged_ig: fs.readFileSync(paths.gbar_user_logged_ig, "utf8"),
-
-        ig_rightitem: fs.readFileSync(paths.ig_rightitem, "utf8"), 
 
         auth_mismatch: fs.readFileSync(paths.auth_mismatch, "utf8"),
         auth_acc_disabled: fs.readFileSync(paths.auth_acc_disabled, "utf8"),
@@ -1260,7 +1269,14 @@ app.get('/ig', async (req, res) => {
     const filePath = await grabEraPath("/ig.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
 
     fs.readFile(filePath, async (err, data) => {
-        let repl = data.toString()
+        let conv;
+        if (language == "ja") {
+            conv = iconv.decode(data, 'shift_jis')
+        } else {
+            conv = data.toString();
+        }
+
+        let repl = conv;
 
         let SimLogin = undefined;
         try {
@@ -1278,10 +1294,13 @@ app.get('/ig', async (req, res) => {
         const ig_css_path = path.join(__dirname, "/assets/ig/skins", "teahouse", "teahouse_3.14am.css")
         const themecss = req.cookies.GS2009_ACCOUNTS ? (fs.existsSync(ig_css_path) ? await fs.readFileSync(ig_css_path).toString() : "") : ""
         if (!req.cookies.GS2009_ACCOUNTS) {
-            repl = repl.replace(/<!-- tab starts.*tab ends -->/sg, `<div class="setup_promo">Welcome to your Google homepage.&nbsp;&nbsp;<a href="javascript:_dlsetp('ss=2')">Make it your own</a>.<div class="setup_promo_subtext">(Already have a page? <a href="/accounts/ServiceLogin?service=ig&amp;passive=true&amp;continue=http://www.google.com/ig&amp;followup=http://www.google.com/ig&amp;cd=US&amp;hl=en&amp;nui=1&amp;ltmpl=default">Sign in</a> to see your stuff.)</div></div>`)
+            repl = repl.replace(/<!-- tab starts.*tab ends -->/sg, template.data.ig.setup_promo)
         }
-        repl = repl.replace("{gs2009_ig_rightItem}", template.data.ig_rightitem)
+        repl = repl.replace("{gs2009_browser_unsupported}", "")
+        repl = repl.replace("{gs2009_ig_rightItem}", template.data.ig.rightitem)
         repl = repl.replace(".ADDTHEMECONTENT{}", themecss)
+
+        if (language == "ja") {repl = iconv.encode(repl, 'shift_jis'); res.set("Content-Type", "text/html;charset=Shift_JIS")}
 
         res.send(repl)
     })
@@ -1498,9 +1517,10 @@ app.get('/search', async (req, res) => {
         if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
         else 
 
-        repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
-
         if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) {
+            repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
+
+            console.log(repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s))
             const links = repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s)[0]
                             .replace("!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing", "")
                             .replace(/<p>/g, "").replace(/<\/p>/g, "")
@@ -1910,7 +1930,7 @@ app.get('/search', async (req, res) => {
         templateToUse = templateToUse.replace(/UrlLink/g, add ? ("/interstitial?url=" + escape(search.link)) : search.link)
         templateToUse = templateToUse.replace(/htmlSnippet/g, add ? ('<a href="#">' + strings.search.mayharm + '</a><br>' + search.htmlSnippet) : search.htmlSnippet)
         templateToUse = templateToUse.replace(/htmlFormattedUrl/g, search.htmlFormattedUrl)
-        //repl = repl.replace(/displayLink/, search.displayLink)
+        repl = repl.replace(/displayLink/, search.displayLink)
         repl = repl.replace(/item/, templateToUse)
     })
 
@@ -1936,6 +1956,8 @@ app.get('/search', async (req, res) => {
 
     repl = repl.replace(/searchFinish/g, searchFinish.slice(0,4))
 
+    // old replacement 
+    /*
     if (req.query.start <= 9 || isNaN(req.query.start) == true) {
         repl = repl.replace(/<td class="b">[\s\S]*?<\/a>/, '')
         repl = repl.replace(/<td>\s*<a[^>]*href="\/search\?[^"]*">/, '<td class="cur"><a tabindex="-1" style="color:#a90a08;font-weight:bold">')
@@ -1974,6 +1996,9 @@ app.get('/search', async (req, res) => {
     } else {
         repl = repl.replace(/nextstart/, parseInt(req.query.start) + 10 )
     }
+    */
+
+
 
     repl = repl.replace(/formattedTotalResults/, result.data.searchInformation.formattedTotalResults)
     if (start != 0) {
