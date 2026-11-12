@@ -249,6 +249,15 @@ async function followPath(urlPath, era) {
         ["/images/malware_logo.gif", "./assets/images/malware_logo.gif"],
         ['/logos/olympics10-bg.jpg', './assets/logos/olympics10-bg.jpg'],
         ['/images/firefox/firefox35_v1.png', './assets/images/firefox/firefox35_v1.png'],
+        ['/images/firefox/title_bg.gif', './assets/images/firefox/title_bg.gif'],
+        ['/images/firefox/title.gif', './assets/images/firefox/title.gif'],
+        ['/images/firefox/fox1.gif', './assets/images/firefox/fox1.gif'],
+        ['/images/firefox/fox2.gif', './assets/images/firefox/fox2.gif'],
+        ['/images/firefox/footer1.gif', './assets/images/firefox/footer1.gif'],
+        ['/images/firefox/footer2.gif', './assets/images/firefox/footer2.gif'],
+        ['/images/firefox/footer3.gif', './assets/images/firefox/footer3.gif'],
+        ['/images/firefox/light.gif', './assets/images/firefox/light.gif'],
+        ['/images/firefox/google.gif', './assets/images/firefox/google.gif'],
         ['/images/firefox/sprite2.png', './assets/images/firefox/sprite2.png'],
         ['/images/firefox/gradsprite2.png', './assets/images/firefox/gradsprite2.png'],
         ['/accounts/mail.gif', './assets/images/accounts/mail.gif'],
@@ -1107,8 +1116,9 @@ app.get('/accounts/Login', async (req, res) => {
     res.send(repl)
 })
 
-app.get('/firefox', (req, res) => {
-    const filePath = path.join(__dirname, "/languages/" + language + "/defaults/" + "/firefox/index.html");
+app.get('/firefox', async (req, res) => {
+    const language = await getLanguage(req.host, req.cookies.GS2009_SETTINGS)
+    const filePath = await grabEraPath("/firefox/index.html", language, grabEras(grabSettings(req.cookies.GS2009_SETTINGS)));
     if (language == "ja") {
         fs.readFile(filePath, (err, data) => {
             res.set("Content-Type", "text/html;charset=Shift_JIS")
@@ -1139,6 +1149,8 @@ app.post('/accounts/LoginAuth', async (req, res) => {
     res.redirect('/');
     */
     
+    console.log(req.body)
+
     if (config.users.enablePasswordAuth ? (await user.auth(req.body.Email, user.md5saltMe(req.body.Passwd))) : await user.exists(req.body.Email, "boolean")) {
         // would implement session id
         let age = {};
@@ -2126,6 +2138,8 @@ const wallma = {
                 },
                 tabTable: {
                     html: `
+                    <script>function onpost() { return true; }</script>
+                    <form action="post" id="post" onsubmit="onpost()" method="post">
                     <style>
                     .prefgroup {width: 100%}
                     .pref_all {
@@ -2195,7 +2209,7 @@ const wallma = {
                     <table class="pref_all" border="0" id="table_pref_all"><tr><td colspan=2><table class="pref_tabs" cellspacing="0" cellpadding="0" border="0"><tr>
                 {tabs}
             <td align=right valign=top>
-              <nobr><input type=submit value="Save Preferences" name=submit2 ID="Submit1"></nobr>
+              <nobr><input formaction="/wallma/SendPreferences" formmethod="post" type=submit value="Save Preferences" name=submit2 ID="Submit1" /></nobr>
             </td>
           </tr>
         </table>
@@ -2209,7 +2223,7 @@ const wallma = {
         </table>
       </td>
     </tr>
-  </table>
+  </table></form>
                     `,
                     htmlObject: {
                         tab: '<td class="{tabStyle}"><a href="{tabHref}"><nobr>{tabTitle}</nobr> </td>'
