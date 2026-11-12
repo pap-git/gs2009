@@ -88,6 +88,7 @@ export default async function searxngfetch(searchip, query,
             results.data.error.desc = "<textarea rows=\"10\" cols=\"50\">" + e + "</textarea><br>URL is: <code>" + url + "</code><br><br><b>Tips:</b><br>     - This instance might not supporting the Google engine for scraping. Try another instance."
             return results
         }
+        console.log(json)
 
         const results = { 
             data: {

@@ -10,13 +10,13 @@ secretdb.json
 # ========================
 # temp captcha files, not in use for right now
 /websites
-config.json
+/config.json
 create.js
 output.html
 .gitignore
 
 .env
-config.toml
+/config.toml
 secretdb.json
 userdb.json
 

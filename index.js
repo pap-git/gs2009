@@ -1291,6 +1291,8 @@ app.get('/ig', async (req, res) => {
 
         repl = repl.replace(/gbar_username/g, SimLogin)
 
+        const igcssPath = path.join(__dirname, "/assets/ig/f/", grabEras(grabSettings(req.cookies.GS2009_SETTINGS)), "ig.css")
+        const igcss = fs.existsSync(igcssPath) ? fs.readFileSync(igcssPath).toString() : "";
         const ig_css_path = path.join(__dirname, "/assets/ig/skins", "teahouse", "teahouse_3.14am.css")
         const themecss = req.cookies.GS2009_ACCOUNTS ? (fs.existsSync(ig_css_path) ? await fs.readFileSync(ig_css_path).toString() : "") : ""
         if (!req.cookies.GS2009_ACCOUNTS) {
@@ -1298,6 +1300,7 @@ app.get('/ig', async (req, res) => {
         }
         repl = repl.replace("{gs2009_browser_unsupported}", "")
         repl = repl.replace("{gs2009_ig_rightItem}", template.data.ig.rightitem)
+        repl = repl.replace(".ADDIGCSS{}", igcss)
         repl = repl.replace(".ADDTHEMECONTENT{}", themecss)
 
         if (language == "ja") {repl = iconv.encode(repl, 'shift_jis'); res.set("Content-Type", "text/html;charset=Shift_JIS")}
@@ -2435,11 +2438,35 @@ app.get('/wallma/ManageServer/serverPreferences', async (req, res) => {
                 },
                 enablePasswordAuth: {
                     title: "",
-                    description: `<b>Enable Password for Accounts</b><br>troll option please dont do in public ok??`
+                    description: `<b>Enable Password for Accounts</b><br>troll option please dont disable in public ok??`
                 }
             },
             frontend: {
-                title: "Default Frontend Settings"
+                title: "Default Frontend Settings",
+                mayharm: {
+                    path: {
+                        title: "Path for rule file of \"Malware warning\"",
+                        description: "File to decide what domain/URL to show Malware warning (/interstitial)"
+                    }
+                },
+                defaults: {
+                    language: {
+                        "title": "Default language of instance",
+                        description: "Please look at the /language folder for available languages."
+                    },
+                    lang_dependsOnDomainAndParams: {
+                        title: "Change frontend language depends on domain",
+                        description: "Requires to add the instance IP to your client's hostsfile."
+                    },
+                    eras: {
+                        title: "Eras",
+                        description: "Change page HTML depends on era (example: 'mid2009').<br>If the era you've entered in here does not exists on your language, it will automatically fallback to English versions of the page."
+                    },
+                    roll_eras: {
+                        title: "Change Era depends on current date",
+                        description: "yuh"
+                    }
+                }
             }
         }
         function generate(parent, object) {

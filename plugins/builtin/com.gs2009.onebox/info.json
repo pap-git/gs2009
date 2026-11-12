@@ -1,0 +1,7 @@
+{
+    "name": "Weather Onebox",
+    "description": "Add weather onebox to gs2009 Search results. Will use ",
+    "attach": {
+        "onebox": "onebox.js"
+    }
+}
