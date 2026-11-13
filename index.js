@@ -640,8 +640,10 @@ async function downloadAllPath(listPath) {
             const item = array[count]
             if (!fs.existsSync(path.join(__dirname, "_downloaded", item[0]))) {
                 try {
+                    if (!fs.existsSync(path.join(__dirname, "_downloaded"))) fs.mkdirSync(path.join(__dirname, "_downloaded"), { recursive: true })
                     log.i("downloading doodle logos: " + item[0] + " [" + count + "/" + (array.length - 1) + "]", tag)
                     const result = await fetch(item[1]);
+                    if (!fs.existsSync(path.resolve(path.join(__dirname, "_downloaded", item[0], "..")))) fs.mkdirSync(path.resolve(path.join(__dirname, "_downloaded", item[0], "..")), { recursive: true })
                     const fileStream = fs.createWriteStream(path.resolve(path.join(__dirname, "_downloaded", item[0])), {"flags": "wx"})
                     await finished(Readable.fromWeb(result.body).pipe(fileStream))
                     if (!fs.existsSync(path.join(__dirname, "_downloaded", ".map.json"))) fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify([]))
@@ -649,6 +651,7 @@ async function downloadAllPath(listPath) {
                     fileMap.push([item[0], path.resolve(path.join(__dirname, "_downloaded", item[0]))])
                     fs.writeFileSync(path.join(__dirname, "_downloaded", ".map.json"), JSON.stringify(fileMap))
                 } catch(e) {
+                    console.log(e)
                     log.e("failed to download file, skipping: " + item[0] + " [" + count + "/" + (array.length - 1) + "]", tag)
                 } 
             } else {
