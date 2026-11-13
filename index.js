@@ -22,6 +22,7 @@ import { imageSizeFromFile } from "image-size/fromFile";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
 import os from "node:os"
+import cors from "cors"
 
 const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const gs2009_version = pjson.version
@@ -567,6 +568,12 @@ async function fetchResults({ askOtherCategories, existingfilePath }) {
     }
     return(result);
 }
+
+app.use(cors({
+    origin: "*",
+    credentials: true,
+    optionsSuccessStatus: 200
+}))
 
 app.use(express.json());
 app.use(express.urlencoded({

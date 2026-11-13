@@ -24,6 +24,7 @@
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
     "cookie-session": "^2.1.1",
+    "cors": "^2.8.6",
     "directory-tree": "^3.6.0",
     "dotenv": "^18.0.1",
     "encoding-japanese": "^2.2.0",
