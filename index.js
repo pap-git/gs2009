@@ -1539,10 +1539,10 @@ app.get('/search', async (req, res) => {
 
         repl = repl.replace(/topItem/g, template.data.search_notfound);
 
-        if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
+        if (getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009) repl = repl.replace(/<p>(\s+.+){1,2}\s+<div id="res" class="med">/, '<p><br></p></div><div id="res" class="med">')
         else 
 
-        if (getEraYears(req.cookies.GS2009_SETTINGS) >= 2009) {
+        if (getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009) {
             repl = repl.replace(/<div id="bsf" style="padding:1.8em 0;margin-top:0">.*<a href="\/experimental\/">.*<\/a>( ?(\r\n)?)*<\/div>/s, 'OKAYREPLACEMEBRO!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing')
 
             console.log(repl.match(/!!!ThisisJustThePlaceholderTextForTheUhhhhTheSearchthing( ?(\r\n)?)*<p>( ?(\r\n)?)*<a href="\/">Google.*<\/p>/s))
@@ -1757,7 +1757,7 @@ app.get('/search', async (req, res) => {
 
                 if (r) {
                     if (ad.on_top_of_search) {
-                        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
+                        if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009)) topadsHTML.push('<li class="tas"><h3><a id="pa1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite>&nbsp; &nbsp; &nbsp; ' + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</li>')
                         else {
                             topadsHTML.push((topAdsCount < 1 ? `<div style="padding-top:11px;"></div>` : "") + `<div id="tpa1" style="background-color:#e5ecf9;border:1px none #e5ecf9;" onmouseover="ss('go to www.iland.com','aw1')" onmouseout="cs()" onclick="ga(this,event)" class="ch taf">` + (topAdsCount < 1 ? `<div id="spl" align="right" style="padding-right:3px;float:right;"><font size="-1" class="f">` + strings.search.sponsored_links + `</font></div>` : "") + `<a id="pa1" href="` + ad.href + `" onmouseover="return ss('go to ` + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `','aw1')" onmouseout="cs()">` + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `</a><br><font size="-1"><span class="a">` + ad.domain + `</span>&nbsp; &nbsp; &nbsp;` + ad.snippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + `</font></div>`)
                         }
@@ -1773,8 +1773,8 @@ app.get('/search', async (req, res) => {
                             }
                         })
                         actualsnippets = actualsnippets.replace(/<br>(?!.*e)/, "")
-                        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
-                        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) adsHTML.push('<font size="+0"><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></font><br>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><span class="a">' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</span><br><br>')
+                        if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009)) adsHTML.push('<li><h3><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></h3>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><cite>' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</cite></li>')
+                        else if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) < 2009)) adsHTML.push('<font size="+0"><a id="an1" href="' + ad.href + '">' + ad.title.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</a></font><br>' + actualsnippets.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '<br><span class="a">' + ad.domain.replace(new RegExp(RegExp.escape(q), "ig"), "<b>$&</b>") + '</span><br><br>')
                     }
                 }
             })
@@ -1810,11 +1810,11 @@ app.get('/search', async (req, res) => {
 
         // todo: oh my god what the fuck man
         let adTables;
-        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
-        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) adTables = links1.length < 1 ? "" : '<table cellspacing="0" cellpadding="0" width="25%" align="right" id="mbEnd" bgcolor="#ffffff" border="0" class="ra"><tbody><tr><td colspan="4"><font size="-1">&nbsp;</font></td></tr><tr><td rowspan="5">&nbsp;&nbsp;</td><td width="1" bgcolor="#c9d7f1" rowspan="5"><img width="1" height="1" alt=""></td><td rowspan="5">&nbsp;&nbsp;</td><td height="25" align="center"><h2 class="sl f">' + strings.search.sponsored_links + '</h2></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td nowrap="" onmouseover="return ss()"><font size="-1">' + links1 + '</font></td><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td height="25" align="center"><font size="-1"></font></td></tr></tbody></table>'
+        if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009)) adTables = links1.length < 1 ? "" : '<table id="mbEnd" width="30%" align="right" style="margin-bottom:1em"><tbody><tr><td id="rhsline" style="padding-left:10px;border-left:1px solid #c9d7f1" class="std"><h2 style="text-align:center;margin:0;padding:0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" class="nobr">' + links1 + '</ol><p>&nbsp;</p></td></tr><tr><td id="rhspad" style="height: 0px;"></td></tr></tbody></table>'
+        else if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) < 2009)) adTables = links1.length < 1 ? "" : '<table cellspacing="0" cellpadding="0" width="25%" align="right" id="mbEnd" bgcolor="#ffffff" border="0" class="ra"><tbody><tr><td colspan="4"><font size="-1">&nbsp;</font></td></tr><tr><td rowspan="5">&nbsp;&nbsp;</td><td width="1" bgcolor="#c9d7f1" rowspan="5"><img width="1" height="1" alt=""></td><td rowspan="5">&nbsp;&nbsp;</td><td height="25" align="center"><h2 class="sl f">' + strings.search.sponsored_links + '</h2></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td nowrap="" onmouseover="return ss()"><font size="-1">' + links1 + '</font></td><tr height="7"><td><img width="1" height="1" alt=""></td></tr><tr><td height="25" align="center"><font size="-1"></font></td></tr></tbody></table>'
 
-        if ((getEraYears(req.cookies.GS2009_SETTINGS) >= 2009)) repl = repl.replace(/<div id="res"( class="med")?>/, adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
-        else if ((getEraYears(req.cookies.GS2009_SETTINGS) < 2009)) repl = repl.replace(/<div id="res">/, adTables + (links2.length < 1 ? "" : links2) + '<div id="res">')
+        if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) >= 2009)) repl = repl.replace(/<div id="res"( class="med")?>/, adTables + (links2.length < 1 ? "" : '<div class="c" id="tads"><h2 style="float:right;margin:3px 3px 0">' + strings.search.sponsored_links + '</h2><ol onmouseover="return true" style="padding:3px 0">' + links2 + '</ol></div>') + '<div id="res" class="med">')
+        else if ((getEraYears(grabSettings(req.cookies.GS2009_SETTINGS)) < 2009)) repl = repl.replace(/<div id="res">/, adTables + (links2.length < 1 ? "" : links2) + '<div id="res">')
     }
 
     if (grabSettings(req.cookies.GS2009_SETTINGS).before !== false) {
